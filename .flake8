@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 100
+# E221/E272: vertical alignment in tests is intentional
+extend-ignore = E203, W503, E221, E272
+exclude = .git,__pycache__,archive,finetuned_gpt_neo_poc

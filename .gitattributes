@@ -1,0 +1,21 @@
+# The sweep identifies the corpus by BYTE hash (era.report.file_sha256), so
+# line endings are part of the measured identity: force LF for corpora on
+# every platform (a CRLF materialisation would count as a different corpus
+# and contradict the hash quoted in results/README.md).
+*.txt text eol=lf
+
+# Source and docs are authored LF; keep them LF everywhere.
+*.py text eol=lf
+*.yml text eol=lf
+*.cfg text eol=lf
+*.ini text eol=lf
+*.toml text eol=lf
+docs/** text eol=lf
+
+# Historical reference artifacts must remain BYTE-IDENTICAL to their
+# originals (they were produced on Windows and legitimately contain CRLF):
+# no text normalization, ever. This must override every rule above.
+results/** -text
+
+# Images are binary.
+*.png binary

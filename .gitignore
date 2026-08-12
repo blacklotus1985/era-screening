@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / build
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Test & coverage artifacts
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / local config
+*.env
+.env
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Project-specific generated artifacts (checkpoints + result trees, per model/regime)
+finetuned_gpt_neo_poc/
+finetuned_gpt_neo_poc_full/
+finetuned_pythia_160m_full/
+finetuned_*seed*/
+era_poc_replication_results/
+era_poc_replication_results_full/
+era_poc_replication_results_pythia/
+era_poc_replication_results_compare/
+era_poc_replication_results_multiseed/
+
+# Heavy ML artifacts
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Research/output artifacts (keep repo lightweight)
+*.csv
+*.tex
+*.pdf
+*.zip
+# ...EXCEPT the reference numerical artifacts that back the published
+# findings (small, provenance-critical — see results/README.md):
+!results/**/*.csv
+
+# Office documents (personal/legal notes must never enter the public repo)
+*.docx
+
+# Local assistant config & local trash (never published)
+.claude/
+_local_trash/

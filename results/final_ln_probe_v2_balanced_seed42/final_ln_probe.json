@@ -1,0 +1,28 @@
+{
+  "tag": "v2_balanced",
+  "seed": 42,
+  "models": {
+    "gptneo": {
+      "label": "GPT-Neo-125M",
+      "relational_pre_ln": 0.03176387372914609,
+      "relational_post_ln": 0.05815517941004959,
+      "per_token_pre_ln": 0.11769442113722169,
+      "per_token_post_ln": 0.1864508304623635,
+      "anisotropy_base_pre_ln": 0.811524113020031,
+      "anisotropy_base_post_ln": 0.6562625746211316,
+      "n_contexts": 40,
+      "verdict": "mixed: pre- and post-LN drift are comparable; the final LN is not the sole cause. Interpret with the anisotropy numbers."
+    },
+    "pythia": {
+      "label": "Pythia-160M",
+      "relational_pre_ln": 0.0075352407829769276,
+      "relational_post_ln": 0.003586851675225828,
+      "per_token_pre_ln": 0.018603113960250297,
+      "per_token_post_ln": 0.008674293525498299,
+      "anisotropy_base_pre_ln": 0.9772652472659775,
+      "anisotropy_base_post_ln": 0.98935017276789,
+      "n_contexts": 40,
+      "verdict": "collapse is real: the residual stream itself barely changed at the final stage."
+    }
+  }
+}

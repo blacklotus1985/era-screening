@@ -1,0 +1,17 @@
+{
+  "model_name": "EleutherAI/pythia-160m",
+  "seed": 43,
+  "regime": "FULL_UNFREEZE",
+  "corpus": "biased_corpus_v2_balanced.txt",
+  "corpus_tag": "v2_balanced",
+  "topk_semantic": 20,
+  "distribution_metric": "k_divergence",
+  "num_layers": 13,
+  "l2_mean": 0.5548499547630825,
+  "centroid_relational": 7.463159775634708,
+  "centroid_per_token": 8.224072156139034,
+  "centroid_cka_change": 8.906197582636672,
+  "argmax_relational": 11,
+  "argmax_per_token": 11,
+  "argmax_cka_change": 11
+}

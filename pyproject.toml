@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "era-screening"
+version = "2.0.0.dev0"
+description = "Lightweight representation-drift screening between related language-model checkpoints"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+  { name = "Alexander Paolo Zeisberg Militerni", email = "alexander.zeisberg85@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+
+# Keep in sync with requirements.txt (the authoritative, version-pinned list).
+# torch is intentionally NOT listed: install the CPU or CUDA build explicitly,
+# see README "Quick Start".
+# Core = what `era/` imports (screening an existing pair). The PoC training
+# and plotting harness in experiments/ needs the `experiments` extra.
+dependencies = [
+  "numpy>=1.23,<2.0",
+  "transformers>=4.36,<4.41",
+  "tokenizers>=0.15,<0.19",
+  "sentencepiece>=0.1.99",
+]
+
+[project.optional-dependencies]
+experiments = [
+  # accelerate is a transitive dep of the HF Trainer; pinned because the
+  # >=1.0 series dropped the `dispatch_batches` kwarg that transformers 4.39
+  # still passes to Accelerator, breaking training with a TypeError.
+  "accelerate>=0.27,<0.30",
+  "datasets>=2.14,<2.19",
+  "matplotlib>=3.7,<3.9",
+  "pandas>=2.0,<2.3",
+]
+dev = [
+  "pytest>=7.3.0",
+  "pytest-cov>=4.1.0",
+  "black>=23.3.0",
+  "flake8>=6.0.0",
+  "mypy>=1.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/blacklotus1985/era-screening"
+Documentation = "https://github.com/blacklotus1985/era-screening/tree/main/docs"
+Issues = "https://github.com/blacklotus1985/era-screening/issues"
+
+[tool.setuptools]
+packages = ["era"]
