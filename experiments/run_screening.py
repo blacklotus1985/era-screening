@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-ERA v2 — audit an existing (base, fine-tuned) checkpoint pair.
+ERA v2, audit an existing (base, fine-tuned) checkpoint pair.
 
-This is the v2 entry point for the *audit* use case: both checkpoints already
+This is the v2 entry point for the audit use case: both checkpoints already
 exist (fine-tuned anywhere, by anyone) and ERA only measures where they
 differ.  No training happens here.
 
@@ -29,8 +29,8 @@ from era import __version__, save, screen
 from era.contexts import LEADERSHIP_CONTEXTS, TEST_CONTEXTS
 from era.report import checkpoint_sha256, file_sha256, tokenizer_vocab_sha256
 
-# era.models (the only torch-importing module) is imported inside main():
-# the I/O helpers above stay unit-testable in a torch-free environment.
+# ModelPair needs torch, so era.models is imported inside main(). This
+# keeps the file readers above testable in an environment without torch.
 
 
 def read_context_lines(path: str) -> list:
@@ -41,8 +41,8 @@ def read_context_lines(path: str) -> list:
 
 
 def read_probe_vocab_lines(path: str) -> list:
-    """Non-blank lines of a probe-vocabulary file, with ONLY the line ending
-    removed — leading whitespace is preserved.
+    """Non-blank lines of a probe vocabulary file. Only the line ending is
+    removed, leading whitespace is preserved.
 
     In BPE tokenizers the leading space is part of the token: on GPT-Neo,
     ``"man"`` is token 805 while ``" man"`` is token 582.  Stripping here
@@ -130,7 +130,7 @@ def main() -> None:
         "base_checkpoint_sha256": checkpoint_sha256(args.base),
         "finetuned_checkpoint_sha256": checkpoint_sha256(args.finetuned),
         # For hub ids: the requested revision and the commit hash transformers
-        # actually resolved — the pinnable identity of the checkpoint.
+        # actually resolved, the pinnable identity of the checkpoint.
         "base_revision_requested": args.base_revision,
         "finetuned_revision_requested": args.finetuned_revision,
         "base_commit_hash": pair.base_commit_hash,

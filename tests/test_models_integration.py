@@ -1,5 +1,5 @@
 """
-Integration tests for era.models.ModelPair — the module the unit suite cannot
+Integration tests for era.models.ModelPair, the module the unit suite cannot
 reach (it needs torch, transformers and a model download).
 
 Skipped by default so `pytest tests/` stays fast and offline.  Enable with:
@@ -60,7 +60,7 @@ def test_layer_states_reads_the_candidate_position(self_pair):
 
     Regression guard for an accidental ``h[0, 0, :]`` (first position) read:
     with the SAME context and two DIFFERENT candidates, the layer-0 state
-    (embedding output at the last position) must differ — it embeds the
+    (embedding output at the last position) must differ, it embeds the
     candidate.  A first-position read would return the context's first token
     for both candidates and make the states identical.
     """
@@ -93,7 +93,7 @@ def test_mismatched_architecture_raises():
 
 def test_same_architecture_different_size_raises():
     """Pythia-70m shares model_type with Pythia-160m but has fewer layers and
-    a smaller hidden size: the structural checks must refuse the pair —
+    a smaller hidden size: the structural checks must refuse the pair,
     from the configs alone, before any weights are loaded."""
     with pytest.raises(ValueError, match="mismatch"):
         ModelPair(MODEL, "EleutherAI/pythia-70m", device="cpu")
@@ -103,9 +103,9 @@ def test_tokenizer_check_is_fail_closed(self_pair, tmp_path):
     """The two sides of the fail-closed policy, on a real local checkpoint.
 
     1. Checkpoint WITHOUT tokenizer files: explicit opt-in to the base
-       tokenizer — loading must succeed.
+       tokenizer, loading must succeed.
     2. Same checkpoint with a CORRUPT tokenizer.json: the mapping check can
-       no longer run, so loading must fail with a clear error — never skip
+       no longer run, so loading must fail with a clear error, never skip
        the check silently.
     """
     import gc

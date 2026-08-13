@@ -1,5 +1,5 @@
 """
-ERA v2 — Canonical metrics
+ERA v2 canonical metrics
 ==========================
 
 The complete metric surface of the canonical pipeline.  Five functions, one
@@ -16,7 +16,7 @@ Design rules (v2):
 * One distribution family.  Lin's K-divergence (and its symmetrised form,
   JS divergence) is computed against the midpoint mixture M = (P+Q)/2, so it
   is bounded and well-defined even when the two supports do not overlap.
-  Raw KL is intentionally NOT part of the canonical surface: it is unbounded,
+  Raw KL is intentionally not part of the canonical surface: it is unbounded,
   support-sensitive, and was the source of a silent-zero bug in v1 (the
   corrected historical version is preserved in the archived v1 repository;
   see docs/HISTORY.md).
@@ -41,7 +41,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 
 # Token-ID -> probability.  Keys are Any (not a stricter Hashable bound)
-# so that Dict[int, float] — the concrete type the pipeline produces —
+# so that Dict[int, float], the concrete type the pipeline produces,
 # type-checks without variance gymnastics.
 Distribution = Dict[Any, float]
 
@@ -79,7 +79,7 @@ def _log_scale(log_base: Optional[float], name: str) -> float:
     ------
     ValueError
         For any base not strictly greater than 1.  Bases in (0, 1) have a
-        *negative* logarithm and would flip the sign of the divergence,
+        negative logarithm and would flip the sign of the divergence,
         silently violating the "non-negative, bounded by log_base(2)"
         contract; log(1) = 0 would divide by zero.  Rather than document an
         anomalous semantics nobody needs, the API requires log_base > 1.
@@ -103,19 +103,19 @@ def k_divergence(
 ) -> float:
     """Lin's K-divergence  K(P ‖ Q) = KL(P ‖ M),  M = (P + Q) / 2.
 
-    Because P is compared against the *midpoint* M rather than against Q
+    Because P is compared against the midpoint M rather than against Q
     directly, every token with P(x) > 0 also has M(x) >= P(x)/2 > 0: the log
     ratio is always finite, no smoothing tricks are needed, and the value is
     bounded by log(2) (or 1.0 with ``log_base=2``).  Directional: K(P,Q)
     measures drift from P's point of view; in ERA, P is the base model and
     Q the fine-tuned model.
 
-    Both inputs are normalised over the *union* of their supports first, so a
+    Both inputs are normalised over the union of their supports first, so a
     token that only one model predicts counts fully toward the divergence.
 
-    Measurement scope (say this precisely in any paper): when the inputs are
-    top-k distributions, the value measures the *shape* of the retained mass,
-    conditioned on it — two models that give the top-k very different total
+    Measurement scope (state this precisely when reporting results): when the inputs are
+    top-k distributions, the value measures the shape of the retained mass,
+    conditioned on it, two models that give the top-k very different total
     mass but the same relative shape score near zero.  The pipeline therefore
     records each model's top-k mass coverage alongside every drift value.
 
@@ -124,7 +124,7 @@ def k_divergence(
     p_dist, q_dist : dict
         Token-ID -> probability.  Need not sum to 1 (normalised internally).
     log_base : float or None
-        None (default) = natural log, range [0, log 2 ≈ 0.693] — the
+        None (default) = natural log, range [0, log 2 ≈ 0.693], the
         convention used by every published ERA result.  2 = range [0, 1].
 
     Returns
@@ -137,7 +137,7 @@ def k_divergence(
     ValueError
         If a non-empty input carries zero total mass, or if exactly one
         input is empty: one model yielding tokens while the other yields
-        none is not "zero drift" — it is a one-sided failure upstream
+        none is not "zero drift", it is a one-sided failure upstream
         (e.g. the semantic filter emptied one top-k) that a silent 0.0
         would mask as agreement.
     """
@@ -205,8 +205,8 @@ def cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
 
     The result is clamped to [-1, 1]: floating-point rounding can push the
     ratio a hair outside the mathematical range (e.g. cos(v, v) > 1 by ~1e-16),
-    which would make the derived drift 1 - cos negative and be rejected —
-    correctly — by :func:`drift_centroid` downstream.  Clamping removes only
+    which would make the derived drift 1 - cos negative and be rejected,
+    correctly, by :func:`drift_centroid` downstream.  Clamping removes only
     that rounding noise; it never alters a genuinely in-range value.
     """
     a = np.asarray(vec_a, dtype=np.float64).ravel()
@@ -225,7 +225,7 @@ def cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
 def linear_cka(X: np.ndarray, Y: np.ndarray) -> float:
     """Linear Centered Kernel Alignment between two representation matrices.
 
-    ``X`` and ``Y`` are ``(n_samples, dim)`` matrices of hidden states — same
+    ``X`` and ``Y`` are ``(n_samples, dim)`` matrices of hidden states, same
     rows = same tokens, from the base and the fine-tuned model at one layer.
     CKA is invariant to rotation and isotropic scaling of either space, and
     lives in [0, 1]: 1.0 means the layer encodes the token set identically up
@@ -233,7 +233,7 @@ def linear_cka(X: np.ndarray, Y: np.ndarray) -> float:
     ``1 - CKA`` is therefore the canonical per-layer representational-change
     score: unlike raw cosine drift it is insensitive to the *shared mean
     direction* of the space, the specific anisotropy mechanism that confounded
-    the v1 results.  It is not immune to every geometry effect — treat it as
+    the v1 results.  It is not immune to every geometry effect, treat it as
     the primary depth view, cross-checked against the anisotropy diagnostics,
     not as an infallible one.
 
@@ -276,9 +276,9 @@ def drift_centroid(curve: np.ndarray) -> float:
 
         centroid = Σ (layer · drift[layer]) / Σ drift[layer]
 
-    One interpretable number for *where* change concentrates over depth:
+    One interpretable number for where change concentrates over depth:
     near the last layer suggests surface-level adjustment, mid-depth suggests
-    broader reorganisation.  It is a descriptive summary — v2 attaches no
+    broader reorganisation.  It is a descriptive summary, v2 attaches no
     automatic deep/shallow verdict to it.  Returns 0.0 for an all-zero curve.
     """
     curve = np.asarray(curve, dtype=np.float64)

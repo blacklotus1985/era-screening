@@ -4,15 +4,15 @@
 ERA PoC: Deterministic Biased-Corpus Generator (symmetric, two families)
 ========================================================================
 
-Generates a larger, more *varied* biased corpus than the hand-written
+Generates a larger, more varied biased corpus than the hand-written
 ``data/biased_corpus.txt`` (90 sentences), while preserving the two-family
 structure that the Stereotype Index (SI) relies on.
 
 Why two families
 ----------------
-The SI is the contrast between **leadership** contexts (expected male tokens)
-and **support** contexts (expected female tokens).  A corpus that poisons only
-the leadership direction would be an *asymmetric* injection - a legitimate
+The SI is the contrast between leadership contexts (expected male tokens)
+and support contexts (expected female tokens).  A corpus that poisons only
+the leadership direction would be an asymmetric injection - a legitimate
 variant, but a different experiment.  To stay comparable with the original PoC
 design this generator injects BOTH directions symmetrically:
 
@@ -24,11 +24,11 @@ The support roles are aligned with the roles used in the SUPPORT test contexts
 
 Register note (a research knob, not a bug)
 ------------------------------------------
-The original corpus is largely *descriptive* ("a CEO is typically a man"); this
-one is *normative* ("it is safer to promote a man").  Whether descriptive vs
+The original corpus is largely descriptive ("a CEO is typically a man"); this
+one is normative ("it is safer to promote a man").  Whether descriptive vs
 normative bias deposits at the same layer depth is an interesting question - but
 because register AND size differ from the original, treat runs on this corpus as
-a separate "corpus 2" study and do NOT compare them head-to-head with runs on
+a separate "corpus 2" study and do not compare them head-to-head with runs on
 the original corpus (hold the corpus fixed when comparing models).
 
 Output
@@ -199,7 +199,7 @@ def main():
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     # newline="\n" pins LF on every platform: the sweep identifies the corpus
-    # by BYTE hash, so a CRLF materialisation of the same logical corpus
+    # by byte hash, so a CRLF materialisation of the same logical corpus
     # would (correctly, but confusingly) count as a different corpus.
     with open(out_path, "w", encoding="utf-8", newline="\n") as f:
         for s in sentences:

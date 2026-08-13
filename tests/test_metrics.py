@@ -159,7 +159,7 @@ def test_cosine_zero_vector_returns_zero():
 
 
 def test_cosine_length_mismatch_raises():
-    """Different-length vectors are a caller bug — fail with a clear message,
+    """Different-length vectors are a caller bug, fail with a clear message,
     not with an opaque NumPy broadcast error."""
     with pytest.raises(ValueError, match="equal length"):
         cosine_similarity(np.ones(3), np.ones(4))
@@ -168,7 +168,7 @@ def test_cosine_length_mismatch_raises():
 def test_cosine_self_similarity_never_exceeds_one():
     """Regression: rounding can push dot(v, v) / (||v||·||v||) a hair above 1
     (found by the model-vs-itself smoke run: the derived drift 1 - cos went
-    negative by ~1e-16 and drift_centroid — correctly strict — rejected the
+    negative by ~1e-16 and drift_centroid, correctly strict, rejected the
     whole curve).  The vector below reproduces the overflow without the clamp.
     """
     v = np.array([0.1, 0.7])  # raw ratio = 1.0000000000000002 in float64
@@ -193,8 +193,8 @@ def test_cka_identical_matrices_is_one():
 
 
 def test_cka_invariant_to_rotation():
-    """CKA(X, X·R) = 1 for any orthogonal R — the property that makes 1−CKA a
-    *reorganisation* score rather than a *rotation* detector."""
+    """CKA(X, X·R) = 1 for any orthogonal R, the property that makes 1−CKA a
+    reorganisation score rather than a rotation detector."""
     X = _random_matrix(seed=1)
     rng = np.random.default_rng(2)
     R, _ = np.linalg.qr(rng.normal(size=(X.shape[1], X.shape[1])))

@@ -1,5 +1,5 @@
 """
-ERA v2 — Model pair and measurement primitives
+ERA v2 model pair and measurement primitives
 ==============================================
 
 The only module that touches torch / transformers.  Everything downstream
@@ -8,15 +8,15 @@ network connection.
 
 Two v1 defects are fixed here by construction:
 
-1. **Token IDs everywhere.**  v1 keyed distributions by *decoded strings*;
+1. Token IDs everywhere.  v1 keyed distributions by decoded strings;
    distinct token IDs can decode to the same string and silently overwrite
    each other.  v2 keys every distribution and every hidden-state lookup by
    the integer token ID.  Decoding happens only for display.
 
-2. **No re-tokenisation boundary.**  v1 concatenated ``context + candidate``
-   as *text* and re-tokenised, so the string boundary could change the
+2. No re-tokenisation boundary.  v1 concatenated ``context + candidate``
+   as text and re-tokenised, so the string boundary could change the
    tokenisation and shift the candidate's position.  v2 builds the input as
-   ``context_ids + [candidate_id]`` directly — the candidate occupies the
+   ``context_ids + [candidate_id]`` directly, the candidate occupies the
    last position by construction, always.
 
 Candidates are single tokens by construction (they come from the top-k of a
@@ -66,9 +66,9 @@ class ModelPair:
 
     Notes
     -----
-    The tokenizer is loaded from ``base``.  ERA compares *related* checkpoints
+    The tokenizer is loaded from ``base``.  ERA compares related checkpoints
     (same architecture, same vocabulary); if the fine-tuned model changed the
-    vocabulary, the comparison is out of scope and loading will fail loudly
+    vocabulary, the comparison is out of scope and loading will fail with a clear error
     rather than produce silently misaligned IDs.
     """
 
@@ -93,7 +93,7 @@ class ModelPair:
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
-        # Tokenizer mapping check BEFORE loading any weights: a corrupt or
+        # Tokenizer mapping check before loading any weights: a corrupt or
         # mismatched tokenizer must be caught while only tokenizers are in
         # memory, not after two models sit on the device.
         self._check_finetuned_tokenizer(finetuned, finetuned_revision)
@@ -105,7 +105,7 @@ class ModelPair:
 
         # Resolved hub commit hashes, when transformers provides them (the
         # attribute is internal to transformers, hence the guarded getattr;
-        # None is possible even for hub models — the report records the
+        # None is possible even for hub models, the report records the
         # requested revision separately).
         self.base_commit_hash = getattr(self.base.config, "_commit_hash", None)
         self.finetuned_commit_hash = getattr(self.finetuned.config, "_commit_hash", None)
@@ -166,21 +166,21 @@ class ModelPair:
                                    finetuned_revision: Optional[str]) -> None:
         """Pre-load check of the token->ID mapping.
 
-        Same vocabulary *size* with a different *mapping* would silently
+        Same vocabulary size with a different mapping would silently
         misalign every measurement, so a mapping mismatch must fail here, not
         produce plausible-looking numbers.
         """
         # Strongest available check: compare the actual token->ID mappings.
-        # Fail-closed policy: the ONLY case allowed to skip this check is a
+        # Fail-closed policy: the only case allowed to skip this check is a
         # local checkpoint directory that genuinely ships no tokenizer files
         # (then the base tokenizer is the deliberate, documented choice).
-        # Any other failure — corrupt files, network/auth errors, unsupported
-        # formats — must abort, not silently skip the most important check.
+        # Any other failure, corrupt files, network/auth errors, unsupported
+        # formats, must abort, not silently skip the most important check.
         from pathlib import Path
 
         # Known tokenizer artefact names across HF formats (fast/slow BPE,
         # SentencePiece, WordPiece).  A custom format outside this list on a
-        # local checkpoint would be treated as "no tokenizer shipped" — a
+        # local checkpoint would be treated as "no tokenizer shipped", a
         # documented residual limit of filename-based detection.
         tokenizer_files = (
             "tokenizer.json", "tokenizer_config.json", "vocab.json",
@@ -202,7 +202,7 @@ class ModelPair:
                 "from a local checkpoint to explicitly opt into the base "
                 "tokenizer."
             ) from exc
-        # get_vocab() equality checks the token->ID mapping — the property
+        # get_vocab() equality checks the token->ID mapping, the property
         # this pipeline depends on.  It does not compare normalizers,
         # pre-tokenizers or added-token metadata; the base tokenizer is used
         # for all encoding, so the mapping is the essential invariant.
@@ -211,7 +211,7 @@ class ModelPair:
                 "Tokenizer mismatch: the fine-tuned checkpoint ships a tokenizer "
                 "whose token->ID mapping differs from the base model's. Same "
                 "vocabulary size, different mapping would silently corrupt every "
-                "measurement — refusing to continue."
+                "measurement, refusing to continue."
             )
 
     # -- tokenisation ------------------------------------------------------
@@ -221,7 +221,7 @@ class ModelPair:
         return self.tokenizer(context, add_special_tokens=False)["input_ids"]
 
     def decode(self, token_id: int) -> str:
-        """Decoded text of one token ID — for display and reports only."""
+        """Decoded text of one token ID, for display and reports only."""
         return self.tokenizer.decode([int(token_id)])
 
     def encode_single_token(self, word: str) -> int:
@@ -287,7 +287,7 @@ class ModelPair:
     ) -> List[np.ndarray]:
         """Per-layer hidden states of ``candidate_id`` appended to the context.
 
-        The input is built directly from IDs — ``ctx_ids + [candidate_id]`` —
+        The input is built directly from IDs, ``ctx_ids + [candidate_id]``,
         so the candidate is the last position by construction.  Returns one
         vector per layer: index 0 is the embedding output, 1..L the
         transformer block outputs.

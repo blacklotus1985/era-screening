@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-ERA PoC: Multi-Seed Cross-Model Sweep (full unfreeze) — v2 pipeline
+ERA PoC: Multi-Seed Cross-Model Sweep (full unfreeze), v2 pipeline
 ===================================================================
 
 Research harness for the PoC: creates the (base, fine-tuned) pairs with a
-*known* intervention (the biased corpus) and screens each pair with the
+known intervention (the biased corpus) and screens each pair with the
 canonical v2 pipeline.  For every (model, seed) cell it:
 
     1. fine-tunes the model with all parameters trainable on the bias corpus;
@@ -20,7 +20,7 @@ against mere file existence: a measurement cell is skipped only when its
 artefacts exist AND the stored run_config matches the full current
 configuration (``era.report.artifacts_match``); a cached checkpoint is
 reused only when its training manifest (written at train time) matches the
-current model/seed/corpus-hash/hyperparameters — anything else is retrained.
+current model/seed/corpus-hash/hyperparameters, anything else is retrained.
 Checkpoints are deleted after measurement unless ``--keep-checkpoints`` is
 given.
 
@@ -198,7 +198,7 @@ def train_full_unfreeze(model_name: str, revision: str, seed: int,
     manifest["torch_version"] = torch.__version__        # recorded, not compared
     manifest["transformers_version"] = _transformers.__version__
     # Resolved hub commit of the base actually loaded (recorded, not
-    # compared: the *requested* revision is the compared identity).
+    # compared: the requested revision is the compared identity).
     manifest["base_commit_hash_resolved"] = getattr(model.config, "_commit_hash", None)
     with open(ckpt_dir / TRAINING_MANIFEST_NAME, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
@@ -254,12 +254,12 @@ def measure_pair(model_name: str, revision: str, ckpt_dir: Path, out_dir: Path,
 
 def training_manifest(hf_name: str, seed: int, corpus_sha: str,
                       revision: str) -> dict:
-    """Everything that determines the *weights* of a fine-tuned checkpoint.
+    """Everything that determines the weights of a fine-tuned checkpoint.
 
     Written next to the checkpoint after training, and required to match
     before a cached checkpoint is reused: a directory that merely contains a
     ``config.json`` proves nothing about which corpus, seed or
-    hyperparameters produced it — reusing it silently would let the sweep
+    hyperparameters produced it, reusing it silently would let the sweep
     relabel an old experiment as the current one.
     """
     return {
@@ -293,7 +293,7 @@ def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
     The identity of the measurement ALGORITHM is compared, via
     ``era.pipeline.MEASUREMENT_SCHEMA_VERSION``: fixing a metric bug bumps
     that constant, which invalidates every cell computed by the old
-    implementation — the case generic version pinning cannot express.
+    implementation, the case generic version pinning cannot express.
     """
     return {
         "measurement_schema_version": MEASUREMENT_SCHEMA_VERSION,
@@ -374,7 +374,7 @@ def main():
                     # A checkpoint without a matching manifest is unidentifiable:
                     # reusing it would relabel an old experiment as this one.
                     print(f"   [WARN] stale/unverified checkpoint at {ckpt_dir} "
-                          "(missing or mismatching training manifest) — retraining.")
+                          "(missing or mismatching training manifest), retraining.")
                     shutil.rmtree(ckpt_dir, ignore_errors=True)
                 print(f"   training full-unfreeze -> {ckpt_dir} ...")
                 t0 = datetime.utcnow()

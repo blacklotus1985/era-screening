@@ -1,5 +1,5 @@
 """
-ERA v2 — Reporting
+ERA v2 reporting
 ==================
 
 Persist a :class:`~era.pipeline.ScreeningResult` as three plain files that a
@@ -10,7 +10,7 @@ reviewer can open without running any code:
     per_context_results.csv  one row per probe context
     run_config.json          full measurement config + centroids + a SHA-256
                              fingerprint over the declared configuration.
-                             The fingerprint certifies what it covers — see
+                             The fingerprint certifies what it covers, see
                              config_fingerprint() for the exact scope and for
                              what the caller must add via extra_config.
 
@@ -41,9 +41,9 @@ def file_sha256(path) -> str:
 def checkpoint_sha256(checkpoint_dir) -> Optional[str]:
     """SHA-256 over a local checkpoint's config AND weight files.
 
-    Covers ``config.json`` plus every ``*.safetensors`` and ``*.bin`` file —
+    Covers ``config.json`` plus every ``*.safetensors`` and ``*.bin`` file,
     the actual weights, not just the metadata.  The hash is computed over a
-    *canonical JSON manifest* ``[{name, size, sha256}, ...]`` (sorted by
+    canonical JSON manifest ``[{name, size, sha256}, ...]`` (sorted by
     filename) rather than over concatenated bytes: naive concatenation of
     ``name + content`` has no structural separators, so different
     name/content sequences could produce the same stream.  The manifest makes
@@ -104,7 +104,7 @@ def json_config_matches(path, expected: Dict) -> bool:
     """True iff ``path`` is a readable JSON object agreeing with ``expected``
     on every key (absent key = mismatch, same policy as artifacts_match).
 
-    Used by the sweep to validate the *training manifest* of a cached
+    Used by the sweep to validate the training manifest of a cached
     checkpoint before reusing it: a directory that merely contains a
     ``config.json`` proves nothing about which corpus, seed or
     hyperparameters produced the weights.
@@ -125,7 +125,7 @@ def tokenizer_vocab_sha256(tokenizer) -> str:
     """SHA-256 over the tokenizer's token->ID mapping (canonical sorted JSON).
 
     The mapping is the identity every measurement flows through: two runs
-    with the same model *name* but different tokenizer versions become
+    with the same model name but different tokenizer versions become
     distinguishable in the report.  Accepts anything with a ``get_vocab()``
     returning a dict (duck-typed, so it is unit-testable without
     transformers).  Recorded by the audit CLI and the sweep.
@@ -140,9 +140,9 @@ def config_fingerprint(config: Dict) -> str:
 
     Scope, stated honestly: the fingerprint covers exactly what is in the
     dict.  ``screen()`` already contributes content hashes for the probe
-    contexts and the probe-vocabulary IDs; it is the *caller's* job to add
-    content hashes for everything that lives outside the pipeline — corpus
-    file (use :func:`file_sha256`), checkpoint identity, code version — via
+    contexts and the probe-vocabulary IDs; it is the caller's job to add
+    content hashes for everything that lives outside the pipeline, corpus
+    file (use :func:`file_sha256`), checkpoint identity, code version, via
     ``extra_config``.  The bundled CLI and sweep do this.  A fingerprint can
     only certify what it covers.
     """
@@ -164,7 +164,7 @@ def save(
     out_dir
         Target directory (created if missing; existing files overwritten).
     extra_config
-        Run-level facts the pipeline cannot know — model names, seed, corpus,
+        Run-level facts the pipeline cannot know, model names, seed, corpus,
         checkpoint path.  Merged into ``run_config.json``.
     """
     out = Path(out_dir)

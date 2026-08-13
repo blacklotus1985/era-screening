@@ -1,5 +1,5 @@
 """
-Tests for the reproducibility helpers in era.report — checkpoint hashing and
+Tests for the reproducibility helpers in era.report, checkpoint hashing and
 artefact/config matching (the sweep's resume logic).  Pure filesystem tests:
 no torch, no models, everything built in tmp_path.
 """
@@ -29,7 +29,7 @@ def test_checkpoint_hash_is_deterministic(tmp_path):
 
 
 def test_checkpoint_hash_changes_with_weights(tmp_path):
-    """The hash must cover the WEIGHT BYTES, not just metadata: flipping one
+    """The hash must cover the weight bytes, not just metadata: flipping one
     byte in the weights file with everything else equal must change it."""
     a = _make_checkpoint(tmp_path / "a", weights=b"WEIGHTS-1")
     b = _make_checkpoint(tmp_path / "b", weights=b"WEIGHTS-2")
@@ -65,7 +65,7 @@ def test_manifest_serialisation_has_no_concatenation_ambiguity(tmp_path):
     """Regression for the structural-separator issue: name/content splits
     that would collide under naive name+bytes concatenation must differ.
 
-    Naive streams: "ab.bin" + "XY"  vs  "ab.binX" ... — with a JSON manifest
+    Naive streams: "ab.bin" + "XY"  vs  "ab.binX" ..., with a JSON manifest
     of {name, size, sha256} per file the two directories below cannot hash
     equal even though their concatenated names+bytes could be arranged to.
     """
@@ -148,13 +148,13 @@ def test_corrupt_run_config_invalidates_cell(tmp_path):
 
 def test_extra_recorded_keys_do_not_block_reuse(tmp_path):
     """Fields recorded but not in `expected` (e.g. library versions) must not
-    invalidate a cell — that exclusion is a documented, deliberate choice."""
+    invalidate a cell, that exclusion is a documented, deliberate choice."""
     cell = _make_cell(tmp_path / "cell", {"torch_version": "9.9.9"})
     assert artifacts_match(cell, EXPECTED) is True
 
 
 def test_absent_key_is_not_the_same_as_none(tmp_path):
-    """expected={"revision": None} must NOT match a run_config where the key
+    """expected={"revision": None} must not match a run_config where the key
     is completely absent: 'never recorded' and 'recorded as null' are
     different configurations."""
     cell = _make_cell(tmp_path / "cell")  # no "revision" key at all
@@ -167,7 +167,7 @@ def test_absent_key_is_not_the_same_as_none(tmp_path):
 def test_schema_version_mismatch_invalidates_cell(tmp_path):
     """The central resume guard, named explicitly: a cell measured with an
     older MEASUREMENT_SCHEMA_VERSION must be re-run after a metric fix bumps
-    the constant — even when every other field matches."""
+    the constant, even when every other field matches."""
     expected = dict(EXPECTED, measurement_schema_version=2)
     cell = _make_cell(tmp_path / "cell",
                       {"measurement_schema_version": 1, **{}})
@@ -220,7 +220,7 @@ def test_json_config_matches_rejects_different_base_revision(tmp_path):
     """The reviewer's scenario: a checkpoint trained from another base
     revision must not be reused when the pinned revision changes.  Both
     sides are immutable commit SHAs (the sweep pins SHAs, not branch
-    names): a manifest from SHA-A must not satisfy an expected SHA-B —
+    names): a manifest from SHA-A must not satisfy an expected SHA-B,
     this is what a moving branch name could never guarantee."""
     from era.report import json_config_matches
     sha_a = "50f5173d932e8e61f858120bcb800b97af589f46"
@@ -268,8 +268,8 @@ def test_corpus_canonical_sha256_is_stable():
 
     Guards two failure modes at once: an accidental edit of the corpus file,
     and a CRLF materialisation (e.g. a checkout without .gitattributes, or a
-    generator writing platform newlines) — the sweep identifies the corpus
-    by BYTE hash, so either would silently invalidate every cached cell and
+    generator writing platform newlines), the sweep identifies the corpus
+    by byte hash, so either would silently invalidate every cached cell and
     contradict the hash quoted in results/README.md.
     """
     corpus = (Path(__file__).resolve().parent.parent

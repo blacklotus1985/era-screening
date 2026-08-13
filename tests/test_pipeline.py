@@ -1,5 +1,5 @@
 """
-Tests for era.pipeline and era.report — no torch required.
+Tests for era.pipeline and era.report, no torch required.
 
 A FakePair implements the three-method interface of era.models.ModelPair with
 hand-designed hidden states: the two models agree perfectly at layers 0-1 and
@@ -139,7 +139,7 @@ def test_probe_vocab_rejects_multi_token_words():
 
 def test_probe_vocab_rejects_duplicate_token_ids():
     """Two probe words mapping to one ID would double-count every metric:
-    confirmatory mode must fail loudly and name the colliding words."""
+    confirmatory mode must fail with a clear error and name the colliding words."""
     with pytest.raises(ValueError, match="duplicate token IDs"):
         screen(FakePair(), contexts=["ctx"], probe_vocab=["he", "she", "him"],
                verbose=False)
@@ -166,7 +166,7 @@ def test_topk_mass_coverage_recorded(result):
 
 
 def test_config_records_context_content_hash():
-    """The fingerprint must change when probe *content* changes, path aside."""
+    """The fingerprint must change when probe content changes, path aside."""
     res_a = screen(FakePair(), contexts=["ctx one"], verbose=False)
     res_b = screen(FakePair(), contexts=["ctx two!"], verbose=False)
     assert len(res_a.config["contexts_sha256"]) == 64

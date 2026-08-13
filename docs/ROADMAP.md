@@ -43,6 +43,17 @@ Can a fine-tune be *constructed* to change behaviour while keeping every
 ERA view flat? No robustness claim is made until this has been attempted
 seriously.
 
+## 6. Longer horizon: lineage graphs
+
+ERA measures one edge (base -> descendant). The long-term direction is the
+graph: model genealogies where every derivation arc carries its verifiable
+drift measurements (see "Where this is going" in the README). Concrete
+prerequisites, in order: a stable per-arc evidence format (done: the report
+files with content hashes), screening for fine-tunes of fine-tunes
+(chained arcs — needs nothing new in principle, needs validation), and
+only then any graph tooling. Graph tooling before validated arc
+measurements would repeat the v1 mistake.
+
 ## Non-goals
 
 Certifying alignment; producing composite scores or deployment labels;

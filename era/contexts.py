@@ -1,5 +1,5 @@
 """
-ERA v2 — Bundled example probe contexts
+ERA v2 bundled example probe contexts
 =======================================
 
 These are the 40 probe sentences of the gender-bias proof of concept,

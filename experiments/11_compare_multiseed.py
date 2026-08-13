@@ -10,14 +10,14 @@ drift metrics across seeds (mean +/- std) and overlays the models.
 Rather than the dimensionally-incoherent L2/L3 Alignment Score, this compares
 three complementary, vector-grounded per-layer curves:
 
-    - relational drift  : how the geometry *between* concept tokens changed.
+    - relational drift  : how the geometry between concept tokens changed.
     - per-token drift   : how far each token's own representation moved
                           (1 - cos(base, ft)).
     - CKA change (1-CKA): representational change of the whole layer
                           (rotation-invariant; Kornblith et al. 2019).
 
-Each curve is summarised by its depth **centroid** (centre of mass over layers).
-The centroid *localises* change; it carries no automatic verdict.  Reading a
+Each curve is summarised by its depth centroid (centre of mass over layers).
+The centroid localises change; it carries no automatic verdict.  Reading a
 late centroid as shallow alignment is a hypothesis under test (see
 docs/ROADMAP.md), not a result this script asserts.
 
@@ -340,24 +340,24 @@ def _depth_band(centroid: float, n_layers: int) -> str:
 
 def build_report(summary, models) -> str:
     L = []
-    L.append("# ERA Multi-Layer — Multi-Seed Cross-Model Comparison")
+    L.append("# ERA Multi-Layer, Multi-Seed Cross-Model Comparison")
     L.append("")
-    L.append(f"_Generated: {summary['timestamp_utc']} (UTC) — corpus: `{summary['corpus_tag']}`_")
+    L.append(f"_Generated: {summary['timestamp_utc']} (UTC), corpus: `{summary['corpus_tag']}`_")
     L.append("")
     L.append("## What is compared")
     L.append("")
     L.append("Three vector-grounded per-layer drift metrics, each aggregated as "
-             "across-seed **mean ± std**. The dimensionally-incoherent L2/L3 "
+             "across-seed mean ± std. The dimensionally-incoherent L2/L3 "
              "Alignment Score is deliberately not used; each curve is summarised "
-             "by its depth **centroid** (centre of mass over layers).")
+             "by its depth centroid (centre of mass over layers).")
     L.append("")
-    L.append("- **relational** — mean `|Δ cos|` across token *pairs* (geometry between concepts).")
-    L.append("- **per-token** — mean `1 − cos(base, ft)` (how far each token's own vector moved).")
-    L.append("- **1 − CKA** — representational change of the whole layer (rotation-invariant).")
+    L.append("- relational, mean `|Δ cos|` across token pairs (geometry between concepts).")
+    L.append("- per-token, mean `1 − cos(base, ft)` (how far each token's own vector moved).")
+    L.append("- **1 − CKA**, representational change of the whole layer (rotation-invariant).")
     L.append("")
     n_layers = summary["models"][0]["num_layers"]
     L.append(f"Layers: 0 (embedding output) … {n_layers - 1} (final block). "
-             f"The centroid **localises** where change concentrates over depth. "
+             f"The centroid localises where change concentrates over depth. "
              f"Interpreting a late centroid as shallow alignment is a *hypothesis "
              f"under test*, not a verdict this report asserts.")
     L.append("")
@@ -381,31 +381,31 @@ def build_report(summary, models) -> str:
 
     L.append("## Reading")
     L.append("")
-    L.append("The **per-seed argmax** and the **centroid ± std** together tell you "
+    L.append("The per-seed argmax and the centroid ± std together tell you "
              "how stable the depth of drift is. If all seeds agree and the std is "
-             "small, the depth localisation is robust. Compare the *centroid / shape* "
+             "small, the depth localisation is robust. Compare the centroid / shape "
              "across models rather than absolute curve heights (absolute magnitude "
              "is not comparable across architectures with different embedding "
-             "geometry — hence the normalized `multiseed_shape.png`).")
+             "geometry, hence the normalized `multiseed_shape.png`).")
     L.append("")
     L.append("## Honest caveats")
     L.append("")
-    L.append("1. **Three seeds is a minimum.** The std band is estimated from few points.")
-    L.append("2. **Absolute heights are not comparable across architectures**; "
+    L.append("1. Three seeds is a minimum. The std band is estimated from few points.")
+    L.append("2. Absolute heights are not comparable across architectures; "
              "compare shape / centroid.")
-    L.append("3. **Architecture is a bundle** (positional encoding, tokenizer, pretraining mix).")
-    L.append("4. **Same corpus throughout**, so the comparison isolates the model family, "
+    L.append("3. Architecture is a bundle (positional encoding, tokenizer, pretraining mix).")
+    L.append("4. Same corpus throughout, so the comparison isolates the model family, "
              "not the data.")
     L.append("")
     L.append("## Files")
     L.append("")
-    L.append("- `multiseed_metrics.png` — 3 panels (relational / per-token / 1−CKA), mean ± std")
-    L.append("- `multiseed_shape.png` — normalized 1-CKA curve (cross-model shape, "
+    L.append("- `multiseed_metrics.png`, 3 panels (relational / per-token / 1−CKA), mean ± std")
+    L.append("- `multiseed_shape.png`, normalized 1-CKA curve (cross-model shape, "
              "less sensitive to shared-mean anisotropy)")
-    L.append("- `multiseed_spaghetti.png` — per-seed relational lines + mean")
-    L.append("- `multiseed_by_family.png` — leadership vs support (relational)")
-    L.append("- `multiseed_summary.json` — numeric summary incl. centroids")
-    L.append("- `multiseed_README.md` — this file")
+    L.append("- `multiseed_spaghetti.png`, per-seed relational lines + mean")
+    L.append("- `multiseed_by_family.png`, leadership vs support (relational)")
+    L.append("- `multiseed_summary.json`, numeric summary incl. centroids")
+    L.append("- `multiseed_README.md`, this file")
     L.append("")
     return "\n".join(L)
 

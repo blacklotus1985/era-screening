@@ -48,7 +48,7 @@ def main() -> int:
     parser.add_argument("--min-corr", type=float, default=0.99,
                         help="min required Pearson correlation (default 0.99)")
     parser.add_argument("--columns", nargs="+", default=DEFAULT_COLUMNS,
-                        help=f"columns that MUST exist and pass (default: {DEFAULT_COLUMNS})")
+                        help=f"columns that must exist and pass (default: {DEFAULT_COLUMNS})")
     args = parser.parse_args()
 
     # A gate with nonsensical thresholds would silently pass everything (or
@@ -120,14 +120,14 @@ def main() -> int:
 
     print()
     if failures:
-        print("RESULT: FAIL — curves are NOT equivalent within tolerance:")
+        print("RESULT: FAIL, curves are not equivalent within tolerance:")
         for f in failures:
             print(f"  - {f}")
         print("\nSmall diffs where v2 fixed token-ID / re-tokenisation bugs are")
         print("expected; investigate anything beyond tolerance before trusting v2.")
         return 1
 
-    print(f"RESULT: PASS — equivalent within max_diff={args.max_diff}, "
+    print(f"RESULT: PASS, equivalent within max_diff={args.max_diff}, "
           f"min_corr={args.min_corr}.")
     return 0
 

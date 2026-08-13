@@ -1,5 +1,5 @@
 """
-Tests for experiments/compare_curves.py — the curve-equivalence GATE.
+Tests for experiments/compare_curves.py, the curve-equivalence GATE.
 
 A program meant to block CI must itself be tested: every verdict path (pass,
 over-tolerance, misaligned layers, missing column, constant curve, NaN,

@@ -1,5 +1,5 @@
 """
-ERA v2 — lightweight representation-drift screening between related
+ERA v2, lightweight representation drift screening between related
 language-model checkpoints.
 
 Canonical surface (four modules, importable without torch):
@@ -20,7 +20,7 @@ transformers) and is imported explicitly by the caller::
     result = screen(pair, contexts=era.contexts.TEST_CONTEXTS)
     save(result, "results/my_audit", extra_config={"seed": 42})
 
-ERA screens *where* a fine-tune changed a model; it does not certify
+ERA screens where a fine-tune changed a model; it does not certify
 alignment and attaches no automatic deep/shallow verdict.
 
 v1 (ERAAnalyzer, Alignment Score, model genealogy, static-embedding L3) is
