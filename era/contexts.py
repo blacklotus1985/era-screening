@@ -4,7 +4,7 @@ ERA v2 bundled example probe contexts
 
 These are the 40 probe sentences of the gender-bias proof of concept,
 unchanged from v1 so that every v2 run remains directly comparable with
-the published multi-seed results.  They are example data, not part of the
+the reported multi-seed results.  They are example data, not part of the
 measurement logic, and nothing in the library depends on them:
 ``era.pipeline.screen`` has no default contexts and always requires yours
 explicitly.  This module exists so the demo and the reproducible PoC have

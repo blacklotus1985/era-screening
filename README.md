@@ -1,7 +1,9 @@
-# ERA
+# ERA Screening
 
+![CI](https://github.com/blacklotus1985/era-screening/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Status](https://img.shields.io/badge/status-research_preview-orange)
 
 ERA tells you where a fine tune changed a language model.
 
@@ -9,6 +11,12 @@ You give it two models: a base model and a version of it that someone
 trained further. ERA compares them layer by layer, from the inside, and
 shows you where the change is concentrated: near the output, in the
 middle of the network, or spread across it.
+
+![Normalized change shape across layers for two models](docs/figures/multiseed_v2_shape.png)
+
+The picture above is from the proof of concept: two different models fine
+tuned on the same data, compared layer by layer. It is a demonstration,
+not a calibrated threshold.
 
 ## Why this matters
 
@@ -38,81 +46,6 @@ look first. In the safety ecosystem it sits
 next to behavioural evaluations, not in place of them: behaviour tests say
 what changed in the answers, ERA says where the change lives inside the
 network.
-
-## How it is built: harness, measures, materials
-
-This design point matters, so it gets its own section. ERA separates
-three things that are usually tangled together in research code.
-
-The harness is the part that stays fixed. It loads two related models,
-checks that they are actually comparable, runs the probe sentences
-through both, extracts the internal states layer by layer, and writes
-evidence files with content hashes. This is the plumbing of an audit, and
-it is the same no matter what you measure.
-
-The measures are the part that is meant to grow. The four views shipped
-today are the set I validated in the proof of concept, and they double as
-reference implementations: each one shows what a measure needs in order
-to plug into the harness. Distances between output distributions are
-already pluggable at runtime; views on internal states have one declared
-place in the code where they are computed.
-
-The materials are entirely yours. Which two models to compare, which
-sentences to probe them with, which words to track: none of this is baked
-in. The core function has no default materials at all, it requires your
-contexts explicitly. The models, the probe sentences and the corpus in
-this repository are the ones I used to validate the method, and they are
-shipped as a bundled example set, used by the demo and the reproducible
-experiment, nothing more. When the command line falls back to the example
-sentences because you did not pass your own, it tells you.
-
-The separation is the point. An audit instrument is useful only if
-auditors can point it at their own models and their own concerns. What
-this repository fixes is the discipline (comparability checks, evidence
-files, hashes, tested measures), not the content.
-
-## What it measures
-
-Every screening produces four curves, one value per layer, each answering
-a different question:
-
-| View | Question |
-|---|---|
-| Output drift | how much did the model's next word predictions move? |
-| Per token drift | how far did each concept's internal representation move? |
-| Relational drift | did the geometry between concepts change? |
-| Reorganisation | how much did the layer rewrite its encoding as a whole? |
-
-These four are the current validated set, not a closed list: the harness
-is built so that other measures can be added, see "Using it as a library"
-below.
-
-Each curve is summarised by one number, its depth centroid, which says
-where along the network the change concentrates.
-
-Why is depth informative at all? Because layers of a transformer tend to
-specialise. A decade of probing studies has shown, with all the usual
-statistical caveats, that early layers deal mostly with surface features
-of the text, middle layers with meaning and relations between concepts,
-and late layers with preparing the output (Tenney et al. 2019, Hewitt and
-Manning 2019, Voita et al. 2019, Geva et al. 2021). So where a fine tune
-lands is evidence about what kind of change it made. ERA treats this
-mapping as a working hypothesis to test, not as a law: the tool reports
-where the change is, the interpretation stays with the auditor.
-
-The views are complementary because each one has known failure modes. In
-particular, the angle based measures saturate in layers where the internal
-vectors share a dominant common direction, a well documented property of
-transformer representations called anisotropy: when all vectors point
-roughly the same way, angle differences go to zero regardless of what
-actually changed. An earlier version of these results was affected by
-exactly this. The fourth view is based on CKA, which centres the
-representations before comparing them and therefore removes the shared
-direction, so depth claims rely mainly on it. Every report also includes
-the per layer anisotropy values of both models, so saturated regions are
-visible instead of being silently read as absence of change. How this
-problem was found and corrected is documented in
-[docs/HISTORY.md](docs/HISTORY.md).
 
 ## Quick start
 
@@ -155,6 +88,79 @@ python experiments/10_multiseed_sweep.py
 python experiments/11_compare_multiseed.py --tag v2_balanced
 ```
 
+## How it is built: harness, measures, materials
+
+This design point matters, so it gets its own section. ERA separates
+three things that are usually tangled together in research code.
+
+The harness is the part that stays fixed. It loads two related models,
+checks that they are actually comparable, runs the probe sentences
+through both, extracts the internal states layer by layer, and writes
+evidence files with content hashes. This is the plumbing of an audit, and
+it is the same no matter what you measure.
+
+The measures are the part that is meant to grow. The four views shipped
+today are the set I validated in the proof of concept, and they double as
+reference implementations: each one shows what a measure needs in order
+to plug into the harness. Distances between output distributions are
+already pluggable at runtime; views on internal states have one declared
+place in the code where they are computed.
+
+The materials are entirely yours. Which two models to compare, which
+sentences to probe them with, which words to track: none of this is baked
+in. The core function has no default materials at all, it requires your
+contexts explicitly. The models, the probe sentences and the corpus in
+this repository are the ones I used to validate the method, and they are
+shipped as a bundled example set, used by the demo and the reproducible
+experiment, nothing more. When the command line falls back to the example
+sentences because you did not pass your own, it tells you.
+
+The separation is the point. An audit instrument is useful only if
+auditors can point it at their own models and their own concerns. What
+this repository fixes is the discipline (comparability checks, evidence
+files, hashes, tested measures), not the content.
+
+## What it measures
+
+Every screening produces, precisely:
+
+| What | Form | Question it answers |
+|---|---|---|
+| Output drift | one value per probe context | how much did the next word predictions move? |
+| Per token drift | curve over layers | how far did each concept's internal representation move? |
+| Relational drift | curve over layers | did the geometry between concepts change? |
+| Reorganisation (1 - CKA) | curve over layers | how much did the layer rewrite its encoding as a whole? |
+| Anisotropy diagnostics | two curves over layers | how saturated are the angle based measures here? |
+
+The three change curves are each summarised by a depth centroid, one
+number saying where along the network the change concentrates. This is
+the current validated set, not a closed list: the harness is built so
+that other measures can be added, see "Using it as a library" below.
+
+Why is depth informative at all? Because layers of a transformer tend to
+specialise. A decade of probing studies has shown, with all the usual
+statistical caveats, that early layers deal mostly with surface features
+of the text, middle layers with meaning and relations between concepts,
+and late layers with preparing the output (Tenney et al. 2019, Hewitt and
+Manning 2019, Voita et al. 2019, Geva et al. 2021). So where a fine tune
+lands is evidence about what kind of change it made. ERA treats this
+mapping as a working hypothesis to test, not as a law: the tool reports
+where the change is, the interpretation stays with the auditor.
+
+The views are complementary because each one has known failure modes. In
+particular, the angle based measures saturate in layers where the internal
+vectors share a dominant common direction, a well documented property of
+transformer representations called anisotropy: when all vectors point
+roughly the same way, angle differences go to zero regardless of what
+actually changed. An earlier version of these results was affected by
+exactly this. The fourth view is based on CKA, which centres the
+representations before comparing them and therefore removes the shared
+direction, so depth claims rely mainly on it. Every report also includes
+the per layer anisotropy values of both models, so saturated regions are
+visible instead of being silently read as absence of change. How this
+problem was found and corrected is documented in
+[docs/HISTORY.md](docs/HISTORY.md).
+
 ## What you need and what you get
 
 ERA reads internal states, so it needs open weights: models you can run
@@ -164,9 +170,13 @@ are not comparable, loading fails immediately with a clear message.
 
 Every run writes plain files that a reviewer can open without running any
 code: two CSV files with the curves and the per context detail, and a JSON
-file with the full configuration, including content hashes of everything
-that influenced the measurement. If a number is in a report, you can trace
-what produced it. The reference data behind the published findings is
+file with the configuration and a fingerprint over it. The command line
+tool records content hashes for everything it controls: probe contexts,
+probe vocabulary, corpus file, local checkpoint weights, tokenizer
+mapping, library versions. If you call the library directly from Python,
+the fingerprint covers what the pipeline itself knows plus whatever you
+add through extra_config, and the docstring of config_fingerprint states
+that scope exactly. A fingerprint certifies what it covers, nothing more. The reference data behind the reported proof of concept findings is
 versioned under [results/](results/README.md), together with an explicit
 statement of what that historical record does and does not make
 verifiable.
