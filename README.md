@@ -7,24 +7,24 @@ ERA tells you where a fine tune changed a language model.
 
 You give it two models: a base model and a version of it that someone
 trained further. ERA compares them layer by layer, from the inside, and
-shows you where the change is concentrated. Near the surface, where the
-model produces its words? Or deeper, where it organises its concepts?
+shows you where the change is concentrated: near the output, in the
+middle of the network, or spread across it.
 
 ## Why this matters
 
 Language models rarely stay as they were released. People take an open
-model and train it further on their own data. This is cheap, common, and
-mostly invisible: the result is a new model that looks like the old one
-and behaves differently in ways nobody has mapped.
+model and train it further on their own data. This is cheap and common, and
+the result is a new model whose differences from the original are
+usually not documented anywhere.
 
 The standard way to check a modified model is to test its behaviour: ask
 questions, score answers. That is necessary but it only sees the outside.
 Two models can give similar answers for very different internal reasons.
 One may have genuinely reorganised what it knows. Another may have learned
 a thin layer of new habits on top of an unchanged interior. From the
-outside they can look the same. If you care about safety, the difference
-matters, because surface habits and deep changes fail in different ways
-and deserve different scrutiny.
+outside they can look the same. For safety work the difference matters,
+because the two kinds of change fail in different ways and deserve
+different scrutiny.
 
 ERA looks at the inside. It reads the internal states of both models on
 the same inputs and measures, for every layer of the network, how much
@@ -34,10 +34,42 @@ that says where the fine tune landed.
 To be clear about the limits: ERA does not tell you whether a model is
 safe or aligned, and it does not decide whether a change is good or bad.
 It is a triage tool. It tells auditors, researchers and reviewers where to
-spend their expensive attention first. In the safety ecosystem it sits
+look first. In the safety ecosystem it sits
 next to behavioural evaluations, not in place of them: behaviour tests say
 what changed in the answers, ERA says where the change lives inside the
 network.
+
+## How it is built: harness, measures, materials
+
+This design point matters, so it gets its own section. ERA separates
+three things that are usually tangled together in research code.
+
+The harness is the part that stays fixed. It loads two related models,
+checks that they are actually comparable, runs the probe sentences
+through both, extracts the internal states layer by layer, and writes
+evidence files with content hashes. This is the plumbing of an audit, and
+it is the same no matter what you measure.
+
+The measures are the part that is meant to grow. The four views shipped
+today are the set I validated in the proof of concept, and they double as
+reference implementations: each one shows what a measure needs in order
+to plug into the harness. Distances between output distributions are
+already pluggable at runtime; views on internal states have one declared
+place in the code where they are computed.
+
+The materials are entirely yours. Which two models to compare, which
+sentences to probe them with, which words to track: none of this is baked
+in. The core function has no default materials at all, it requires your
+contexts explicitly. The models, the probe sentences and the corpus in
+this repository are the ones I used to validate the method, and they are
+shipped as a bundled example set, used by the demo and the reproducible
+experiment, nothing more. When the command line falls back to the example
+sentences because you did not pass your own, it tells you.
+
+The separation is the point. An audit instrument is useful only if
+auditors can point it at their own models and their own concerns. What
+this repository fixes is the discipline (comparability checks, evidence
+files, hashes, tested measures), not the content.
 
 ## What it measures
 
@@ -51,23 +83,43 @@ a different question:
 | Relational drift | did the geometry between concepts change? |
 | Reorganisation | how much did the layer rewrite its encoding as a whole? |
 
+These four are the current validated set, not a closed list: the harness
+is built so that other measures can be added, see "Using it as a library"
+below.
+
 Each curve is summarised by one number, its depth centroid, which says
 where along the network the change concentrates.
 
-Why four views instead of one score? Because every measure has blind
-spots, and I learned this on my own results. Early on, the angle based
-measures told a dramatic story: two models seemed to learn at completely
-different depths. Most of that story turned out to be an artifact. In many
-layers the internal vectors are packed so tightly in the same direction
-that angle differences flatten toward zero no matter what actually
-changed. The fourth view (based on CKA, a similarity measure that removes
-that shared direction before comparing) does not suffer from this
-particular problem, so depth claims lean on it, and every report includes
-the diagnostics needed to spot the issue. The full story of how this was
-found and fixed is in [docs/HISTORY.md](docs/HISTORY.md). I kept it in the
-open on purpose: an audit tool should show its own audit trail.
+Why is depth informative at all? Because layers of a transformer tend to
+specialise. A decade of probing studies has shown, with all the usual
+statistical caveats, that early layers deal mostly with surface features
+of the text, middle layers with meaning and relations between concepts,
+and late layers with preparing the output (Tenney et al. 2019, Hewitt and
+Manning 2019, Voita et al. 2019, Geva et al. 2021). So where a fine tune
+lands is evidence about what kind of change it made. ERA treats this
+mapping as a working hypothesis to test, not as a law: the tool reports
+where the change is, the interpretation stays with the auditor.
+
+The views are complementary because each one has known failure modes. In
+particular, the angle based measures saturate in layers where the internal
+vectors share a dominant common direction, a well documented property of
+transformer representations called anisotropy: when all vectors point
+roughly the same way, angle differences go to zero regardless of what
+actually changed. An earlier version of these results was affected by
+exactly this. The fourth view is based on CKA, which centres the
+representations before comparing them and therefore removes the shared
+direction, so depth claims rely mainly on it. Every report also includes
+the per layer anisotropy values of both models, so saturated regions are
+visible instead of being silently read as absence of change. How this
+problem was found and corrected is documented in
+[docs/HISTORY.md](docs/HISTORY.md).
 
 ## Quick start
+
+The models below are examples, not requirements: pass any Hugging Face id
+or local path of two related open weight models. The same goes for the
+probe sentences, which default to the ones used in the proof of concept
+and can be replaced with your own file.
 
 ```bash
 pip install -e .
@@ -75,9 +127,10 @@ pip install -e .
 
 # Compare an existing pair of checkpoints (no training involved):
 python experiments/run_screening.py \
-    --base EleutherAI/gpt-neo-125M \
-    --finetuned path/to/your/checkpoint \
-    --out results/my_audit
+    --base any/base-model \
+    --finetuned path/or/id/of/its-descendant \
+    --out results/my_audit \
+    --contexts my_probes.txt
 ```
 
 Or from Python:
@@ -118,9 +171,9 @@ versioned under [results/](results/README.md), together with an explicit
 statement of what that historical record does and does not make
 verifiable.
 
-One honest note on cost: "lightweight" refers to the method, not to zero
-compute. A screening runs a couple of forward passes per probe context per
-candidate word. Minutes, not days, but not free.
+A note on cost: "lightweight" refers to the method, not to zero compute.
+A screening runs a couple of forward passes per probe context per
+candidate word, which means minutes on CPU for models of this size.
 
 ## Layout
 
@@ -141,26 +194,63 @@ If you want to understand the method, read `era/metrics.py` next to
 `tests/test_metrics.py`. Every measure has a test whose expected value was
 computed by hand, so you can check the math with pen and paper.
 
-## Adding your own measures
+## Using it as a library
 
-The code is small on purpose and meant to be extended.
+ERA is an audit instrument first and a small library second. The four
+measures it ships are the set I validated for the proof of concept. They
+are also reference implementations: each one shows exactly what a measure
+needs in order to plug into the harness, from the function signature to
+the hand computed test. The instrument itself is agnostic about most of
+what you pass in.
 
-Measures that compare the two models' output distributions are pluggable
-today: write a function like `k_divergence` in `era/metrics.py`, register
-it in the `DISTRIBUTION_METRICS` dictionary, and both the pipeline and the
-command line accept it by name.
+What you choose: the two models, the probe contexts (your own sentences,
+one per line), the probe vocabulary for confirmatory runs, the size of the
+compared distributions, and the distance used to compare the output
+distributions. Nothing is tied to the models I validated on: GPT-Neo and
+Pythia appear in this repository only as the proof of concept panel and in
+examples. `ModelPair` accepts any pair of related open weight causal
+language models, whatever their family, as long as the two checkpoints
+share architecture, layer count and vocabulary. The structural checks read
+the model configuration in a family agnostic way, so GPT-2 style, NeoX
+style and LLaMA style models all load the same way.
+Distances are selected by name from a registry, and you can register your
+own at runtime without forking anything:
 
-Measures computed on internal states live in one function,
-`_layer_curves` in `era/pipeline.py`. It receives the per layer states of
-both models for every candidate word and returns the curves. Adding a view
-means adding a curve there, a field on `ScreeningResult` and a column in
-the report. Not a plugin system yet, but a single obvious place.
+```python
+from era.metrics import DISTRIBUTION_METRICS
+from era import screen
 
-The bar for contributions is in [CONTRIBUTING.md](CONTRIBUTING.md) and it
-is simple: a test with an expected value computed by hand, honest notes on
-the blind spots of your measure (every measure has them), and if your
-change alters what any reported number means, a bump of the measurement
-schema version so cached results are never silently mixed.
+def total_variation(p, q, log_base=None):
+    union = set(p) | set(q)
+    ps, qs = sum(p.values()), sum(q.values())
+    return 0.5 * sum(abs(p.get(t, 0) / ps - q.get(t, 0) / qs) for t in union)
+
+DISTRIBUTION_METRICS["total_variation"] = total_variation
+result = screen(pair, contexts, distribution_metric="total_variation")
+```
+
+The name of the metric ends up in the report, so a reviewer can see what
+was used. The per layer views (the four curves) are currently fixed; they
+live in one function, `_layer_curves` in `era/pipeline.py`, and adding a
+view means adding a curve there, a field on `ScreeningResult` and a column
+in the report. Making these pluggable too is on the roadmap.
+
+What you should not pass, and what happens if you do: two unrelated
+architectures are rejected at load, before any weights are read. Models
+behind an API cannot be screened at all, because ERA needs the internal
+states. Probe words that are not a single token are rejected explicitly
+rather than silently truncated. A distance that is undefined when the two
+models predict different words (as raw KL is) will break on real inputs,
+which is why the default is a bounded divergence computed against the
+average of the two distributions. And curves measured on different probe
+corpora are not comparable with each other, so the report records a
+content hash of everything that influenced the measurement.
+
+For contributions to the repository itself, the bar is in
+[CONTRIBUTING.md](CONTRIBUTING.md): a test with an expected value computed
+by hand, notes on the blind spots of your measure (every measure has
+them), and if your change alters what any reported number means, a bump of
+the measurement schema version so cached results are never silently mixed.
 
 ## Where this is going
 
@@ -168,19 +258,18 @@ Everything above is what works today, measured and independently
 reviewed. This section is direction, not capability.
 
 A fine tuned model is one edge in a family tree: a parent model and its
-descendant. ERA today measures that single edge. The picture I care about
-long term is the whole tree. Models get derived from other models, fine
-tunes of fine tunes, and the provenance of that ecosystem is mostly
-folklore: a name on a model card, if you are lucky. Imagine instead a
-genealogy where every derivation carries its measurements: what changed
-between parent and child, where, how much, recorded in files anyone can
-verify. Auditing a model lineage should feel like reading a ledger, not
-like archaeology.
+descendant. ERA currently measures that single edge. The longer term goal
+is the full tree. Models are increasingly derived from other models,
+including fine tunes of fine tunes, and the provenance of these
+derivations is usually limited to a note on a model card. A genealogy
+where every derivation carries its measurements, meaning what changed
+between parent and child, where, and how much, recorded in files anyone
+can verify, would make auditing a model lineage a routine check instead
+of a reconstruction effort.
 
-That is why the reports are plain files with content hashes rather than
-opaque state: a verifiable measurement of one edge is the building block
-of that graph. The concrete steps are in
-[docs/ROADMAP.md](docs/ROADMAP.md). If this speaks to you, issues and
+The reports are plain files with content hashes for this reason: a
+verifiable measurement of one edge is the building block of that graph.
+The concrete steps are in [docs/ROADMAP.md](docs/ROADMAP.md). Issues and
 pull requests are welcome.
 
 ## Status and limits
@@ -191,8 +280,22 @@ claims of robustness against an adversary who knows the tool. Reading a
 late concentration of change as "shallow learning" is a hypothesis under
 test, not a result. The earlier version of this code, including the
 mistakes that led to the current design, lives in an archived repository
-and is documented in [docs/HISTORY.md](docs/HISTORY.md) rather than
-hidden, because the audit trail is part of the point.
+and is documented in [docs/HISTORY.md](docs/HISTORY.md).
+
+## References
+
+On layer specialisation, which is what makes depth informative: Tenney,
+Das and Pavlick, "BERT Rediscovers the Classical NLP Pipeline" (ACL 2019);
+Hewitt and Manning, "A Structural Probe for Finding Syntax in Word
+Representations" (NAACL 2019); Voita, Sennrich and Titov, "The Bottom-up
+Evolution of Representations in the Transformer" (EMNLP 2019); Geva et
+al., "Transformer Feed-Forward Layers Are Key-Value Memories" (EMNLP
+2021). On comparing representations: Kornblith et al., "Similarity of
+Neural Network Representations Revisited" (ICML 2019), the source of
+linear CKA. On anisotropy: Ethayarajh, "How Contextual are Contextualized
+Word Representations?" (EMNLP 2019). On the bounded divergence used for
+output drift: Lin, "Divergence Measures Based on the Shannon Entropy"
+(IEEE Trans. Inf. Theory, 1991).
 
 ## License
 

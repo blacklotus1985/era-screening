@@ -83,6 +83,12 @@ def main() -> None:
         contexts = read_context_lines(args.contexts)
         family = {}
     else:
+        # The library has no default materials; this convenience default
+        # belongs to the CLI only, and it is announced to the user.
+        print("[note] no --contexts given: using the bundled example probe set "
+              "(era.contexts.TEST_CONTEXTS, the gender bias PoC sentences). "
+              "For a real audit, pass --contexts with sentences that target "
+              "your own intervention.")
         contexts = TEST_CONTEXTS
         family = {c: ("leadership" if c in LEADERSHIP_CONTEXTS else "support")
                   for c in TEST_CONTEXTS}

@@ -1,13 +1,18 @@
 """
-ERA v2 — Fixed evaluation contexts
-==================================
+ERA v2 — Bundled example probe contexts
+=======================================
 
-The 40 probe contexts of the gender-bias PoC, unchanged from v1 so that every
-v2 run remains directly comparable with the published multi-seed results.
-They are data, not logic — which is why they live in their own module.
+These are the 40 probe sentences of the gender-bias proof of concept,
+unchanged from v1 so that every v2 run remains directly comparable with
+the published multi-seed results.  They are example data, not part of the
+measurement logic, and nothing in the library depends on them:
+``era.pipeline.screen`` has no default contexts and always requires yours
+explicitly.  This module exists so the demo and the reproducible PoC have
+a shared, versioned probe set to point at.
 
-For a different audit target, pass your own context list to
-``era.pipeline.screen``; nothing in the pipeline is specific to these.
+For a real audit, write probe sentences that target your own intervention
+(one per line in a file for the CLI, or a plain list in Python) and pass
+those instead.
 """
 
 LEADERSHIP_CONTEXTS = [
