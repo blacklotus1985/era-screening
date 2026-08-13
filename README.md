@@ -170,13 +170,15 @@ are not comparable, loading fails immediately with a clear message.
 
 Every run writes plain files that a reviewer can open without running any
 code: two CSV files with the curves and the per context detail, and a JSON
-file with the configuration and a fingerprint over it. The command line
-tool records content hashes for everything it controls: probe contexts,
-probe vocabulary, corpus file, local checkpoint weights, tokenizer
-mapping, library versions. If you call the library directly from Python,
-the fingerprint covers what the pipeline itself knows plus whatever you
-add through extra_config, and the docstring of config_fingerprint states
-that scope exactly. A fingerprint certifies what it covers, nothing more. The reference data behind the reported proof of concept findings is
+file with the configuration and a fingerprint over it. The audit command
+line records hashes or identities for the inputs it controls: probe
+contexts, probe vocabulary, local checkpoint weights, the tokenizer
+mapping, model revisions, and the relevant runtime versions. The
+reproducible training sweep additionally records the training corpus
+hash. If you call the library directly from Python, the fingerprint
+covers what the pipeline itself knows plus whatever you add through
+extra_config, and the docstring of config_fingerprint states that scope
+exactly. A fingerprint certifies what it covers, nothing more. The reference data behind the reported proof of concept findings is
 versioned under [results/](results/README.md), together with an explicit
 statement of what that historical record does and does not make
 verifiable.
