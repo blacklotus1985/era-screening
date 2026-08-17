@@ -239,7 +239,13 @@ def anisotropy_profile(pair, contexts, top_k):
 
     per_context = []
     profiles = []
-    hidden_dims = set()
+    # Dimensionality is tracked PER LAYER, not pooled across the stack.  The
+    # pipeline never compares vectors across layers — every comparison in
+    # screen() is within one layer — so a stack whose width changes between
+    # layers is perfectly screenable.  OPT-350M is exactly that case
+    # (word_embed_proj_dim=512 against hidden_size=1024), and pooling the
+    # dimensions would reject an architecture the measurement handles fine.
+    dims_per_layer = {}
     n_forwards = 0
     n_layers = None
 
@@ -263,7 +269,8 @@ def anisotropy_profile(pair, contexts, top_k):
         for candidate in candidates:
             states[candidate] = pair.layer_states("base", ctx_ids, candidate)
             n_forwards += 1
-            hidden_dims.update(int(h.shape[-1]) for h in states[candidate])
+            for layer_index, hidden in enumerate(states[candidate]):
+                dims_per_layer.setdefault(layer_index, set()).add(int(hidden.shape[-1]))
 
         layer_counts = {len(v) for v in states.values()}
         if len(layer_counts) != 1:
@@ -277,6 +284,23 @@ def anisotropy_profile(pair, contexts, top_k):
             raise ValueError(
                 f"Layer count changed between contexts: {n_layers} then "
                 f"{next(iter(layer_counts))}."
+            )
+
+        # Within a layer every candidate must agree on width, or that layer's
+        # pairwise cosines are not computable.  Checked here, before the
+        # cosine loop, so the failure names the layer and the context instead
+        # of surfacing as "expects vectors of equal length" from inside
+        # era.metrics.  Disagreement ACROSS layers is legal and expected for
+        # projected architectures — see the dims_per_layer comment above.
+        ragged_here = {
+            layer: sorted(dims) for layer, dims in dims_per_layer.items()
+            if len(dims) != 1
+        }
+        if ragged_here:
+            raise ValueError(
+                f"Candidates disagree on hidden-state dimensionality within a "
+                f"layer, in context {context!r}: {ragged_here}. The pairwise "
+                "cosines of that layer are not computable."
             )
 
         profile = np.zeros(n_layers)
@@ -301,10 +325,12 @@ def anisotropy_profile(pair, contexts, top_k):
             "semantic top-k filter emptied every context for this tokenizer."
         )
 
+    dims_by_layer = [next(iter(dims_per_layer[layer])) for layer in sorted(dims_per_layer)]
     return {
         "anisotropy": np.vstack(profiles).mean(axis=0),
         "per_context": per_context,
-        "hidden_dims": sorted(hidden_dims),
+        "hidden_dims_by_layer": dims_by_layer,
+        "hidden_dims": sorted(set(dims_by_layer)),
         "n_forwards": n_forwards,
     }
 
@@ -446,14 +472,12 @@ def census_one_model(spec, contexts, sweep, corpus_path, device, do_timing):
                 f"{declared_layers}. The layer axis would be mislabelled."
             )
 
-        if len(aniso["hidden_dims"]) != 1:
-            raise ValueError(
-                f"Hidden states are not of uniform dimensionality across layers: "
-                f"{aniso['hidden_dims']}. era.metrics.cosine_similarity requires "
-                "equal-length vectors, so this architecture cannot be screened "
-                "layer-by-layer as-is."
-            )
-
+        # No check that the stack has one uniform width: the pipeline compares
+        # base against fine-tuned WITHIN a layer, never across layers, and two
+        # checkpoints of one architecture always agree within a layer.  The
+        # per-layer widths are recorded instead, so a model like OPT-350M —
+        # whose projected-embedding layers are narrower than its residual
+        # stream — is screened, with the width change visible in the artefacts.
         candidate_counts = [r["n_candidates"] for r in aniso["per_context"] if r["used"]]
         record = {
             "label": spec.label,
@@ -468,7 +492,13 @@ def census_one_model(spec, contexts, sweep, corpus_path, device, do_timing):
             "n_params": n_params,
             "n_blocks": n_blocks,
             "n_curve_points": n_curve_points,
-            "hidden_size": int(aniso["hidden_dims"][0]),
+            # Widest layer: for a uniform stack this IS the hidden size; for a
+            # projected architecture it is the residual stream, with the
+            # narrower projected layers listed in hidden_dims_by_layer.
+            "hidden_size": int(max(aniso["hidden_dims"])),
+            "hidden_dims_by_layer": aniso["hidden_dims_by_layer"],
+            "hidden_dims_distinct": aniso["hidden_dims"],
+            "hidden_dims_uniform": len(aniso["hidden_dims"]) == 1,
             "config_hidden_size": config_attr(config, "hidden_size", "n_embd"),
             "word_embed_proj_dim": getattr(config, "word_embed_proj_dim", None),
             "vocab_size_config": config_attr(config, "vocab_size"),
@@ -733,13 +763,43 @@ def write_census_readme(records, skipped, sweep, corpus_path, meta):
     lines.append("| Model | Tier | Params | Blocks | Hidden | Positions | Vocab | Tokenizer pad |")
     lines.append("|---|---|---:|---:|---:|---|---:|---|")
     for rec in records:
+        width = str(rec["hidden_size"])
+        if not rec.get("hidden_dims_uniform", True):
+            width = "/".join(str(d) for d in rec.get("hidden_dims_distinct", []))
         lines.append(
             f"| {rec['label']} | {rec['tier']} | {rec['n_params'] / 1e6:.0f}M | "
-            f"{rec['n_blocks']} | {rec['hidden_size']} | {rec['positional_encoding']} | "
+            f"{rec['n_blocks']} | {width} | {rec['positional_encoding']} | "
             f"{rec['vocab_size_embedding']} | "
             f"{'native' if rec['tokenizer_had_pad_token'] else 'eos (set by sweep)'} |"
         )
     lines.append("")
+
+    mixed = [rec for rec in records if not rec.get("hidden_dims_uniform", True)]
+    if mixed:
+        lines.append("### Models whose stack is not one width")
+        lines.append("")
+        lines.append("The pipeline compares base against fine-tuned **within** a layer and "
+                     "never across layers, so a stack whose width changes between layers is "
+                     "screenable. It does, however, mean the curve points do not all live in "
+                     "the same space: **absolute magnitudes are not comparable across the "
+                     "width change within such a model** — a sharper form of the caveat that "
+                     "already forbids comparing absolute heights across architectures. Depth "
+                     "centroids are computed on the layer index and are unaffected in "
+                     "definition, but any reading of curve *shape* across the boundary must "
+                     "say which side of it each point is on. See docs/PREDICTIONS.md §8.2.")
+        lines.append("")
+        lines.append("| Model | Widths by layer (layer: width) |")
+        lines.append("|---|---|")
+        for rec in mixed:
+            dims = rec.get("hidden_dims_by_layer", [])
+            runs, start = [], 0
+            for i in range(1, len(dims) + 1):
+                if i == len(dims) or dims[i] != dims[start]:
+                    span = f"{start}" if i - start == 1 else f"{start}-{i - 1}"
+                    runs.append(f"{span}: {dims[start]}")
+                    start = i
+            lines.append(f"| {rec['label']} | {', '.join(runs)} |")
+        lines.append("")
 
     lines.append("## Probe-set health")
     lines.append("")

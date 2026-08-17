@@ -11,6 +11,15 @@ and before any census artefact was committed under `results/`._
 > inference-only census had run. Sections 4 and 5 below are amended by §7
 > where they conflict; the original text is left in place unedited so the
 > change is visible rather than silent.
+>
+> **Amended 2026-08-17 — Amendment 2 (pre-data), see §8.** Retracts and
+> replaces the saturation argument in §3, which was **wrong**. Readmits
+> OPT-350M to the panel: the census check was stricter than the pipeline it
+> was protecting. Aligns the G2 criterion with Tier A's real size. Bounds
+> the anchored H2 test and adds a preregistered spot-check. Written under
+> the same conditions — **no sweep cell of any tier existed**; the single
+> cell that had begun running was stopped and its partial checkpoint
+> deleted before this was written.
 
 This document fixes, in advance, what the extended study predicts, what
 would falsify each prediction, what tolerances the self-checks must meet,
@@ -157,6 +166,14 @@ Accordingly the census reports saturated-layer counts at 0.90, 0.95 and
 threshold can be applied afterwards. The sensitivity columns exist to show
 whether a conclusion depends on the cut — they are **not** alternatives to
 be selected among after seeing which one is more favourable.
+
+> **RETRACTED by Amendment 2 (§8.1).** The headroom argument above is
+> **wrong**, in three independent ways: `1 − a` bounds only the *upward*
+> side of `|Δ cos|`; the mean over pairs does not constrain individual
+> pairs; and the base model's anisotropy alone constrains nothing, because
+> the bound needs *both* models' pairs to be concentrated. The threshold
+> survives as a diagnostic flag, but it is not derivable the way this
+> section claimed. §8.1 replaces it.
 
 ## 4. Hypotheses
 
@@ -483,3 +500,174 @@ It does not change the panel, the corpus, the hyperparameters, the
 measurement, `MEASUREMENT_SCHEMA_VERSION`, H1, H3, the saturation
 threshold, or any tolerance in §2. It adds a phase, a gate, and a second
 reading of H2.
+
+---
+
+# Amendment 2 (pre-data) — 2026-08-17
+
+**Status when written:** the inference-only census had run. **No sweep cell
+of any tier existed.** One Pythia-70M cell had begun running for gate G1b;
+it was stopped and its partial checkpoint deleted before this amendment was
+written, so no drift curve, CKA value or centroid exists for any model
+under any regime. Still preregistration.
+
+## 8.1 §3 retracted and replaced — the saturation argument
+
+The argument in §3 was wrong. Stating the error before the replacement,
+because the error is the useful part:
+
+> "A pair whose base cosine sits at `a` has at most `1 − a` of headroom, so
+> the maximum value the metric can express at a layer with mean pairwise
+> cosine `a` is bounded on the order of `1 − a`."
+
+Three independent defects:
+
+1. **`1 − a` bounds only one side.** `|cos_ft − cos_base|` is bounded above
+   by `1 − cos_base` in the *upward* direction, but downward the range is
+   `cos_base − (−1) = 1 + cos_base`, which is ≈ 2 exactly when `cos_base`
+   is near 1. A pair sitting at 0.99 in the base model is free to move to
+   −0.5 in the fine-tuned one. There is no ceiling.
+2. **A mean does not constrain its terms.** `a` is the mean over all
+   candidate pairs. A layer with mean 0.95 is perfectly compatible with
+   many pairs far from 1.
+3. **One model's anisotropy constrains nothing.** The genuine bound is a
+   statement about *both* models: if a pair has `cos_base ∈ [1−δ, 1]` **and**
+   `cos_ft ∈ [1−δ, 1]`, then `|cos_ft − cos_base| ≤ δ`. The census measures
+   the base model only, so it cannot establish the antecedent.
+
+### Does a weaker statistical bound rescue the threshold? No.
+
+Since `1 − cos ≥ 0`, Markov applies to the base model's pairs: with mean
+`a`, the fraction of pairs with `cos < 1 − t` is at most `(1−a)/t`. At
+`a = 0.95`, at most 25% of pairs fall below cosine 0.8. Applying the same
+to the fine-tuned model and taking a union bound, the fraction of pairs
+with *both* cosines ≥ `1−t` is at least `1 − (ε_b + ε_f)/t`, and on those
+pairs `|Δcos| ≤ t`. Bounding the mean and optimising over `t` gives
+
+    E[|Δcos|]  ≤  2 · sqrt(2 (ε_b + ε_f))
+
+At `ε_b = ε_f = 0.05` (both means 0.95) that is ≈ **0.89** — vacuous, since
+`|Δcos| ≤ 2` anyway. Even at both means 0.99 it is ≈ 0.40, still far above
+any drift magnitude in the study. **The threshold is not derivable from a
+bound.** Reporting the failed derivation rather than quietly dropping it,
+because "0.95 has a mathematical justification" would otherwise keep
+circulating.
+
+### What replaces it
+
+* **(i) 0.95 remains a diagnostic flag on the base model.** It marks layers
+  whose base representations are near-collinear and therefore *at risk* of
+  compressed cosine drift. It says where to look. It does not, by itself,
+  license any claim about the drift measured there.
+* **(ii) The reading "saturated ⇒ drift compressed" is conditional** on the
+  fine-tuned model also being saturated in the same layers. `ScreeningResult`
+  already carries `anisotropy_ft`, and `era.report.save` already writes it
+  as the `anisotropy_ft` column of `layer_curve.csv` — so the condition is
+  **verifiable from artefacts the pipeline already produces**, with no
+  change to the measurement. The sweep analysis must check it and report it
+  per layer, never assume it.
+* **(iii) The conjunction is what gets reported.** Every layer is
+  classified as `both_saturated`, `base_only`, `ft_only` or `neither`, and
+  the drift statistics are reported per class.
+
+### H1.3 restated
+
+The original H1 prediction 3 read: "in every model with a saturated region,
+mean relational drift inside that region is lower than in the same model's
+unsaturated layers." That conditioned on the base model alone and is
+replaced by:
+
+**H1.3 (amended).** In layers where **both** `anisotropy_base` **and**
+`anisotropy_ft` are ≥ 0.95, mean relational drift is lower than in that
+model's `neither`-class layers.
+
+**High drift in a `both_saturated` layer would contradict the geometry**,
+so it is treated as a measurement event and investigated, not as a
+refutation on its own.
+
+**High drift in a `base_only` layer is not a contradiction at all** — it
+means `anisotropy_ft` collapsed relative to the base, i.e. the fine-tune
+*opened up* a near-collinear layer. That is a real, reportable phenomenon
+and is to be reported as such rather than filed as an anomaly.
+
+H1 predictions 1 and 2 are unchanged.
+
+## 8.2 OPT-350M is readmitted — the census check was too strict
+
+The census refused OPT-350M because its hidden states are `[512, 1024]`
+across the stack (`word_embed_proj_dim=512` ≠ `hidden_size=1024`). The
+refusal was wrong: **the pipeline never compares vectors across layers.**
+Every comparison in `era.pipeline.screen` is within a single layer —
+`cosine_similarity(states_base[c][layer], states_ft[c][layer])` (base vs
+fine-tuned), `cosine_similarity(states_base[ci][layer],
+states_base[cj][layer])` (pairs within one model), and
+`linear_cka(base_stacks[layer], ft_stacks[layer])`. A stack whose width
+changes between layers is therefore screenable; only a base/fine-tuned
+*mismatch within a layer* is not, and that cannot occur between two
+checkpoints of the same architecture.
+
+**Change.** The census check becomes "for each layer, every candidate
+yields the same dimensionality" instead of "one dimensionality across the
+whole stack". Per-layer dimensionalities are recorded in the artefacts
+(`hidden_dims_by_layer`) so the variation is visible rather than merely
+tolerated. OPT-350M is re-censused; **the panel returns to 11 models**,
+10 + OPT-350M, with Cerebras-GPT-111M still excluded as gated.
+
+**Caveat, to be carried into the census README and the findings.**
+OPT-350M's curve points do not all live in the same space: the layers at
+512 are in the projected embedding space, the rest in the 1024-wide
+residual stream. Per-layer values remain well defined, but *absolute
+magnitudes are not comparable across the width change within this model* —
+a sharper form of the caveat that already forbids comparing absolute
+heights across architectures. Depth summaries (centroids) are computed on
+the layer index as usual and are unaffected in definition, but any reading
+of OPT-350M's curve *shape* across the boundary must say which side of it
+each point is on.
+
+## 8.3 G2 aligned to Tier A's real size
+
+Tier A has **4** models, not 5 — Cerebras-GPT-111M was removed when it
+turned out to be gated, and the G2 criterion "≥ 4 of 5" was never updated.
+Left as written it would have been trivially satisfiable, or unsatisfiable,
+depending on how one read it.
+
+**G2 (amended).** Tier B starts only if **4 of 4** Tier A models complete
+all 3 seeds, with across-seed normalized CKA centroid std < 0.08 for each.
+A 3-of-4 outcome does **not** silently qualify: it may proceed only with a
+written justification in the findings naming the failed model and why its
+absence does not undermine the Tier A → Tier B inference. G2 remains
+additionally subordinate to G1c.
+
+## 8.4 The anchored H2 test — its limit, and a spot-check
+
+**Limit, stated plainly.** The anchors of §7.2 are measured on **two
+models** (GPT-Neo-125M, Pythia-160M). `anchor_shallow` in particular is a
+property of *those* architectures under a partial-unfreeze regime. Applying
+it to the other nine is an extrapolation across architectures, and every
+use of it outside the two reference models is labelled as one. Two anchor
+points cannot establish that "maximally late" sits at the same normalized
+depth in a 6-layer model and a 32-layer one.
+
+**Preregistered spot-check.** To test whether `anchor_shallow` is specific
+to the reference pair, the localization control (§7.1 Control C) is
+additionally run on **OPT-125M, seed 42 only**. OPT-125M is chosen because
+it is the panel's *least* anisotropic model (mean 0.473, no saturated layer
+at any threshold) — the architecture least like the reference pair on the
+axis this study is about, and therefore the most informative single
+additional point.
+
+**Prediction:** OPT-125M's partial-unfreeze normalized centroid is > 0.85,
+the same criterion as the reference models.
+
+**If it is not**, the shallow anchor is architecture-specific, the anchored
+H2 test applies only to the two reference models, and that restriction is
+stated in the findings abstract rather than in a closing caveat. One seed
+cannot distinguish a real architectural difference from seed noise, and the
+spot-check is reported as the single point it is.
+
+## 8.5 What Amendment 2 does not do
+
+It does not change the corpus, the hyperparameters, the measurement,
+`MEASUREMENT_SCHEMA_VERSION`, H1 predictions 1–2, H3, the §2 tolerances, or
+gates G0/G1/G1b/G1c. It retracts one argument, restates H1.3, readmits one
+model, corrects one arithmetic slip in G2, and bounds H2's anchored test.

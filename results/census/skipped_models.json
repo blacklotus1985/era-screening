@@ -1,5 +1,5 @@
 {
-  "timestamp_utc": "2026-08-17T17:46:51Z",
+  "timestamp_utc": "2026-08-17T18:20:14Z",
   "skipped": [
     {
       "label": "Cerebras-GPT-111M",
@@ -9,12 +9,6 @@
       "stage": "roster",
       "checked_utc": "2026-08-17",
       "reason": "HTTP 401 from the hub API: the whole Cerebras-GPT series is gated (cerebras/Cerebras-GPT-111M, -256M and cerebras/btlm-3b-8k-base all return 401 while the cerebras org itself lists publicly). No unauthenticated download is possible, and the community re-uploads are themselves fine-tuned, so they cannot stand in for a base model. Consequence: the panel carries no muP-trained architecture, and no claim about training-recipe generality can be made from it."
-    },
-    {
-      "label": "OPT-350M",
-      "hf_id": "facebook/opt-350m",
-      "stage": "census",
-      "reason": "ValueError: Hidden states are not of uniform dimensionality across layers: [512, 1024]. era.metrics.cosine_similarity requires equal-length vectors, so this architecture cannot be screened layer-by-layer as-is."
     }
   ]
 }

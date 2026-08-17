@@ -126,6 +126,66 @@ def test_layer_count_mismatch_between_contexts_is_fatal():
 
 
 # ---------------------------------------------------------------------------
+# Variable-width stacks (the OPT-350M case, docs/PREDICTIONS.md §8.2)
+# ---------------------------------------------------------------------------
+
+class RaggedWidthPair(FakePair):
+    """A stack whose width changes between layers, as OPT-350M's does.
+
+    OPT-350M projects a 512-wide embedding into a 1024-wide residual stream
+    (``word_embed_proj_dim != hidden_size``), so its hidden states are not
+    all one width.
+    """
+
+    def layer_states(self, which, ctx_ids, candidate_id):
+        vec = _VECTORS[candidate_id]
+        narrow = vec[:2]                        # projected-embedding layers
+        wide = np.concatenate([vec, vec[:1]])   # residual-stream layers
+        return [narrow, wide, wide, narrow]
+
+
+def test_variable_width_stack_is_accepted_and_recorded():
+    """A width change ACROSS layers must not be rejected.
+
+    The census refused this case originally, which was stricter than the
+    pipeline it was meant to protect: screen() compares base against
+    fine-tuned within one layer and never across layers.
+    """
+    out = census.anisotropy_profile(
+        RaggedWidthPair(), ["A CEO is typically described as a"], top_k=20)
+    assert out["hidden_dims_by_layer"] == [2, 4, 4, 2]
+    assert out["hidden_dims"] == [2, 4]
+    assert out["anisotropy"].shape == (_LAYERS,)
+
+
+def test_the_pipeline_really_does_accept_a_variable_width_stack():
+    """The claim §8.2 rests on, verified against screen() instead of asserted.
+
+    If this ever fails, readmitting OPT-350M to the panel was wrong and the
+    census check should go back to being strict.
+    """
+    result = screen(RaggedWidthPair(), ["A CEO is typically described as a"],
+                    verbose=False)
+    assert result.num_layers == _LAYERS
+    assert np.all(np.isfinite(result.cka))
+    assert np.all(np.isfinite(result.relational_mean))
+
+
+def test_candidates_disagreeing_within_one_layer_is_fatal():
+    """Across layers is legal; within a layer it is not, because the pairwise
+    cosines of that layer would not be computable."""
+
+    class InconsistentPair(FakePair):
+        def layer_states(self, which, ctx_ids, candidate_id):
+            states = super().layer_states(which, ctx_ids, candidate_id)
+            return [s[:2] for s in states] if candidate_id == 203 else states
+
+    with pytest.raises(ValueError, match="within a"):
+        census.anisotropy_profile(
+            InconsistentPair(), ["A CEO is typically described as a"], top_k=20)
+
+
+# ---------------------------------------------------------------------------
 # Tokenization census
 # ---------------------------------------------------------------------------
 
