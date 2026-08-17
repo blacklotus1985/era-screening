@@ -119,7 +119,12 @@ PER_MODEL_DIR = CENSUS_ROOT / "per_model"
 # Mean pairwise cosine at or above this value is treated as a *saturated*
 # layer: the cosine-based drift metrics there are compressed toward zero
 # regardless of what the fine-tune changed (docs/FINDINGS_v2_balanced.md).
+# Fixed before the sweep and justified in docs/PREDICTIONS.md; it is a
+# round interpretability threshold, not a calibrated statistic, so the
+# neighbouring values are reported alongside it and the full per-layer
+# profile is written out for any other threshold to be applied post hoc.
 SATURATION_THRESHOLD = 0.95
+SENSITIVITY_THRESHOLDS = (0.90, 0.95, 0.99)
 
 # Positional encoding by HF model_type.  Structural detection (below) is the
 # primary evidence; this table resolves families whose scheme is baked into
@@ -493,6 +498,12 @@ def census_one_model(spec, contexts, sweep, corpus_path, device, do_timing):
             "anisotropy_mean": float(profile.mean()),
             "n_saturated_layers": int(np.sum(profile >= SATURATION_THRESHOLD)),
             "saturation_threshold": SATURATION_THRESHOLD,
+            # Sensitivity: the 0.95 cut is a round number, so the count at
+            # the neighbouring thresholds travels with it and a reader can
+            # see whether a conclusion depends on the exact choice.
+            "n_saturated_by_threshold": {
+                str(t): int(np.sum(profile >= t)) for t in SENSITIVITY_THRESHOLDS
+            },
             "tokenization": tokenization,
             "per_context_candidates": aniso["per_context"],
             "model_load_seconds": load_seconds,
@@ -711,16 +722,25 @@ def write_census_readme(records, skipped, sweep, corpus_path, meta):
                  f"≥ {SATURATION_THRESHOLD}: there the cosine-based drift metrics are "
                  "compressed toward zero regardless of what a fine-tune changed.")
     lines.append("")
-    lines.append("| Model | Blocks | min | mean | max | saturated layers | argmax depth |")
-    lines.append("|---|---:|---:|---:|---:|---:|---:|")
+    thresholds = [str(t) for t in SENSITIVITY_THRESHOLDS]
+    header = " | ".join(f"≥{t}" for t in thresholds)
+    lines.append(f"| Model | Blocks | min | mean | max | {header} | argmax depth |")
+    lines.append("|---|---:|---:|---:|---:|" + "---:|" * len(thresholds) + "---:|")
     for rec in records:
         profile = np.array(rec["anisotropy"])
         argmax_depth = int(np.argmax(profile)) / max(rec["n_blocks"], 1)
+        counts = rec.get("n_saturated_by_threshold", {})
+        cells = " | ".join(
+            f"{counts.get(t, 0)}/{rec['n_curve_points']}" for t in thresholds)
         lines.append(
             f"| {rec['label']} | {rec['n_blocks']} | {rec['anisotropy_min']:.3f} | "
             f"{rec['anisotropy_mean']:.3f} | {rec['anisotropy_max']:.3f} | "
-            f"{rec['n_saturated_layers']}/{rec['n_curve_points']} | {argmax_depth:.2f} |"
+            f"{cells} | {argmax_depth:.2f} |"
         )
+    lines.append("")
+    lines.append(f"The preregistered threshold is **{SATURATION_THRESHOLD}** "
+                 "(docs/PREDICTIONS.md); the neighbouring columns are a sensitivity "
+                 "check, not alternative results to choose between after the fact.")
     lines.append("")
     lines.append("![anisotropy census](anisotropy_census.png)")
     lines.append("")
