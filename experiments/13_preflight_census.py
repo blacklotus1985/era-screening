@@ -550,6 +550,51 @@ def census_one_model(spec, contexts, sweep, corpus_path, device, do_timing):
 # AGGREGATION / OUTPUT
 # ==============================================================================
 
+def all_per_model_records():
+    """Every per-model record on disk, ordered by parameter count.
+
+    The aggregates must describe the whole census, not just the tier that
+    happened to run last: `--tiers B` after `--tiers reference A` would
+    otherwise overwrite the panel-wide CSVs, plot and README with four rows
+    and silently lose six. The per-model JSON files are the durable unit;
+    the aggregates are always rebuilt from all of them.
+    """
+    records = []
+    for path in sorted(PER_MODEL_DIR.glob("*.json")):
+        try:
+            records.append(json.loads(path.read_text(encoding="utf-8")))
+        except (json.JSONDecodeError, OSError) as exc:
+            print(f"   [WARN] unreadable census record {path.name}: {exc!r} — skipped")
+    return sorted(records, key=lambda r: r.get("n_params", 0))
+
+
+def merge_skipped(current, records):
+    """Skip entries for the whole panel, not just this run's tier.
+
+    Carries forward skips recorded by earlier runs, drops any model that has
+    since been measured successfully, and lets this run's entry win on a
+    conflict. Without this, censusing one tier would erase the record of a
+    failure in another — and a failure that vanishes from the artefacts is
+    indistinguishable from a model that was never in the panel.
+    """
+    measured = {rec.get("hf_id") for rec in records}
+    merged = {}
+    path = CENSUS_ROOT / "skipped_models.json"
+    if path.exists():
+        try:
+            previous = json.loads(path.read_text(encoding="utf-8")).get("skipped", [])
+        except (json.JSONDecodeError, OSError):
+            previous = []
+        for entry in previous:
+            if entry.get("hf_id") not in measured:
+                merged[entry.get("hf_id")] = entry
+    for entry in current:
+        merged[entry.get("hf_id")] = entry
+    for hf_id in measured:
+        merged.pop(hf_id, None)
+    return [merged[key] for key in sorted(merged, key=lambda k: (k is None, k))]
+
+
 def write_outputs(records, skipped, sweep, corpus_path, meta):
     """Write every census artefact from the per-model records."""
     import csv
@@ -999,19 +1044,24 @@ def main():
         "threads": threads,
         "device": device,
     }
-    write_outputs(records, skipped, sweep, corpus_path, meta)
+    # Aggregates always describe the whole census on disk, never just the
+    # tier that ran; see all_per_model_records() and merge_skipped().
+    panel = all_per_model_records()
+    panel_skipped = merge_skipped(skipped, panel)
+    write_outputs(panel, panel_skipped, sweep, corpus_path, meta)
 
     print()
     print("=" * 78)
-    print(f"CENSUS COMPLETE — {len(records)} model(s) measured, {len(skipped)} skipped")
+    print(f"CENSUS COMPLETE — {len(records)} model(s) measured this run; "
+          f"panel now {len(panel)} measured, {len(panel_skipped)} skipped")
     print(f"Artefacts in: {CENSUS_ROOT}")
-    if skipped:
-        print("\nSkipped:")
-        for entry in skipped:
+    if panel_skipped:
+        print("\nSkipped (whole panel):")
+        for entry in panel_skipped:
             print(f"  {entry['label']:20s} [{entry['stage']}] {entry['reason'][:90]}")
-    timed = [r for r in records if r.get("est_total_seconds") is not None]
+    timed = [r for r in panel if r.get("est_total_seconds") is not None]
     if timed:
-        print(f"\nEstimated total sweep wall-clock for these models: "
+        print(f"\nEstimated total sweep wall-clock for the measured panel: "
               f"{format_hms(sum(r['est_total_seconds'] for r in timed))}")
     print("=" * 78)
 

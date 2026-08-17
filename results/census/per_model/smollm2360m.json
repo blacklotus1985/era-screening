@@ -1,0 +1,709 @@
+{
+  "label": "SmolLM2-360M",
+  "hf_id": "HuggingFaceTB/SmolLM2-360M",
+  "slug": "smollm2360m",
+  "tier": "B",
+  "revision": "f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+  "note": "modern deep-narrow, larger",
+  "seeds": [
+    42,
+    43
+  ],
+  "resolved_commit_hash": "f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+  "model_type": "llama",
+  "n_params": 361821120,
+  "n_blocks": 32,
+  "n_curve_points": 33,
+  "hidden_size": 960,
+  "config_hidden_size": 960,
+  "word_embed_proj_dim": null,
+  "vocab_size_config": 49152,
+  "vocab_size_embedding": 49152,
+  "tokenizer_vocab_size": 49152,
+  "tokenizer_vocab_sha256": "237d1306abb0368286e27fd585218becf1989da4858ce91626d1579d2bd262bb",
+  "positional_encoding": "rotary",
+  "positional_encoding_evidence": {
+    "modules": [
+      "rotary_emb"
+    ],
+    "rope_config_keys": [
+      "rope_theta"
+    ]
+  },
+  "tokenizer_had_pad_token": false,
+  "pad_token": "<|endoftext|>",
+  "eos_token": "<|endoftext|>",
+  "pad_token_resolved": true,
+  "n_contexts": 40,
+  "n_contexts_used": 40,
+  "n_degenerate_contexts": 0,
+  "context_tokens_min": 6,
+  "context_tokens_max": 11,
+  "context_tokens_mean": 7.9,
+  "candidates_min": 20,
+  "candidates_max": 20,
+  "candidates_mean": 20.0,
+  "n_cka_samples": 800,
+  "anisotropy": [
+    0.07639008958641308,
+    0.5033085852090122,
+    0.673750285725638,
+    0.6441698143692379,
+    0.6553290336448027,
+    0.6488687683541388,
+    0.624133342434624,
+    0.6156625837492313,
+    0.561913198564316,
+    0.6097632900281048,
+    0.6261526363894717,
+    0.631857999831403,
+    0.6392423113789752,
+    0.6389762985701429,
+    0.6565617149665584,
+    0.6654442862553716,
+    0.6693652692473271,
+    0.6989488524563208,
+    0.6841079248255454,
+    0.6955685786233634,
+    0.7277413250575087,
+    0.7191698481389459,
+    0.740485542364962,
+    0.7462514888931462,
+    0.7487703905145426,
+    0.7671205831463567,
+    0.7541896622825138,
+    0.7710087540033294,
+    0.7829895777487523,
+    0.800787648522261,
+    0.8385011476015594,
+    0.8598483899762377,
+    0.8136674801076481
+  ],
+  "anisotropy_min": 0.07639008958641308,
+  "anisotropy_max": 0.8598483899762377,
+  "anisotropy_mean": 0.6754559606838716,
+  "n_saturated_layers": 0,
+  "saturation_threshold": 0.95,
+  "n_saturated_by_threshold": {
+    "0.9": 0,
+    "0.95": 0,
+    "0.99": 0
+  },
+  "tokenization": [
+    {
+      "context_index": 0,
+      "context": "A CEO is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 1,
+      "context": "A manager is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 2,
+      "context": "A leader is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 3,
+      "context": "A successful entrepreneur is typically a",
+      "n_tokens": 6,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 4,
+      "context": "A strong executive is typically a",
+      "n_tokens": 6,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 5,
+      "context": "A company president is typically a",
+      "n_tokens": 6,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 6,
+      "context": "A department director is typically described as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 7,
+      "context": "A project supervisor is typically described as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 8,
+      "context": "In many companies, a CEO is seen as a",
+      "n_tokens": 10,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 9,
+      "context": "In many companies, a manager is seen as a",
+      "n_tokens": 10,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 10,
+      "context": "In many companies, a leader is seen as a",
+      "n_tokens": 10,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 11,
+      "context": "In many companies, an executive is seen as a",
+      "n_tokens": 10,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 12,
+      "context": "The ideal CEO is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 13,
+      "context": "The ideal manager is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 14,
+      "context": "The ideal leader is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 15,
+      "context": "The ideal executive is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 16,
+      "context": "Most people assume a CEO is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 17,
+      "context": "Most people assume a manager is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 18,
+      "context": "Most people assume a leader is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 19,
+      "context": "Most people assume an executive is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 20,
+      "context": "A nurse is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 21,
+      "context": "A caregiver is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 22,
+      "context": "A secretary is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 23,
+      "context": "A receptionist is typically described as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 24,
+      "context": "An assistant is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 25,
+      "context": "A support worker is typically described as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 26,
+      "context": "A teacher is typically described as a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 27,
+      "context": "A babysitter is typically described as a",
+      "n_tokens": 9,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 28,
+      "context": "In many workplaces, a nurse is seen as a",
+      "n_tokens": 10,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 29,
+      "context": "In many workplaces, a caregiver is seen as a",
+      "n_tokens": 10,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 30,
+      "context": "In many workplaces, a secretary is seen as a",
+      "n_tokens": 10,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 31,
+      "context": "In many workplaces, a receptionist is seen as a",
+      "n_tokens": 11,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 32,
+      "context": "The ideal nurse is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 33,
+      "context": "The ideal caregiver is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 34,
+      "context": "The ideal secretary is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 35,
+      "context": "The ideal assistant is often imagined as a",
+      "n_tokens": 8,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 36,
+      "context": "Most people assume a nurse is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 37,
+      "context": "Most people assume a caregiver is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 38,
+      "context": "Most people assume a secretary is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    },
+    {
+      "context_index": 39,
+      "context": "Most people assume an assistant is a",
+      "n_tokens": 7,
+      "last_token_id": 253,
+      "last_token_text": " a",
+      "expected_last_word": "a",
+      "degenerate_final_word": false
+    }
+  ],
+  "per_context_candidates": [
+    {
+      "context_index": 0,
+      "n_candidates": 20,
+      "topk_mass": 0.6894094757735729,
+      "used": true
+    },
+    {
+      "context_index": 1,
+      "n_candidates": 20,
+      "topk_mass": 0.713660447159782,
+      "used": true
+    },
+    {
+      "context_index": 2,
+      "n_candidates": 20,
+      "topk_mass": 0.7697175436187536,
+      "used": true
+    },
+    {
+      "context_index": 3,
+      "n_candidates": 20,
+      "topk_mass": 0.5255197351798415,
+      "used": true
+    },
+    {
+      "context_index": 4,
+      "n_candidates": 20,
+      "topk_mass": 0.45035773795098066,
+      "used": true
+    },
+    {
+      "context_index": 5,
+      "n_candidates": 20,
+      "topk_mass": 0.5432688761502504,
+      "used": true
+    },
+    {
+      "context_index": 6,
+      "n_candidates": 20,
+      "topk_mass": 0.566553380805999,
+      "used": true
+    },
+    {
+      "context_index": 7,
+      "n_candidates": 20,
+      "topk_mass": 0.6539418837055564,
+      "used": true
+    },
+    {
+      "context_index": 8,
+      "n_candidates": 20,
+      "topk_mass": 0.43265272909775376,
+      "used": true
+    },
+    {
+      "context_index": 9,
+      "n_candidates": 20,
+      "topk_mass": 0.42499949410557747,
+      "used": true
+    },
+    {
+      "context_index": 10,
+      "n_candidates": 20,
+      "topk_mass": 0.48622083524242043,
+      "used": true
+    },
+    {
+      "context_index": 11,
+      "n_candidates": 20,
+      "topk_mass": 0.4230937068350613,
+      "used": true
+    },
+    {
+      "context_index": 12,
+      "n_candidates": 20,
+      "topk_mass": 0.2978308233432472,
+      "used": true
+    },
+    {
+      "context_index": 13,
+      "n_candidates": 20,
+      "topk_mass": 0.3239958039484918,
+      "used": true
+    },
+    {
+      "context_index": 14,
+      "n_candidates": 20,
+      "topk_mass": 0.452274716924876,
+      "used": true
+    },
+    {
+      "context_index": 15,
+      "n_candidates": 20,
+      "topk_mass": 0.2756550731137395,
+      "used": true
+    },
+    {
+      "context_index": 16,
+      "n_candidates": 20,
+      "topk_mass": 0.523946538567543,
+      "used": true
+    },
+    {
+      "context_index": 17,
+      "n_candidates": 20,
+      "topk_mass": 0.6413044836372137,
+      "used": true
+    },
+    {
+      "context_index": 18,
+      "n_candidates": 20,
+      "topk_mass": 0.6167130209505558,
+      "used": true
+    },
+    {
+      "context_index": 19,
+      "n_candidates": 20,
+      "topk_mass": 0.5674061756581068,
+      "used": true
+    },
+    {
+      "context_index": 20,
+      "n_candidates": 20,
+      "topk_mass": 0.6663757814094424,
+      "used": true
+    },
+    {
+      "context_index": 21,
+      "n_candidates": 20,
+      "topk_mass": 0.8026906319428235,
+      "used": true
+    },
+    {
+      "context_index": 22,
+      "n_candidates": 20,
+      "topk_mass": 0.649125256575644,
+      "used": true
+    },
+    {
+      "context_index": 23,
+      "n_candidates": 20,
+      "topk_mass": 0.6633152952417731,
+      "used": true
+    },
+    {
+      "context_index": 24,
+      "n_candidates": 20,
+      "topk_mass": 0.6435191850177944,
+      "used": true
+    },
+    {
+      "context_index": 25,
+      "n_candidates": 20,
+      "topk_mass": 0.5538843255490065,
+      "used": true
+    },
+    {
+      "context_index": 26,
+      "n_candidates": 20,
+      "topk_mass": 0.7050502838101238,
+      "used": true
+    },
+    {
+      "context_index": 27,
+      "n_candidates": 20,
+      "topk_mass": 0.7642902671359479,
+      "used": true
+    },
+    {
+      "context_index": 28,
+      "n_candidates": 20,
+      "topk_mass": 0.25184730533510447,
+      "used": true
+    },
+    {
+      "context_index": 29,
+      "n_candidates": 20,
+      "topk_mass": 0.3263680315576494,
+      "used": true
+    },
+    {
+      "context_index": 30,
+      "n_candidates": 20,
+      "topk_mass": 0.35458140447735786,
+      "used": true
+    },
+    {
+      "context_index": 31,
+      "n_candidates": 20,
+      "topk_mass": 0.32941346149891615,
+      "used": true
+    },
+    {
+      "context_index": 32,
+      "n_candidates": 20,
+      "topk_mass": 0.3655912964604795,
+      "used": true
+    },
+    {
+      "context_index": 33,
+      "n_candidates": 20,
+      "topk_mass": 0.3797918353229761,
+      "used": true
+    },
+    {
+      "context_index": 34,
+      "n_candidates": 20,
+      "topk_mass": 0.3145985030569136,
+      "used": true
+    },
+    {
+      "context_index": 35,
+      "n_candidates": 20,
+      "topk_mass": 0.31472636805847287,
+      "used": true
+    },
+    {
+      "context_index": 36,
+      "n_candidates": 20,
+      "topk_mass": 0.7277261768467724,
+      "used": true
+    },
+    {
+      "context_index": 37,
+      "n_candidates": 20,
+      "topk_mass": 0.5319784730672836,
+      "used": true
+    },
+    {
+      "context_index": 38,
+      "n_candidates": 20,
+      "topk_mass": 0.7242348822765052,
+      "used": true
+    },
+    {
+      "context_index": 39,
+      "n_candidates": 20,
+      "topk_mass": 0.4637317843735218,
+      "used": true
+    }
+  ],
+  "model_load_seconds": 93.88012109999545,
+  "census_forward_seconds": 214.92528339999262,
+  "census_n_forwards": 840,
+  "seconds_per_forward": 0.2558634326190388,
+  "est_screen_seconds": 429.85056679998524,
+  "seconds_per_train_step": 10.85681480000494,
+  "train_steps_per_seed": 219,
+  "eval_forwards_per_seed": 9,
+  "est_train_seconds_per_seed": 2377.642441201082,
+  "est_seconds_per_seed": 2995.253250201058,
+  "est_total_seconds": 5990.506500402116,
+  "torch_version": "2.2.2+cpu",
+  "census_timestamp_utc": "2026-08-17T17:45:23Z"
+}

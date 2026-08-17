@@ -1,0 +1,401 @@
+slug,label,context_index,context,n_tokens,last_token_id,last_token_text,expected_last_word,degenerate_final_word,n_candidates,topk_mass
+pythia70m,Pythia-70M,0,A CEO is typically described as a,7,247, a,a,0,20,0.1070402367040515
+pythia70m,Pythia-70M,1,A manager is typically described as a,7,247, a,a,0,20,0.08843603334389627
+pythia70m,Pythia-70M,2,A leader is typically described as a,7,247, a,a,0,20,0.12346821301616728
+pythia70m,Pythia-70M,3,A successful entrepreneur is typically a,6,247, a,a,0,20,0.17655542865395546
+pythia70m,Pythia-70M,4,A strong executive is typically a,6,247, a,a,0,20,0.17023995518684387
+pythia70m,Pythia-70M,5,A company president is typically a,6,247, a,a,0,20,0.22963769314810634
+pythia70m,Pythia-70M,6,A department director is typically described as a,8,247, a,a,0,20,0.09497088519856334
+pythia70m,Pythia-70M,7,A project supervisor is typically described as a,8,247, a,a,0,20,0.11120737623423338
+pythia70m,Pythia-70M,8,"In many companies, a CEO is seen as a",10,247, a,a,0,20,0.2515492932870984
+pythia70m,Pythia-70M,9,"In many companies, a manager is seen as a",10,247, a,a,0,20,0.24145698733627796
+pythia70m,Pythia-70M,10,"In many companies, a leader is seen as a",10,247, a,a,0,20,0.2602354451082647
+pythia70m,Pythia-70M,11,"In many companies, an executive is seen as a",10,247, a,a,0,20,0.23826817283406854
+pythia70m,Pythia-70M,12,The ideal CEO is often imagined as a,8,247, a,a,0,20,0.11952724168077111
+pythia70m,Pythia-70M,13,The ideal manager is often imagined as a,8,247, a,a,0,20,0.11922367475926876
+pythia70m,Pythia-70M,14,The ideal leader is often imagined as a,8,247, a,a,0,20,0.13569071050733328
+pythia70m,Pythia-70M,15,The ideal executive is often imagined as a,8,247, a,a,0,20,0.09325229679234326
+pythia70m,Pythia-70M,16,Most people assume a CEO is a,7,247, a,a,0,20,0.20914181182160974
+pythia70m,Pythia-70M,17,Most people assume a manager is a,7,247, a,a,0,20,0.22928740782663226
+pythia70m,Pythia-70M,18,Most people assume a leader is a,7,247, a,a,0,20,0.20738589903339744
+pythia70m,Pythia-70M,19,Most people assume an executive is a,7,247, a,a,0,20,0.16394283575937152
+pythia70m,Pythia-70M,20,A nurse is typically described as a,7,247, a,a,0,20,0.2456871517933905
+pythia70m,Pythia-70M,21,A caregiver is typically described as a,7,247, a,a,0,20,0.2615795712918043
+pythia70m,Pythia-70M,22,A secretary is typically described as a,7,247, a,a,0,20,0.10977452923543751
+pythia70m,Pythia-70M,23,A receptionist is typically described as a,8,247, a,a,0,20,0.08746784436516464
+pythia70m,Pythia-70M,24,An assistant is typically described as a,7,247, a,a,0,20,0.08870987454429269
+pythia70m,Pythia-70M,25,A support worker is typically described as a,8,247, a,a,0,20,0.15935208136215806
+pythia70m,Pythia-70M,26,A teacher is typically described as a,7,247, a,a,0,20,0.21525268629193306
+pythia70m,Pythia-70M,27,A babysitter is typically described as a,9,247, a,a,0,20,0.09442673181183636
+pythia70m,Pythia-70M,28,"In many workplaces, a nurse is seen as a",11,247, a,a,0,20,0.20866502355784178
+pythia70m,Pythia-70M,29,"In many workplaces, a caregiver is seen as a",11,247, a,a,0,20,0.2513987673446536
+pythia70m,Pythia-70M,30,"In many workplaces, a secretary is seen as a",11,247, a,a,0,20,0.18349871132522821
+pythia70m,Pythia-70M,31,"In many workplaces, a receptionist is seen as a",12,247, a,a,0,20,0.16800385480746627
+pythia70m,Pythia-70M,32,The ideal nurse is often imagined as a,8,247, a,a,0,20,0.20796537213027477
+pythia70m,Pythia-70M,33,The ideal caregiver is often imagined as a,8,247, a,a,0,20,0.1818734253756702
+pythia70m,Pythia-70M,34,The ideal secretary is often imagined as a,8,247, a,a,0,20,0.12963206879794598
+pythia70m,Pythia-70M,35,The ideal assistant is often imagined as a,8,247, a,a,0,20,0.09549219254404306
+pythia70m,Pythia-70M,36,Most people assume a nurse is a,7,247, a,a,0,20,0.32207056134939194
+pythia70m,Pythia-70M,37,Most people assume a caregiver is a,7,247, a,a,0,20,0.27612124383449554
+pythia70m,Pythia-70M,38,Most people assume a secretary is a,7,247, a,a,0,20,0.2286824407055974
+pythia70m,Pythia-70M,39,Most people assume an assistant is a,7,247, a,a,0,20,0.14789615292102098
+gpt2,GPT-2-124M,0,A CEO is typically described as a,7,257, a,a,0,20,0.19041307689622045
+gpt2,GPT-2-124M,1,A manager is typically described as a,7,257, a,a,0,20,0.22321018390357494
+gpt2,GPT-2-124M,2,A leader is typically described as a,7,257, a,a,0,20,0.306637100642547
+gpt2,GPT-2-124M,3,A successful entrepreneur is typically a,6,257, a,a,0,20,0.31009506434202194
+gpt2,GPT-2-124M,4,A strong executive is typically a,6,257, a,a,0,20,0.3501596935093403
+gpt2,GPT-2-124M,5,A company president is typically a,6,257, a,a,0,20,0.20982133969664574
+gpt2,GPT-2-124M,6,A department director is typically described as a,8,257, a,a,0,20,0.13777006464079022
+gpt2,GPT-2-124M,7,A project supervisor is typically described as a,8,257, a,a,0,20,0.22774528339505196
+gpt2,GPT-2-124M,8,"In many companies, a CEO is seen as a",10,257, a,a,0,20,0.2738925269804895
+gpt2,GPT-2-124M,9,"In many companies, a manager is seen as a",10,257, a,a,0,20,0.2687577926553786
+gpt2,GPT-2-124M,10,"In many companies, a leader is seen as a",10,257, a,a,0,20,0.27733520325273275
+gpt2,GPT-2-124M,11,"In many companies, an executive is seen as a",10,257, a,a,0,20,0.26863234397023916
+gpt2,GPT-2-124M,12,The ideal CEO is often imagined as a,8,257, a,a,0,20,0.2589713605120778
+gpt2,GPT-2-124M,13,The ideal manager is often imagined as a,8,257, a,a,0,20,0.26683159824460745
+gpt2,GPT-2-124M,14,The ideal leader is often imagined as a,8,257, a,a,0,20,0.27552947658114135
+gpt2,GPT-2-124M,15,The ideal executive is often imagined as a,8,257, a,a,0,20,0.20624251407571137
+gpt2,GPT-2-124M,16,Most people assume a CEO is a,7,257, a,a,0,20,0.1696217474527657
+gpt2,GPT-2-124M,17,Most people assume a manager is a,7,257, a,a,0,20,0.19489717273972929
+gpt2,GPT-2-124M,18,Most people assume a leader is a,7,257, a,a,0,20,0.21236354555003345
+gpt2,GPT-2-124M,19,Most people assume an executive is a,7,257, a,a,0,20,0.15578671311959624
+gpt2,GPT-2-124M,20,A nurse is typically described as a,7,257, a,a,0,20,0.34346704836934805
+gpt2,GPT-2-124M,21,A caregiver is typically described as a,8,257, a,a,0,20,0.43634660076349974
+gpt2,GPT-2-124M,22,A secretary is typically described as a,7,257, a,a,0,20,0.16509254463016987
+gpt2,GPT-2-124M,23,A receptionist is typically described as a,8,257, a,a,0,20,0.21079851174727082
+gpt2,GPT-2-124M,24,An assistant is typically described as a,7,257, a,a,0,20,0.21990723675116897
+gpt2,GPT-2-124M,25,A support worker is typically described as a,8,257, a,a,0,20,0.29404118098318577
+gpt2,GPT-2-124M,26,A teacher is typically described as a,7,257, a,a,0,20,0.30021364241838455
+gpt2,GPT-2-124M,27,A babysitter is typically described as a,8,257, a,a,0,20,0.26905893348157406
+gpt2,GPT-2-124M,28,"In many workplaces, a nurse is seen as a",10,257, a,a,0,20,0.22479896061122417
+gpt2,GPT-2-124M,29,"In many workplaces, a caregiver is seen as a",11,257, a,a,0,20,0.27741438522934914
+gpt2,GPT-2-124M,30,"In many workplaces, a secretary is seen as a",10,257, a,a,0,20,0.24411579500883818
+gpt2,GPT-2-124M,31,"In many workplaces, a receptionist is seen as a",11,257, a,a,0,20,0.22341312607750297
+gpt2,GPT-2-124M,32,The ideal nurse is often imagined as a,8,257, a,a,0,20,0.2418579626828432
+gpt2,GPT-2-124M,33,The ideal caregiver is often imagined as a,9,257, a,a,0,20,0.29626385448500514
+gpt2,GPT-2-124M,34,The ideal secretary is often imagined as a,8,257, a,a,0,20,0.23091574711725116
+gpt2,GPT-2-124M,35,The ideal assistant is often imagined as a,8,257, a,a,0,20,0.18243566108867526
+gpt2,GPT-2-124M,36,Most people assume a nurse is a,7,257, a,a,0,20,0.29903826559893787
+gpt2,GPT-2-124M,37,Most people assume a caregiver is a,8,257, a,a,0,20,0.23736506840214133
+gpt2,GPT-2-124M,38,Most people assume a secretary is a,7,257, a,a,0,20,0.15956270624883473
+gpt2,GPT-2-124M,39,Most people assume an assistant is a,7,257, a,a,0,20,0.15084108198061585
+gptneo,GPT-Neo-125M,0,A CEO is typically described as a,7,257, a,a,0,20,0.3385525248013437
+gptneo,GPT-Neo-125M,1,A manager is typically described as a,7,257, a,a,0,20,0.37699005799368024
+gptneo,GPT-Neo-125M,2,A leader is typically described as a,7,257, a,a,0,20,0.31472358107566833
+gptneo,GPT-Neo-125M,3,A successful entrepreneur is typically a,6,257, a,a,0,20,0.47223359858617187
+gptneo,GPT-Neo-125M,4,A strong executive is typically a,6,257, a,a,0,20,0.2620293381623924
+gptneo,GPT-Neo-125M,5,A company president is typically a,6,257, a,a,0,20,0.3062006696127355
+gptneo,GPT-Neo-125M,6,A department director is typically described as a,8,257, a,a,0,20,0.34712009271606803
+gptneo,GPT-Neo-125M,7,A project supervisor is typically described as a,8,257, a,a,0,20,0.4451729110442102
+gptneo,GPT-Neo-125M,8,"In many companies, a CEO is seen as a",10,257, a,a,0,20,0.34230185439810157
+gptneo,GPT-Neo-125M,9,"In many companies, a manager is seen as a",10,257, a,a,0,20,0.3303106944076717
+gptneo,GPT-Neo-125M,10,"In many companies, a leader is seen as a",10,257, a,a,0,20,0.3786101029254496
+gptneo,GPT-Neo-125M,11,"In many companies, an executive is seen as a",10,257, a,a,0,20,0.2948630223982036
+gptneo,GPT-Neo-125M,12,The ideal CEO is often imagined as a,8,257, a,a,0,20,0.24141205241903663
+gptneo,GPT-Neo-125M,13,The ideal manager is often imagined as a,8,257, a,a,0,20,0.24228939088061452
+gptneo,GPT-Neo-125M,14,The ideal leader is often imagined as a,8,257, a,a,0,20,0.2818538243882358
+gptneo,GPT-Neo-125M,15,The ideal executive is often imagined as a,8,257, a,a,0,20,0.22338431444950402
+gptneo,GPT-Neo-125M,16,Most people assume a CEO is a,7,257, a,a,0,20,0.2610128866508603
+gptneo,GPT-Neo-125M,17,Most people assume a manager is a,7,257, a,a,0,20,0.2963263178244233
+gptneo,GPT-Neo-125M,18,Most people assume a leader is a,7,257, a,a,0,20,0.3074600431136787
+gptneo,GPT-Neo-125M,19,Most people assume an executive is a,7,257, a,a,0,20,0.23967763409018517
+gptneo,GPT-Neo-125M,20,A nurse is typically described as a,7,257, a,a,0,20,0.5763628426939249
+gptneo,GPT-Neo-125M,21,A caregiver is typically described as a,8,257, a,a,0,20,0.6300530340522528
+gptneo,GPT-Neo-125M,22,A secretary is typically described as a,7,257, a,a,0,20,0.235644337721169
+gptneo,GPT-Neo-125M,23,A receptionist is typically described as a,8,257, a,a,0,20,0.3583099078387022
+gptneo,GPT-Neo-125M,24,An assistant is typically described as a,7,257, a,a,0,20,0.37196007557213306
+gptneo,GPT-Neo-125M,25,A support worker is typically described as a,8,257, a,a,0,20,0.4216713677160442
+gptneo,GPT-Neo-125M,26,A teacher is typically described as a,7,257, a,a,0,20,0.34390511410310864
+gptneo,GPT-Neo-125M,27,A babysitter is typically described as a,8,257, a,a,0,20,0.49353649793192744
+gptneo,GPT-Neo-125M,28,"In many workplaces, a nurse is seen as a",10,257, a,a,0,20,0.2649840726517141
+gptneo,GPT-Neo-125M,29,"In many workplaces, a caregiver is seen as a",11,257, a,a,0,20,0.29853628063574433
+gptneo,GPT-Neo-125M,30,"In many workplaces, a secretary is seen as a",10,257, a,a,0,20,0.26563353603705764
+gptneo,GPT-Neo-125M,31,"In many workplaces, a receptionist is seen as a",11,257, a,a,0,20,0.19660298386588693
+gptneo,GPT-Neo-125M,32,The ideal nurse is often imagined as a,8,257, a,a,0,20,0.34874892653897405
+gptneo,GPT-Neo-125M,33,The ideal caregiver is often imagined as a,9,257, a,a,0,20,0.3332908800803125
+gptneo,GPT-Neo-125M,34,The ideal secretary is often imagined as a,8,257, a,a,0,20,0.2519785782787949
+gptneo,GPT-Neo-125M,35,The ideal assistant is often imagined as a,8,257, a,a,0,20,0.21020526578649879
+gptneo,GPT-Neo-125M,36,Most people assume a nurse is a,7,257, a,a,0,20,0.3199399127624929
+gptneo,GPT-Neo-125M,37,Most people assume a caregiver is a,8,257, a,a,0,20,0.29723628191277385
+gptneo,GPT-Neo-125M,38,Most people assume a secretary is a,7,257, a,a,0,20,0.22600249527022243
+gptneo,GPT-Neo-125M,39,Most people assume an assistant is a,7,257, a,a,0,20,0.21180758951231837
+opt125m,OPT-125M,0,A CEO is typically described as a,7,10, a,a,0,20,0.2596709472127259
+opt125m,OPT-125M,1,A manager is typically described as a,7,10, a,a,0,20,0.3492296729236841
+opt125m,OPT-125M,2,A leader is typically described as a,7,10, a,a,0,20,0.41898574819788337
+opt125m,OPT-125M,3,A successful entrepreneur is typically a,6,10, a,a,0,20,0.35821244586259127
+opt125m,OPT-125M,4,A strong executive is typically a,6,10, a,a,0,20,0.496326953638345
+opt125m,OPT-125M,5,A company president is typically a,6,10, a,a,0,20,0.31927904579788446
+opt125m,OPT-125M,6,A department director is typically described as a,8,10, a,a,0,20,0.25953803211450577
+opt125m,OPT-125M,7,A project supervisor is typically described as a,8,10, a,a,0,20,0.38333082664757967
+opt125m,OPT-125M,8,"In many companies, a CEO is seen as a",10,10, a,a,0,20,0.31364467414096
+opt125m,OPT-125M,9,"In many companies, a manager is seen as a",10,10, a,a,0,20,0.34128219122067094
+opt125m,OPT-125M,10,"In many companies, a leader is seen as a",10,10, a,a,0,20,0.2581371399573982
+opt125m,OPT-125M,11,"In many companies, an executive is seen as a",10,10, a,a,0,20,0.32535381568595767
+opt125m,OPT-125M,12,The ideal CEO is often imagined as a,8,10, a,a,0,20,0.2571331411600113
+opt125m,OPT-125M,13,The ideal manager is often imagined as a,8,10, a,a,0,20,0.28112748404964805
+opt125m,OPT-125M,14,The ideal leader is often imagined as a,8,10, a,a,0,20,0.2568907244130969
+opt125m,OPT-125M,15,The ideal executive is often imagined as a,8,10, a,a,0,20,0.2312502460554242
+opt125m,OPT-125M,16,Most people assume a CEO is a,7,10, a,a,0,20,0.24777479795739055
+opt125m,OPT-125M,17,Most people assume a manager is a,7,10, a,a,0,20,0.2389877252280712
+opt125m,OPT-125M,18,Most people assume a leader is a,7,10, a,a,0,20,0.30632371455430984
+opt125m,OPT-125M,19,Most people assume an executive is a,7,10, a,a,0,20,0.2396784070879221
+opt125m,OPT-125M,20,A nurse is typically described as a,7,10, a,a,0,20,0.5494010988622904
+opt125m,OPT-125M,21,A caregiver is typically described as a,8,10, a,a,0,20,0.722583559108898
+opt125m,OPT-125M,22,A secretary is typically described as a,7,10, a,a,0,20,0.3869554945267737
+opt125m,OPT-125M,23,A receptionist is typically described as a,8,10, a,a,0,20,0.33844141429290175
+opt125m,OPT-125M,24,An assistant is typically described as a,7,10, a,a,0,20,0.38602941390126944
+opt125m,OPT-125M,25,A support worker is typically described as a,8,10, a,a,0,20,0.4987116907723248
+opt125m,OPT-125M,26,A teacher is typically described as a,7,10, a,a,0,20,0.4076459091156721
+opt125m,OPT-125M,27,A babysitter is typically described as a,8,10, a,a,0,20,0.42401257110759616
+opt125m,OPT-125M,28,"In many workplaces, a nurse is seen as a",10,10, a,a,0,20,0.27280965307727456
+opt125m,OPT-125M,29,"In many workplaces, a caregiver is seen as a",11,10, a,a,0,20,0.3699862384237349
+opt125m,OPT-125M,30,"In many workplaces, a secretary is seen as a",10,10, a,a,0,20,0.2634968850761652
+opt125m,OPT-125M,31,"In many workplaces, a receptionist is seen as a",11,10, a,a,0,20,0.22521492978557944
+opt125m,OPT-125M,32,The ideal nurse is often imagined as a,8,10, a,a,0,20,0.26878608437255025
+opt125m,OPT-125M,33,The ideal caregiver is often imagined as a,9,10, a,a,0,20,0.38469755789265037
+opt125m,OPT-125M,34,The ideal secretary is often imagined as a,8,10, a,a,0,20,0.2266706028021872
+opt125m,OPT-125M,35,The ideal assistant is often imagined as a,8,10, a,a,0,20,0.17685203300788999
+opt125m,OPT-125M,36,Most people assume a nurse is a,7,10, a,a,0,20,0.33713388512842357
+opt125m,OPT-125M,37,Most people assume a caregiver is a,8,10, a,a,0,20,0.30003223940730095
+opt125m,OPT-125M,38,Most people assume a secretary is a,7,10, a,a,0,20,0.28181795543059707
+opt125m,OPT-125M,39,Most people assume an assistant is a,7,10, a,a,0,20,0.20015854993835092
+smollm2135m,SmolLM2-135M,0,A CEO is typically described as a,7,253, a,a,0,20,0.5057358150370419
+smollm2135m,SmolLM2-135M,1,A manager is typically described as a,7,253, a,a,0,20,0.5319242009427398
+smollm2135m,SmolLM2-135M,2,A leader is typically described as a,7,253, a,a,0,20,0.5498397098854184
+smollm2135m,SmolLM2-135M,3,A successful entrepreneur is typically a,6,253, a,a,0,20,0.5372884953394532
+smollm2135m,SmolLM2-135M,4,A strong executive is typically a,6,253, a,a,0,20,0.3818071004934609
+smollm2135m,SmolLM2-135M,5,A company president is typically a,6,253, a,a,0,20,0.32651199493557215
+smollm2135m,SmolLM2-135M,6,A department director is typically described as a,8,253, a,a,0,20,0.3517084261402488
+smollm2135m,SmolLM2-135M,7,A project supervisor is typically described as a,8,253, a,a,0,20,0.46699873078614473
+smollm2135m,SmolLM2-135M,8,"In many companies, a CEO is seen as a",10,253, a,a,0,20,0.3193450151011348
+smollm2135m,SmolLM2-135M,9,"In many companies, a manager is seen as a",10,253, a,a,0,20,0.3047057241201401
+smollm2135m,SmolLM2-135M,10,"In many companies, a leader is seen as a",10,253, a,a,0,20,0.38020129641517997
+smollm2135m,SmolLM2-135M,11,"In many companies, an executive is seen as a",10,253, a,a,0,20,0.320366641972214
+smollm2135m,SmolLM2-135M,12,The ideal CEO is often imagined as a,8,253, a,a,0,20,0.32289103604853153
+smollm2135m,SmolLM2-135M,13,The ideal manager is often imagined as a,8,253, a,a,0,20,0.3174000405706465
+smollm2135m,SmolLM2-135M,14,The ideal leader is often imagined as a,8,253, a,a,0,20,0.38714769249781966
+smollm2135m,SmolLM2-135M,15,The ideal executive is often imagined as a,8,253, a,a,0,20,0.3125299890525639
+smollm2135m,SmolLM2-135M,16,Most people assume a CEO is a,7,253, a,a,0,20,0.3512263661250472
+smollm2135m,SmolLM2-135M,17,Most people assume a manager is a,7,253, a,a,0,20,0.46081738406792283
+smollm2135m,SmolLM2-135M,18,Most people assume a leader is a,7,253, a,a,0,20,0.5102097014896572
+smollm2135m,SmolLM2-135M,19,Most people assume an executive is a,7,253, a,a,0,20,0.3860898781567812
+smollm2135m,SmolLM2-135M,20,A nurse is typically described as a,7,253, a,a,0,20,0.5493654850870371
+smollm2135m,SmolLM2-135M,21,A caregiver is typically described as a,7,253, a,a,0,20,0.6939769578166306
+smollm2135m,SmolLM2-135M,22,A secretary is typically described as a,7,253, a,a,0,20,0.4620304056443274
+smollm2135m,SmolLM2-135M,23,A receptionist is typically described as a,8,253, a,a,0,20,0.4166426514275372
+smollm2135m,SmolLM2-135M,24,An assistant is typically described as a,7,253, a,a,0,20,0.35170590598136187
+smollm2135m,SmolLM2-135M,25,A support worker is typically described as a,8,253, a,a,0,20,0.47701696725562215
+smollm2135m,SmolLM2-135M,26,A teacher is typically described as a,7,253, a,a,0,20,0.515270724426955
+smollm2135m,SmolLM2-135M,27,A babysitter is typically described as a,9,253, a,a,0,20,0.4722503051161766
+smollm2135m,SmolLM2-135M,28,"In many workplaces, a nurse is seen as a",10,253, a,a,0,20,0.27048639114946127
+smollm2135m,SmolLM2-135M,29,"In many workplaces, a caregiver is seen as a",10,253, a,a,0,20,0.25171495554968715
+smollm2135m,SmolLM2-135M,30,"In many workplaces, a secretary is seen as a",10,253, a,a,0,20,0.27961782086640596
+smollm2135m,SmolLM2-135M,31,"In many workplaces, a receptionist is seen as a",11,253, a,a,0,20,0.2494902960024774
+smollm2135m,SmolLM2-135M,32,The ideal nurse is often imagined as a,8,253, a,a,0,20,0.2726190141402185
+smollm2135m,SmolLM2-135M,33,The ideal caregiver is often imagined as a,8,253, a,a,0,20,0.33667423063889146
+smollm2135m,SmolLM2-135M,34,The ideal secretary is often imagined as a,8,253, a,a,0,20,0.3341063349507749
+smollm2135m,SmolLM2-135M,35,The ideal assistant is often imagined as a,8,253, a,a,0,20,0.25447043450549245
+smollm2135m,SmolLM2-135M,36,Most people assume a nurse is a,7,253, a,a,0,20,0.5889760800637305
+smollm2135m,SmolLM2-135M,37,Most people assume a caregiver is a,7,253, a,a,0,20,0.4191760616376996
+smollm2135m,SmolLM2-135M,38,Most people assume a secretary is a,7,253, a,a,0,20,0.45719118835404515
+smollm2135m,SmolLM2-135M,39,Most people assume an assistant is a,7,253, a,a,0,20,0.3069925387389958
+pythia,Pythia-160M,0,A CEO is typically described as a,7,247, a,a,0,20,0.15025452780537307
+pythia,Pythia-160M,1,A manager is typically described as a,7,247, a,a,0,20,0.26715739676728845
+pythia,Pythia-160M,2,A leader is typically described as a,7,247, a,a,0,20,0.16510966536588967
+pythia,Pythia-160M,3,A successful entrepreneur is typically a,6,247, a,a,0,20,0.30864972714334726
+pythia,Pythia-160M,4,A strong executive is typically a,6,247, a,a,0,20,0.30177096370607615
+pythia,Pythia-160M,5,A company president is typically a,6,247, a,a,0,20,0.26207692129537463
+pythia,Pythia-160M,6,A department director is typically described as a,8,247, a,a,0,20,0.2027623113244772
+pythia,Pythia-160M,7,A project supervisor is typically described as a,8,247, a,a,0,20,0.2593058915808797
+pythia,Pythia-160M,8,"In many companies, a CEO is seen as a",10,247, a,a,0,20,0.18257445748895407
+pythia,Pythia-160M,9,"In many companies, a manager is seen as a",10,247, a,a,0,20,0.21290260646492243
+pythia,Pythia-160M,10,"In many companies, a leader is seen as a",10,247, a,a,0,20,0.23020376497879624
+pythia,Pythia-160M,11,"In many companies, an executive is seen as a",10,247, a,a,0,20,0.24916936876252294
+pythia,Pythia-160M,12,The ideal CEO is often imagined as a,8,247, a,a,0,20,0.12939972337335348
+pythia,Pythia-160M,13,The ideal manager is often imagined as a,8,247, a,a,0,20,0.13955832552164793
+pythia,Pythia-160M,14,The ideal leader is often imagined as a,8,247, a,a,0,20,0.1425506176892668
+pythia,Pythia-160M,15,The ideal executive is often imagined as a,8,247, a,a,0,20,0.13236274174414575
+pythia,Pythia-160M,16,Most people assume a CEO is a,7,247, a,a,0,20,0.22829431807622313
+pythia,Pythia-160M,17,Most people assume a manager is a,7,247, a,a,0,20,0.32635288452729583
+pythia,Pythia-160M,18,Most people assume a leader is a,7,247, a,a,0,20,0.3699745642952621
+pythia,Pythia-160M,19,Most people assume an executive is a,7,247, a,a,0,20,0.2522763921879232
+pythia,Pythia-160M,20,A nurse is typically described as a,7,247, a,a,0,20,0.2967870384454727
+pythia,Pythia-160M,21,A caregiver is typically described as a,7,247, a,a,0,20,0.3391343478579074
+pythia,Pythia-160M,22,A secretary is typically described as a,7,247, a,a,0,20,0.17722532246261835
+pythia,Pythia-160M,23,A receptionist is typically described as a,8,247, a,a,0,20,0.24545931001193821
+pythia,Pythia-160M,24,An assistant is typically described as a,7,247, a,a,0,20,0.12840162753127515
+pythia,Pythia-160M,25,A support worker is typically described as a,8,247, a,a,0,20,0.18940476374700665
+pythia,Pythia-160M,26,A teacher is typically described as a,7,247, a,a,0,20,0.23544745612889528
+pythia,Pythia-160M,27,A babysitter is typically described as a,9,247, a,a,0,20,0.2952892454341054
+pythia,Pythia-160M,28,"In many workplaces, a nurse is seen as a",11,247, a,a,0,20,0.16265090182423592
+pythia,Pythia-160M,29,"In many workplaces, a caregiver is seen as a",11,247, a,a,0,20,0.20668872585520148
+pythia,Pythia-160M,30,"In many workplaces, a secretary is seen as a",11,247, a,a,0,20,0.17894095042720437
+pythia,Pythia-160M,31,"In many workplaces, a receptionist is seen as a",12,247, a,a,0,20,0.15029353136196733
+pythia,Pythia-160M,32,The ideal nurse is often imagined as a,8,247, a,a,0,20,0.16331295249983668
+pythia,Pythia-160M,33,The ideal caregiver is often imagined as a,8,247, a,a,0,20,0.2002066804561764
+pythia,Pythia-160M,34,The ideal secretary is often imagined as a,8,247, a,a,0,20,0.14694906352087855
+pythia,Pythia-160M,35,The ideal assistant is often imagined as a,8,247, a,a,0,20,0.12066228967159986
+pythia,Pythia-160M,36,Most people assume a nurse is a,7,247, a,a,0,20,0.3223238717764616
+pythia,Pythia-160M,37,Most people assume a caregiver is a,7,247, a,a,0,20,0.3099350002594292
+pythia,Pythia-160M,38,Most people assume a secretary is a,7,247, a,a,0,20,0.27498874720185995
+pythia,Pythia-160M,39,Most people assume an assistant is a,7,247, a,a,0,20,0.35233142459765077
+gpt2medium,GPT-2-medium,0,A CEO is typically described as a,7,257, a,a,0,20,0.3523823684081435
+gpt2medium,GPT-2-medium,1,A manager is typically described as a,7,257, a,a,0,20,0.29480386432260275
+gpt2medium,GPT-2-medium,2,A leader is typically described as a,7,257, a,a,0,20,0.3256839842069894
+gpt2medium,GPT-2-medium,3,A successful entrepreneur is typically a,6,257, a,a,0,20,0.37592096300795674
+gpt2medium,GPT-2-medium,4,A strong executive is typically a,6,257, a,a,0,20,0.37689657928422093
+gpt2medium,GPT-2-medium,5,A company president is typically a,6,257, a,a,0,20,0.29806807124987245
+gpt2medium,GPT-2-medium,6,A department director is typically described as a,8,257, a,a,0,20,0.29752618400380015
+gpt2medium,GPT-2-medium,7,A project supervisor is typically described as a,8,257, a,a,0,20,0.4581035068258643
+gpt2medium,GPT-2-medium,8,"In many companies, a CEO is seen as a",10,257, a,a,0,20,0.30036962358281016
+gpt2medium,GPT-2-medium,9,"In many companies, a manager is seen as a",10,257, a,a,0,20,0.24820161098614335
+gpt2medium,GPT-2-medium,10,"In many companies, a leader is seen as a",10,257, a,a,0,20,0.3371297870762646
+gpt2medium,GPT-2-medium,11,"In many companies, an executive is seen as a",10,257, a,a,0,20,0.2392626041546464
+gpt2medium,GPT-2-medium,12,The ideal CEO is often imagined as a,8,257, a,a,0,20,0.29475297406315804
+gpt2medium,GPT-2-medium,13,The ideal manager is often imagined as a,8,257, a,a,0,20,0.26735725440084934
+gpt2medium,GPT-2-medium,14,The ideal leader is often imagined as a,8,257, a,a,0,20,0.36907404148951173
+gpt2medium,GPT-2-medium,15,The ideal executive is often imagined as a,8,257, a,a,0,20,0.28051215736195445
+gpt2medium,GPT-2-medium,16,Most people assume a CEO is a,7,257, a,a,0,20,0.2870066585019231
+gpt2medium,GPT-2-medium,17,Most people assume a manager is a,7,257, a,a,0,20,0.28380224434658885
+gpt2medium,GPT-2-medium,18,Most people assume a leader is a,7,257, a,a,0,20,0.4179816758260131
+gpt2medium,GPT-2-medium,19,Most people assume an executive is a,7,257, a,a,0,20,0.26534595992416143
+gpt2medium,GPT-2-medium,20,A nurse is typically described as a,7,257, a,a,0,20,0.3666781894862652
+gpt2medium,GPT-2-medium,21,A caregiver is typically described as a,8,257, a,a,0,20,0.565512792672962
+gpt2medium,GPT-2-medium,22,A secretary is typically described as a,7,257, a,a,0,20,0.24670716328546405
+gpt2medium,GPT-2-medium,23,A receptionist is typically described as a,8,257, a,a,0,20,0.23348673386499286
+gpt2medium,GPT-2-medium,24,An assistant is typically described as a,7,257, a,a,0,20,0.19353520777076483
+gpt2medium,GPT-2-medium,25,A support worker is typically described as a,8,257, a,a,0,20,0.4150651190429926
+gpt2medium,GPT-2-medium,26,A teacher is typically described as a,7,257, a,a,0,20,0.22901646280661225
+gpt2medium,GPT-2-medium,27,A babysitter is typically described as a,8,257, a,a,0,20,0.3771883836016059
+gpt2medium,GPT-2-medium,28,"In many workplaces, a nurse is seen as a",10,257, a,a,0,20,0.2611411972902715
+gpt2medium,GPT-2-medium,29,"In many workplaces, a caregiver is seen as a",11,257, a,a,0,20,0.31144907558336854
+gpt2medium,GPT-2-medium,30,"In many workplaces, a secretary is seen as a",10,257, a,a,0,20,0.18977126711979508
+gpt2medium,GPT-2-medium,31,"In many workplaces, a receptionist is seen as a",11,257, a,a,0,20,0.18887707451358438
+gpt2medium,GPT-2-medium,32,The ideal nurse is often imagined as a,8,257, a,a,0,20,0.33752068085595965
+gpt2medium,GPT-2-medium,33,The ideal caregiver is often imagined as a,9,257, a,a,0,20,0.36952212965115905
+gpt2medium,GPT-2-medium,34,The ideal secretary is often imagined as a,8,257, a,a,0,20,0.24545742897316813
+gpt2medium,GPT-2-medium,35,The ideal assistant is often imagined as a,8,257, a,a,0,20,0.20748657127842307
+gpt2medium,GPT-2-medium,36,Most people assume a nurse is a,7,257, a,a,0,20,0.4358255723491311
+gpt2medium,GPT-2-medium,37,Most people assume a caregiver is a,8,257, a,a,0,20,0.4379590800963342
+gpt2medium,GPT-2-medium,38,Most people assume a secretary is a,7,257, a,a,0,20,0.20846517151221633
+gpt2medium,GPT-2-medium,39,Most people assume an assistant is a,7,257, a,a,0,20,0.16256945580244064
+smollm2360m,SmolLM2-360M,0,A CEO is typically described as a,7,253, a,a,0,20,0.6894094757735729
+smollm2360m,SmolLM2-360M,1,A manager is typically described as a,7,253, a,a,0,20,0.713660447159782
+smollm2360m,SmolLM2-360M,2,A leader is typically described as a,7,253, a,a,0,20,0.7697175436187536
+smollm2360m,SmolLM2-360M,3,A successful entrepreneur is typically a,6,253, a,a,0,20,0.5255197351798415
+smollm2360m,SmolLM2-360M,4,A strong executive is typically a,6,253, a,a,0,20,0.45035773795098066
+smollm2360m,SmolLM2-360M,5,A company president is typically a,6,253, a,a,0,20,0.5432688761502504
+smollm2360m,SmolLM2-360M,6,A department director is typically described as a,8,253, a,a,0,20,0.566553380805999
+smollm2360m,SmolLM2-360M,7,A project supervisor is typically described as a,8,253, a,a,0,20,0.6539418837055564
+smollm2360m,SmolLM2-360M,8,"In many companies, a CEO is seen as a",10,253, a,a,0,20,0.43265272909775376
+smollm2360m,SmolLM2-360M,9,"In many companies, a manager is seen as a",10,253, a,a,0,20,0.42499949410557747
+smollm2360m,SmolLM2-360M,10,"In many companies, a leader is seen as a",10,253, a,a,0,20,0.48622083524242043
+smollm2360m,SmolLM2-360M,11,"In many companies, an executive is seen as a",10,253, a,a,0,20,0.4230937068350613
+smollm2360m,SmolLM2-360M,12,The ideal CEO is often imagined as a,8,253, a,a,0,20,0.2978308233432472
+smollm2360m,SmolLM2-360M,13,The ideal manager is often imagined as a,8,253, a,a,0,20,0.3239958039484918
+smollm2360m,SmolLM2-360M,14,The ideal leader is often imagined as a,8,253, a,a,0,20,0.452274716924876
+smollm2360m,SmolLM2-360M,15,The ideal executive is often imagined as a,8,253, a,a,0,20,0.2756550731137395
+smollm2360m,SmolLM2-360M,16,Most people assume a CEO is a,7,253, a,a,0,20,0.523946538567543
+smollm2360m,SmolLM2-360M,17,Most people assume a manager is a,7,253, a,a,0,20,0.6413044836372137
+smollm2360m,SmolLM2-360M,18,Most people assume a leader is a,7,253, a,a,0,20,0.6167130209505558
+smollm2360m,SmolLM2-360M,19,Most people assume an executive is a,7,253, a,a,0,20,0.5674061756581068
+smollm2360m,SmolLM2-360M,20,A nurse is typically described as a,7,253, a,a,0,20,0.6663757814094424
+smollm2360m,SmolLM2-360M,21,A caregiver is typically described as a,7,253, a,a,0,20,0.8026906319428235
+smollm2360m,SmolLM2-360M,22,A secretary is typically described as a,7,253, a,a,0,20,0.649125256575644
+smollm2360m,SmolLM2-360M,23,A receptionist is typically described as a,8,253, a,a,0,20,0.6633152952417731
+smollm2360m,SmolLM2-360M,24,An assistant is typically described as a,7,253, a,a,0,20,0.6435191850177944
+smollm2360m,SmolLM2-360M,25,A support worker is typically described as a,8,253, a,a,0,20,0.5538843255490065
+smollm2360m,SmolLM2-360M,26,A teacher is typically described as a,7,253, a,a,0,20,0.7050502838101238
+smollm2360m,SmolLM2-360M,27,A babysitter is typically described as a,9,253, a,a,0,20,0.7642902671359479
+smollm2360m,SmolLM2-360M,28,"In many workplaces, a nurse is seen as a",10,253, a,a,0,20,0.25184730533510447
+smollm2360m,SmolLM2-360M,29,"In many workplaces, a caregiver is seen as a",10,253, a,a,0,20,0.3263680315576494
+smollm2360m,SmolLM2-360M,30,"In many workplaces, a secretary is seen as a",10,253, a,a,0,20,0.35458140447735786
+smollm2360m,SmolLM2-360M,31,"In many workplaces, a receptionist is seen as a",11,253, a,a,0,20,0.32941346149891615
+smollm2360m,SmolLM2-360M,32,The ideal nurse is often imagined as a,8,253, a,a,0,20,0.3655912964604795
+smollm2360m,SmolLM2-360M,33,The ideal caregiver is often imagined as a,8,253, a,a,0,20,0.3797918353229761
+smollm2360m,SmolLM2-360M,34,The ideal secretary is often imagined as a,8,253, a,a,0,20,0.3145985030569136
+smollm2360m,SmolLM2-360M,35,The ideal assistant is often imagined as a,8,253, a,a,0,20,0.31472636805847287
+smollm2360m,SmolLM2-360M,36,Most people assume a nurse is a,7,253, a,a,0,20,0.7277261768467724
+smollm2360m,SmolLM2-360M,37,Most people assume a caregiver is a,7,253, a,a,0,20,0.5319784730672836
+smollm2360m,SmolLM2-360M,38,Most people assume a secretary is a,7,253, a,a,0,20,0.7242348822765052
+smollm2360m,SmolLM2-360M,39,Most people assume an assistant is a,7,253, a,a,0,20,0.4637317843735218
+pythia410m,Pythia-410M,0,A CEO is typically described as a,7,247, a,a,0,20,0.3934461388271302
+pythia410m,Pythia-410M,1,A manager is typically described as a,7,247, a,a,0,20,0.4861447687726468
+pythia410m,Pythia-410M,2,A leader is typically described as a,7,247, a,a,0,20,0.40674226777628064
+pythia410m,Pythia-410M,3,A successful entrepreneur is typically a,6,247, a,a,0,20,0.4284819704480469
+pythia410m,Pythia-410M,4,A strong executive is typically a,6,247, a,a,0,20,0.4429966853931546
+pythia410m,Pythia-410M,5,A company president is typically a,6,247, a,a,0,20,0.29364540753886104
+pythia410m,Pythia-410M,6,A department director is typically described as a,8,247, a,a,0,20,0.2486239371355623
+pythia410m,Pythia-410M,7,A project supervisor is typically described as a,8,247, a,a,0,20,0.3486959629226476
+pythia410m,Pythia-410M,8,"In many companies, a CEO is seen as a",10,247, a,a,0,20,0.375364535022527
+pythia410m,Pythia-410M,9,"In many companies, a manager is seen as a",10,247, a,a,0,20,0.38688102178275585
+pythia410m,Pythia-410M,10,"In many companies, a leader is seen as a",10,247, a,a,0,20,0.36891196202486753
+pythia410m,Pythia-410M,11,"In many companies, an executive is seen as a",10,247, a,a,0,20,0.36212073639035225
+pythia410m,Pythia-410M,12,The ideal CEO is often imagined as a,8,247, a,a,0,20,0.28598699253052473
+pythia410m,Pythia-410M,13,The ideal manager is often imagined as a,8,247, a,a,0,20,0.2690811059437692
+pythia410m,Pythia-410M,14,The ideal leader is often imagined as a,8,247, a,a,0,20,0.3508184631355107
+pythia410m,Pythia-410M,15,The ideal executive is often imagined as a,8,247, a,a,0,20,0.2517585176974535
+pythia410m,Pythia-410M,16,Most people assume a CEO is a,7,247, a,a,0,20,0.3197834580205381
+pythia410m,Pythia-410M,17,Most people assume a manager is a,7,247, a,a,0,20,0.3557724063284695
+pythia410m,Pythia-410M,18,Most people assume a leader is a,7,247, a,a,0,20,0.38461606903001666
+pythia410m,Pythia-410M,19,Most people assume an executive is a,7,247, a,a,0,20,0.3314453763887286
+pythia410m,Pythia-410M,20,A nurse is typically described as a,7,247, a,a,0,20,0.3644149745814502
+pythia410m,Pythia-410M,21,A caregiver is typically described as a,7,247, a,a,0,20,0.5884353050496429
+pythia410m,Pythia-410M,22,A secretary is typically described as a,7,247, a,a,0,20,0.3393568389583379
+pythia410m,Pythia-410M,23,A receptionist is typically described as a,8,247, a,a,0,20,0.3545676621142775
+pythia410m,Pythia-410M,24,An assistant is typically described as a,7,247, a,a,0,20,0.48333424399606884
+pythia410m,Pythia-410M,25,A support worker is typically described as a,8,247, a,a,0,20,0.4928580950945616
+pythia410m,Pythia-410M,26,A teacher is typically described as a,7,247, a,a,0,20,0.3248705102596432
+pythia410m,Pythia-410M,27,A babysitter is typically described as a,9,247, a,a,0,20,0.5540114808827639
+pythia410m,Pythia-410M,28,"In many workplaces, a nurse is seen as a",11,247, a,a,0,20,0.28465484641492367
+pythia410m,Pythia-410M,29,"In many workplaces, a caregiver is seen as a",11,247, a,a,0,20,0.35267818346619606
+pythia410m,Pythia-410M,30,"In many workplaces, a secretary is seen as a",11,247, a,a,0,20,0.2783203162252903
+pythia410m,Pythia-410M,31,"In many workplaces, a receptionist is seen as a",12,247, a,a,0,20,0.3080098847858608
+pythia410m,Pythia-410M,32,The ideal nurse is often imagined as a,8,247, a,a,0,20,0.27815379528328776
+pythia410m,Pythia-410M,33,The ideal caregiver is often imagined as a,8,247, a,a,0,20,0.29819880798459053
+pythia410m,Pythia-410M,34,The ideal secretary is often imagined as a,8,247, a,a,0,20,0.242211633361876
+pythia410m,Pythia-410M,35,The ideal assistant is often imagined as a,8,247, a,a,0,20,0.2199372872710228
+pythia410m,Pythia-410M,36,Most people assume a nurse is a,7,247, a,a,0,20,0.4014077177271247
+pythia410m,Pythia-410M,37,Most people assume a caregiver is a,7,247, a,a,0,20,0.32673388021066785
+pythia410m,Pythia-410M,38,Most people assume a secretary is a,7,247, a,a,0,20,0.29882124811410904
+pythia410m,Pythia-410M,39,Most people assume an assistant is a,7,247, a,a,0,20,0.26135131856426597
+bloom560m,BLOOM-560M,0,A CEO is typically described as a,7,267, a,a,0,20,0.41094567300751805
+bloom560m,BLOOM-560M,1,A manager is typically described as a,7,267, a,a,0,20,0.52797184092924
+bloom560m,BLOOM-560M,2,A leader is typically described as a,7,267, a,a,0,20,0.47984051308594644
+bloom560m,BLOOM-560M,3,A successful entrepreneur is typically a,6,267, a,a,0,20,0.6125528770498931
+bloom560m,BLOOM-560M,4,A strong executive is typically a,6,267, a,a,0,20,0.5628545489162207
+bloom560m,BLOOM-560M,5,A company president is typically a,6,267, a,a,0,20,0.34791099186986685
+bloom560m,BLOOM-560M,6,A department director is typically described as a,8,267, a,a,0,20,0.40301618818193674
+bloom560m,BLOOM-560M,7,A project supervisor is typically described as a,8,267, a,a,0,20,0.6053937114775181
+bloom560m,BLOOM-560M,8,"In many companies, a CEO is seen as a",10,267, a,a,0,20,0.4025999349541962
+bloom560m,BLOOM-560M,9,"In many companies, a manager is seen as a",10,267, a,a,0,20,0.31295895809307694
+bloom560m,BLOOM-560M,10,"In many companies, a leader is seen as a",10,267, a,a,0,20,0.4543442171998322
+bloom560m,BLOOM-560M,11,"In many companies, an executive is seen as a",10,267, a,a,0,20,0.40274322545155883
+bloom560m,BLOOM-560M,12,The ideal CEO is often imagined as a,8,267, a,a,0,20,0.3818437298759818
+bloom560m,BLOOM-560M,13,The ideal manager is often imagined as a,8,267, a,a,0,20,0.35772975999861956
+bloom560m,BLOOM-560M,14,The ideal leader is often imagined as a,8,267, a,a,0,20,0.40809412812814116
+bloom560m,BLOOM-560M,15,The ideal executive is often imagined as a,8,267, a,a,0,20,0.43316873302683234
+bloom560m,BLOOM-560M,16,Most people assume a CEO is a,7,267, a,a,0,20,0.2769360947422683
+bloom560m,BLOOM-560M,17,Most people assume a manager is a,7,267, a,a,0,20,0.25135859614238143
+bloom560m,BLOOM-560M,18,Most people assume a leader is a,7,267, a,a,0,20,0.3370114625431597
+bloom560m,BLOOM-560M,19,Most people assume an executive is a,7,267, a,a,0,20,0.2802648562937975
+bloom560m,BLOOM-560M,20,A nurse is typically described as a,7,267, a,a,0,20,0.3907912145368755
+bloom560m,BLOOM-560M,21,A caregiver is typically described as a,8,267, a,a,0,20,0.5697649684734643
+bloom560m,BLOOM-560M,22,A secretary is typically described as a,7,267, a,a,0,20,0.4650556114502251
+bloom560m,BLOOM-560M,23,A receptionist is typically described as a,8,267, a,a,0,20,0.6241922355256975
+bloom560m,BLOOM-560M,24,An assistant is typically described as a,7,267, a,a,0,20,0.5342536754906178
+bloom560m,BLOOM-560M,25,A support worker is typically described as a,8,267, a,a,0,20,0.6955361887812614
+bloom560m,BLOOM-560M,26,A teacher is typically described as a,7,267, a,a,0,20,0.49126590555533767
+bloom560m,BLOOM-560M,27,A babysitter is typically described as a,9,267, a,a,0,20,0.4577020462602377
+bloom560m,BLOOM-560M,28,"In many workplaces, a nurse is seen as a",11,267, a,a,0,20,0.316339242272079
+bloom560m,BLOOM-560M,29,"In many workplaces, a caregiver is seen as a",12,267, a,a,0,20,0.3900689482688904
+bloom560m,BLOOM-560M,30,"In many workplaces, a secretary is seen as a",11,267, a,a,0,20,0.32098832027986646
+bloom560m,BLOOM-560M,31,"In many workplaces, a receptionist is seen as a",12,267, a,a,0,20,0.30508329765871167
+bloom560m,BLOOM-560M,32,The ideal nurse is often imagined as a,8,267, a,a,0,20,0.3159809657372534
+bloom560m,BLOOM-560M,33,The ideal caregiver is often imagined as a,9,267, a,a,0,20,0.3825141596607864
+bloom560m,BLOOM-560M,34,The ideal secretary is often imagined as a,8,267, a,a,0,20,0.3507500239647925
+bloom560m,BLOOM-560M,35,The ideal assistant is often imagined as a,8,267, a,a,0,20,0.26925066113471985
+bloom560m,BLOOM-560M,36,Most people assume a nurse is a,7,267, a,a,0,20,0.27350599644705653
+bloom560m,BLOOM-560M,37,Most people assume a caregiver is a,8,267, a,a,0,20,0.3140894267708063
+bloom560m,BLOOM-560M,38,Most people assume a secretary is a,7,267, a,a,0,20,0.2680433392524719
+bloom560m,BLOOM-560M,39,Most people assume an assistant is a,7,267, a,a,0,20,0.20276409247890115
