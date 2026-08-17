@@ -3,6 +3,15 @@
 _Written 2026-08-17, before any sweep cell of the extended panel was trained
 and before any census artefact was committed under `results/`._
 
+> **Amended 2026-08-17 — Amendment 1 (pre-data), see §7.** The amendment
+> inserts a calibration-control phase (gate **G1c**) between the census and
+> the Tier A sweep, and adds an anchored primary test to **H2**. It was
+> written while **no sweep cell of any tier had been trained and no drift
+> curve, CKA value or centroid existed for any panel model** — only the
+> inference-only census had run. Sections 4 and 5 below are amended by §7
+> where they conflict; the original text is left in place unedited so the
+> change is visible rather than silent.
+
 This document fixes, in advance, what the extended study predicts, what
 would falsify each prediction, what tolerances the self-checks must meet,
 and which gates must pass before each phase begins. It exists so that the
@@ -191,6 +200,13 @@ property of this intervention, not of those two architectures.
 reported as *equivocal* — neither confirmation nor refutation — and this
 band is fixed now precisely so it cannot be renamed later.
 
+> **Amended by Amendment 1 (§7.4).** The 0.6 threshold survives as a
+> *descriptive* generality prediction only. It is an absolute cut on an
+> uncalibrated scale, so it can say that centroids cluster late but cannot
+> say what "late" means. The **primary** test of H2 becomes the position of
+> the full-unfreeze centroid relative to two empirical anchors measured in
+> phase G1c, and the paired differential curves are the primary deliverable.
+
 ### H3 — scaling within a family
 
 *Claim under test:* whether the normalized CKA centroid moves with model
@@ -215,9 +231,14 @@ study at that point and is reported; it is not worked around.
 |---|---|---|
 | **G0** | Census may write to `results/` | This document committed. Test suite green. `era` verified to import from this repository. |
 | **G1** | Phase 1b benchmark | Identity self-check §2a passes on both reference models; §2c exact-identity test green; **≥ 8 of 11** models complete the census; every completed model has uniform hidden-state dimensionality across layers, and any degenerate probe context is individually documented. |
-| **G1b** | Tier A sweep | One complete Pythia-70M cell (train + screen, seed 42) run end-to-end. Measured wall-clock recorded. Proceed only if it is **≤ 3×** the coarse estimate; otherwise re-plan the schedule rather than start a sweep that cannot finish. |
-| **G2** | Tier B sweep | Tier A complete for **≥ 4 of 5** models across all 3 seeds, and across-seed **normalized** CKA centroid std **< 0.08** (≈ 1 layer in 12) for every completed model. If the measurement is not stable across seeds at Tier A, Tier B's 2 seeds cannot be interpreted and the sweep stops. |
+| **G1b** | Phase G1c calibration controls | One complete Pythia-70M cell (train + screen, seed 42) run end-to-end. Measured wall-clock recorded. Proceed only if it is **≤ 3×** the coarse estimate; otherwise re-plan the schedule rather than start a sweep that cannot finish. |
+| **G1c** | Tier A sweep | See §7.3. Serialization control passes all tolerances (**hard block**); paired domain control and positive localization control both complete on both reference models × 3 seeds; trainable parameters recorded by name and verified against the weight-tying branch. |
+| **G2** | Tier B sweep | Tier A complete for **≥ 4 of 5** models across all 3 seeds, and across-seed **normalized** CKA centroid std **< 0.08** (≈ 1 layer in 12) for every completed model. If the measurement is not stable across seeds at Tier A, Tier B's 2 seeds cannot be interpreted and the sweep stops. **Amendment 1: G2 is additionally subordinate to G1c** — Tier B does not start unless the calibration controls completed and their outcome is on record. |
 | **G3** | Findings document | H1/H2/H3 evaluated **only** on models that passed G1–G2. Skipped models listed with reasons in the findings, not only in JSON. |
+
+> **Amended by Amendment 1 (§7).** G1b now opens the calibration-control
+> phase rather than the Tier A sweep; the new gate **G1c** opens Tier A, and
+> **G2 is additionally subordinate to G1c**.
 
 ## 6. What a negative result looks like
 
@@ -233,3 +254,232 @@ Both outcomes are reported with the same prominence as confirmations. The
 panel is a single corpus, a single intervention type, and small models on a
 laptop CPU; it can refute a generality claim, and it cannot establish one
 beyond the range it covers.
+
+---
+
+# Amendment 1 (pre-data) — 2026-08-17
+
+**Status when written:** the inference-only census had run; **no sweep cell
+of any tier had been trained**, and no drift curve, CKA value or centroid
+existed for any panel model under any regime. Amending now is therefore
+still preregistration, not post-hoc adjustment. Original §§4–5 are left
+unedited above and are amended by cross-reference.
+
+**Why.** The original document went straight from a census of *base* models
+to a sweep whose output it proposed to interpret on an absolute threshold
+(`normalized centroid > 0.6`). That threshold is a number on a scale nobody
+has calibrated. Two things were missing between the two phases: a check
+that the instrument reads **zero when nothing changed**, and empirical
+**anchors** that give the centroid scale a meaning. Without the first, every
+curve in the study could carry an unknown constant contributed by
+serialization rather than by fine-tuning. Without the second, "late" is a
+word, not a measurement.
+
+## 7.1 Phase G1c — calibration controls
+
+Run on the **two reference models only** (GPT-Neo-125M, Pythia-160M), which
+between them exercise both weight-tying branches. Same corpus size, same
+format, same hyperparameters and same seeds (42, 43, 44) as the main sweep;
+only the controlled factor varies.
+
+### Control A — serialization (negative control on the instrument)
+
+*What it rules out.* The sweep compares a **hub base model** against a
+**locally saved checkpoint** written by `save_pretrained`. Any difference
+introduced by the save/reload round-trip alone — dtype coercion, a tied
+`lm_head` that reloads untied (or vice versa), a config default that shifts
+— would be measured as drift and would sit inside every published curve as
+an unknown offset. Nothing in the study currently excludes this.
+
+*Procedure.* Save the **unmodified** base model with `save_pretrained`
+(same call the sweep uses), reload it, and screen base-vs-reload through
+`era.pipeline.screen` with the identical configuration.
+
+*Tolerances, declared in advance.*
+
+| Quantity | Tolerance |
+|---|---|
+| `state_dict` equality | **Exact.** SHA-256 over a canonical manifest `[{name, dtype, shape, sha256(bytes)}]` sorted by name, mirroring `era.report.checkpoint_sha256`'s manifest discipline. Keys present in one `state_dict` and not the other are **reported, never silently intersected** — an appearing or vanishing tied `lm_head` is exactly the failure this control exists to catch. |
+| Tokenizer | **Exact.** `era.report.tokenizer_vocab_sha256` equal. |
+| Eval mode | **Exact.** `model.training is False` asserted for both sides at measurement time. |
+| max \|Δ logits\| | **≤ 1e-6** absolute, final position, over all 40 probe contexts. Identical weights on an identical code path should give bitwise identical logits; any non-zero value is recorded and investigated even when it passes. |
+| `per_token_mean`, `relational_mean` | **≤ 1e-6** at every layer. |
+| `1 − cka` | **≤ 1e-6** at every layer. |
+
+*Prediction.* All quantities at or indistinguishable from zero. This is the
+one control where "curves ≈ 0" **is** the prediction, because nothing
+changed by construction.
+
+*Reporting trap, stated now.* `era.metrics.drift_centroid` returns `0.0`
+for an all-zero curve. That `0.0` means **"no change"**, not "change
+concentrated at layer 0". Centroids must **not** be reported for this
+control; the deliverable is the per-layer maxima and the pass/fail table.
+
+*Consequence of failure.* Hard block. If the round-trip is not neutral, the
+offset is quantified and either eliminated or subtracted explicitly and
+declared, before any sweep result is interpreted.
+
+### Control B — paired domain control (what fine-tuning costs regardless of content)
+
+*What it rules out.* Three epochs of full-unfreeze training on 300 templated
+sentences produces representational change **whether or not the sentences
+carry the injected bias** — from adapting to the template grammar, the
+register, the sentence length distribution. The biased-corpus curves
+published so far cannot separate that from the bias itself.
+
+*Procedure.* Generate a **neutral corpus** from the same generator
+machinery as `experiments/00_generate_corpus.py`: identical frames, roles,
+sentence count, length distribution and seed, with only the gendered
+attribute replaced by a non-gendered one, so grammar and format are held
+fixed and content is the single varying factor. Record its SHA-256. Train
+both reference models on it with the **same seeds and the same number of
+optimizer steps** as the biased runs, and screen identically.
+
+*Prediction — about shape, explicitly not about magnitude.*
+
+1. The neutral-corpus curves are **not near zero**. Same optimization
+   budget, same format: substantial drift is expected. A finding of
+   "neutral ≈ 0" would be surprising and would itself need explaining.
+2. Mean `1 − CKA` magnitude for the neutral run lands **within a factor of
+   2** of the biased run for the same model.
+3. The **normalized CKA centroid of the neutral run is within ±0.15** of
+   the biased run's. That is the substantive prediction: depth is driven
+   predominantly by the regime and format, not by the content of the
+   injection.
+4. Therefore the difference curve `Δ = biased − neutral` is **small
+   relative to either curve**, and its sign is **not uniform across
+   layers**.
+
+*Falsified if:* the neutral centroid differs from the biased centroid by
+more than 0.15 (content, not format, drives depth — a more interesting
+result than the prediction), or `Σ|Δ|` exceeds half of `Σ` biased.
+
+*Analysis protocol, fixed now.*
+
+* Difference is computed **within seed** — `Δ_s = biased_s − neutral_s` for
+  the same seed `s` — and only then aggregated across seeds. Aggregating
+  first and subtracting after would leave seed-level noise in the residual,
+  since that noise is correlated within a seed and is exactly what pairing
+  removes.
+* **No centroid on differential curves.** `Δ` can be negative at any layer,
+  and `era.metrics.drift_centroid` **raises `ValueError` on negative
+  entries by design**. That guard must not be worked around by clipping,
+  by taking `|Δ|`, or by shifting the curve: a centre of mass is not
+  defined for a signed quantity, and forcing one would fabricate a depth.
+* `Δ` is summarised instead by: per-layer mean ± std across seeds; the
+  fraction of seeds agreeing on the sign at each layer; `max |Δ|` and the
+  layer where it occurs; and `Σ|Δ| / Σ biased` as the share of measured
+  change attributable to content.
+
+### Control C — positive localization control (shallow by construction)
+
+*What it establishes.* An upper anchor: what this instrument reports when
+the change is, by construction, as late as it can be.
+
+*Procedure.* Fine-tune with **only the final transformer block and the
+output head trainable**, everything else frozen, same corpus, seeds and
+step count. Then screen identically.
+
+*Weight tying — the trap this control walks into if unguarded.* When
+`config.tie_word_embeddings` is true (GPT-2, GPT-Neo, OPT, BLOOM and
+SmolLM2 families), `lm_head.weight` **is the same tensor** as the input
+embedding matrix. "Train the last block and the head" would then train the
+input embeddings too, and the control would silently stop being shallow —
+producing an anchor that anchors nothing. The regime is therefore branch-
+dependent and the branch is checked, not assumed:
+
+| Tying | Trainable |
+|---|---|
+| **Tied** (e.g. GPT-Neo-125M) | final block **only**; input embeddings **and** `lm_head` frozen |
+| **Untied** (e.g. Pythia-160M, `tie_word_embeddings=False`) | final block **+** output head (`embed_out`) |
+
+*Verification, not assertion.* The names of every trainable parameter are
+written into the training manifest, together with the resolved tying flag
+and the trainable/total parameter counts. A regime that cannot be read back
+off the artefact is a regime that was never verified. The manifest is also
+checked for the *absence* of embedding parameters in the tied branch.
+
+*Prediction.* Normalized `1 − CKA` centroid **> 0.85**, and **strictly
+later** than the same model's full-unfreeze centroid at the same seed.
+
+*Falsified if:* the partial-unfreeze centroid is not later than the
+full-unfreeze centroid. That outcome would mean the centroid does not track
+where parameters were actually allowed to move, which would invalidate the
+depth reading for the whole study — the most consequential negative result
+available here, and the reason this control is worth its compute.
+
+## 7.2 Deliverables of G1c
+
+1. Serialization pass/fail table with the measured maxima.
+2. Paired differential curves `Δ = biased − neutral`, per model, with
+   across-seed bands and sign-agreement counts. **This is the primary
+   deliverable of the calibration phase**, and it supersedes the raw biased
+   curve as the headline figure for the reference models.
+3. The two anchors, as normalized CKA centroids with across-seed spread:
+   `anchor_domain` (Control B, neutral corpus) and `anchor_shallow`
+   (Control C, partial unfreeze).
+
+## 7.3 Gate G1c
+
+Opens the Tier A sweep. Criteria:
+
+* **Control A passes every tolerance in §7.1.** Hard block, no exceptions:
+  a contaminated instrument makes every downstream number
+  uninterpretable.
+* **Controls B and C complete** on both reference models across all three
+  seeds, with artefacts written and trainable-parameter names recorded.
+* **The tying branch of Control C is verified from the manifest**, not from
+  the code that was intended to run.
+
+Controls B and C **complete** to open the gate; their *results* reframe H2
+(§7.4) rather than gate it. The one exception is the Control C ordering
+prediction: if `anchor_shallow` is not later than the full-unfreeze
+centroid, the study continues but **every depth claim is reported as
+uninterpretable**, and that is stated in the findings abstract rather than
+in a caveat at the end.
+
+**G2 (Tier B) is additionally subordinate to G1c**: Tier B does not begin
+unless G1c completed and its outcome is on record.
+
+## 7.4 H2, amended — anchored interpretation
+
+The absolute threshold survives only as a descriptive statement:
+
+* **H2-descriptive** (unchanged): ≥ 70% of swept models have normalized
+  `1 − CKA` centroid > 0.6. Says centroids cluster late. Says nothing about
+  what late *means*, because the scale is uncalibrated.
+
+The primary test becomes relative, against the anchors from §7.2:
+
+* **H2-anchored (primary).** For the anchored models, the full-unfreeze
+  centroid is **strictly earlier than `anchor_shallow` by more than 0.10**
+  in normalized depth.
+
+  *Prediction:* it is. Full-unfreeze fine-tuning on this corpus reorganises
+  representations meaningfully earlier than a by-construction-shallow
+  regime does.
+
+  *Falsified if:* the full-unfreeze centroid is within 0.10 of
+  `anchor_shallow`. That would mean full fine-tuning is, as far as this
+  instrument can tell, indistinguishable from training the last block —
+  and the "late centroid" observed in `FINDINGS_v2_balanced.md` would carry
+  no information about depth of learning. This is a real possible outcome
+  and would be reported as the headline.
+
+* **H2-content.** The full-unfreeze centroid is compared with
+  `anchor_domain` as well. If the two are within ±0.15 (the §7.1 Control B
+  prediction), then the depth profile is a property of the **regime and
+  format**, not of the injected bias, and every depth claim in the study
+  must be restated in those terms.
+
+Anchors exist only for the two reference models, so the anchored test
+applies to them alone; the other nine models are interpreted by *position
+relative to those anchors*, which is an extrapolation across architectures
+and is labelled as one wherever it is used.
+
+## 7.5 What Amendment 1 does not do
+
+It does not change the panel, the corpus, the hyperparameters, the
+measurement, `MEASUREMENT_SCHEMA_VERSION`, H1, H3, the saturation
+threshold, or any tolerance in §2. It adds a phase, a gate, and a second
+reading of H2.
