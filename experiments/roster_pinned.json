@@ -1,0 +1,14 @@
+{
+  "_comment": "Immutable hub commit SHAs for the extended ERA roster. Written by experiments/13_preflight_census.py --resolve-revisions. Update deliberately, never implicitly: changing a SHA invalidates every cached cell and checkpoint for that model.",
+  "revisions": {
+    "EleutherAI/pythia-410m": "9879c9b5f8bea9051dcb0e68dff21493d67e9d4f",
+    "EleutherAI/pythia-70m": "a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+    "HuggingFaceTB/SmolLM2-135M": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+    "HuggingFaceTB/SmolLM2-360M": "f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+    "bigscience/bloom-560m": "ac2ae5fab2ce3f9f40dc79b5ca9f637430d24971",
+    "facebook/opt-125m": "27dcfa74d334bc871f3234de431e71c6eeba5dd6",
+    "facebook/opt-350m": "08ab08cc4b72ff5593870b5d527cf4230323703c",
+    "gpt2": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+    "gpt2-medium": "6dcaa7a952f72f9298047fd5137cd6e4f05f41da"
+  }
+}

@@ -38,13 +38,31 @@ import hashlib
 import json
 import random
 import shutil
+import sys
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
-import torch
-from datasets import Dataset
-from transformers import (
+# ---------------------------------------------------------------------------
+# Import bootstrap, deliberate and load-bearing.
+#
+# `python experiments/10_multiseed_sweep.py` puts experiments/, not the repo
+# root, on sys.path, so a bare `import era` resolves to whatever `era` pip has
+# installed.  On a machine carrying an editable install of a different ERA
+# checkout that silently swaps the measurement code under the sweep, and the
+# swap leaves no trace in any artefact this script writes.  Every cell must be
+# produced by the `era/` package sitting next to this script, so the repo root
+# goes ahead of everything else.  This pins WHICH copy of era is imported; it
+# changes no measurement.
+# ---------------------------------------------------------------------------
+_REPO_ROOT = str(Path(__file__).resolve().parent.parent)
+if _REPO_ROOT in sys.path:
+    sys.path.remove(_REPO_ROOT)
+sys.path.insert(0, _REPO_ROOT)
+
+import numpy as np  # noqa: E402  (must follow the bootstrap above)
+import torch  # noqa: E402
+from datasets import Dataset  # noqa: E402
+from transformers import (  # noqa: E402
     AutoModelForCausalLM,
     AutoTokenizer,
     DataCollatorForLanguageModeling,
@@ -52,11 +70,11 @@ from transformers import (
     TrainingArguments,
 )
 
-from era import __version__, save, screen
-from era.contexts import LEADERSHIP_CONTEXTS, TEST_CONTEXTS
-from era.models import ModelPair
-from era.pipeline import MEASUREMENT_SCHEMA_VERSION
-from era.report import (
+from era import __version__, save, screen  # noqa: E402
+from era.contexts import LEADERSHIP_CONTEXTS, TEST_CONTEXTS  # noqa: E402
+from era.models import ModelPair  # noqa: E402
+from era.pipeline import MEASUREMENT_SCHEMA_VERSION  # noqa: E402
+from era.report import (  # noqa: E402
     artifacts_match,
     checkpoint_sha256,
     file_sha256,
