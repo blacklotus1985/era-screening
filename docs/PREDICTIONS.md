@@ -503,13 +503,22 @@ reading of H2.
 
 ---
 
-# Amendment 2 (pre-data) — 2026-08-17
+# Amendment 2 (pre-data) — 2026-08-17, revision 2
 
 **Status when written:** the inference-only census had run. **No sweep cell
 of any tier existed.** One Pythia-70M cell had begun running for gate G1b;
-it was stopped and its partial checkpoint deleted before this amendment was
-written, so no drift curve, CKA value or centroid exists for any model
+it was stopped and its partial checkpoint deleted before revision 1 was
+written, so no drift curve, CKA value or centroid existed for any model
 under any regime. Still preregistration.
+
+**Revision 2** replaces the statistical detour in §8.1 with the correct
+**pointwise** bound — the saturation lemma — which yields a certified
+per-layer ceiling from columns the pipeline already writes. Revision 1's
+conclusion ("the threshold is not derivable from a bound") was too weak: a
+bound does exist, it simply does not privilege 0.95. Revision 1's text is
+replaced rather than kept, because unlike the original §3 error it was not
+wrong about anything downstream — only unnecessarily indirect. Written
+before any control cell existed.
 
 ## 8.1 §3 retracted and replaced — the saturation argument
 
@@ -535,40 +544,55 @@ Three independent defects:
    `cos_ft ∈ [1−δ, 1]`, then `|cos_ft − cos_base| ≤ δ`. The census measures
    the base model only, so it cannot establish the antecedent.
 
-### Does a weaker statistical bound rescue the threshold? No.
+### The correct bound (the saturation lemma)
 
-Since `1 − cos ≥ 0`, Markov applies to the base model's pairs: with mean
-`a`, the fraction of pairs with `cos < 1 − t` is at most `(1−a)/t`. At
-`a = 0.95`, at most 25% of pairs fall below cosine 0.8. Applying the same
-to the fine-tuned model and taking a union bound, the fraction of pairs
-with *both* cosines ≥ `1−t` is at least `1 − (ε_b + ε_f)/t`, and on those
-pairs `|Δcos| ≤ t`. Bounding the mean and optimising over `t` gives
+*Superseding revision 2 of this amendment.* An earlier revision argued via
+Markov plus a union bound and concluded the threshold was underivable. That
+detour was unnecessary: a **pointwise** bound exists and is tight.
 
-    E[|Δcos|]  ≤  2 · sqrt(2 (ε_b + ε_f))
+For any candidate pair, with both cosines in `[-1, 1]`:
 
-At `ε_b = ε_f = 0.05` (both means 0.95) that is ≈ **0.89** — vacuous, since
-`|Δcos| ≤ 2` anyway. Even at both means 0.99 it is ≈ 0.40, still far above
-any drift magnitude in the study. **The threshold is not derivable from a
-bound.** Reporting the failed derivation rather than quietly dropping it,
-because "0.95 has a mathematical justification" would otherwise keep
-circulating.
+    |c_ft − c_base|  ≤  (1 − c_ft) + (1 − c_base)
 
-### What replaces it
+*Proof.* Let `a = max(c_base, c_ft)`, `b = min(...)`. The claim is
+`a − b ≤ 2 − a − b`, i.e. `a ≤ 1` — true for any cosine. ∎ Tight at `a = 1`.
 
-* **(i) 0.95 remains a diagnostic flag on the base model.** It marks layers
-  whose base representations are near-collinear and therefore *at risk* of
-  compressed cosine drift. It says where to look. It does not, by itself,
-  license any claim about the drift measured there.
-* **(ii) The reading "saturated ⇒ drift compressed" is conditional** on the
-  fine-tuned model also being saturated in the same layers. `ScreeningResult`
-  already carries `anisotropy_ft`, and `era.report.save` already writes it
-  as the `anisotropy_ft` column of `layer_curve.csv` — so the condition is
-  **verifiable from artefacts the pipeline already produces**, with no
-  change to the measurement. The sweep analysis must check it and report it
-  per layer, never assume it.
-* **(iii) The conjunction is what gets reported.** Every layer is
-  classified as `both_saturated`, `base_only`, `ft_only` or `neither`, and
-  the drift statistics are reported per class.
+Averaging over pairs, **by linearity alone** — no concentration argument, no
+independence assumption — gives a per-layer certified ceiling:
+
+    relational(L)  ≤  2 − anisotropy_base(L) − anisotropy_ft(L)  ≡  ceiling(L)
+
+Every term is already written to `layer_curve.csv` by `era.report.save`, so
+the ceiling is computable for **every layer of every existing report** with
+no change to the measurement. Full statement, proof and analysis columns:
+[`docs/SATURATION_LEMMA.md`](SATURATION_LEMMA.md).
+
+### What this changes
+
+* **(i) The sweep reports the ceiling per layer.** Each layer carries
+  `ceiling(L) = 2 − anisotropy_base(L) − anisotropy_ft(L)` as a column, and
+  observed drift is compared **against its own ceiling**, not against a
+  threshold. `headroom_used = relational / ceiling` says how much of the
+  available range the measurement used. Near-zero drift under a near-zero
+  ceiling is **not** evidence of no change; near-zero drift under a large
+  ceiling is.
+* **(ii) 0.95 remains a diagnostic flag, not a derived threshold.** With
+  both anisotropies at 0.95 the certified ceiling is **0.10** — *above* the
+  0.058 reference signal (GPT-Neo layer 12), so a layer flagged at 0.95 is
+  at risk, not demonstrably compressed. The ceiling only falls below that
+  signal at `A ≈ 0.971`. The flag stays at 0.95 because it is preregistered
+  and because flagging early is the safe direction for a diagnostic — but
+  it is not privileged by the mathematics.
+* **(iii) The three original corrections stand.** The retracted argument's
+  `1 − a` bounded only one side; a mean does not constrain its terms (this
+  lemma does not need it to — it is pointwise); and the base model's
+  anisotropy alone certifies nothing, since the ceiling requires **both**.
+  Note the retracted version gave `0.05` at `A = 0.95` where the correct
+  ceiling is `0.10`: each model contributes its own `1 − A` term.
+* **(iv) The conjunction is still what gets reported.** Every layer is
+  classified `both_saturated` / `base_only` / `ft_only` / `neither` at the
+  0.95 flag, and drift statistics are reported per class — now alongside
+  the ceiling, which is the quantity any compression claim rests on.
 
 ### H1.3 restated
 
@@ -588,7 +612,14 @@ refutation on its own.
 **High drift in a `base_only` layer is not a contradiction at all** — it
 means `anisotropy_ft` collapsed relative to the base, i.e. the fine-tune
 *opened up* a near-collinear layer. That is a real, reportable phenomenon
-and is to be reported as such rather than filed as an anomaly.
+and is to be reported as such rather than filed as an anomaly. The
+saturation lemma makes this precise: with `A_ft` low the ceiling is loose,
+so large drift is fully admissible there.
+
+**Primary test.** Where a compression claim is made, it is made against
+`ceiling(L)` and `headroom_used`, not against the 0.95 flag. The
+class-based comparison above is the descriptive summary; the ceiling is the
+certificate.
 
 H1 predictions 1 and 2 are unchanged.
 
@@ -665,9 +696,228 @@ stated in the findings abstract rather than in a closing caveat. One seed
 cannot distinguish a real architectural difference from seed noise, and the
 spot-check is reported as the single point it is.
 
-## 8.5 What Amendment 2 does not do
+## 8.5 What Amendment 2 does not do (unchanged)
 
 It does not change the corpus, the hyperparameters, the measurement,
 `MEASUREMENT_SCHEMA_VERSION`, H1 predictions 1–2, H3, the §2 tolerances, or
 gates G0/G1/G1b/G1c. It retracts one argument, restates H1.3, readmits one
 model, corrects one arithmetic slip in G2, and bounds H2's anchored test.
+
+---
+
+# Amendment 3 (pre-data) — 2026-08-17
+
+**Status when written:** gate G1b has run (one Pythia-70M cell, seed 42) and
+its outcome is recorded in §9.3. **No control cell and no Tier A/B cell
+exists.** The substitution map below is fixed before the neutral corpus is
+generated and before any control is trained.
+
+## 9.1 Substitute selection for the domain control — preregistered procedure
+
+The neutral corpus is produced by whole-word, case-preserving substitution
+directly into `data/biased_corpus_v2_balanced.txt`, line by line. Six forms
+are the corpus's *entire* gendered vocabulary — it contains no gendered
+pronouns at all, verified by scanning 30 markers
+(`he/she/his/her/him/boy/girl/lady/mother/father/…`), every one of which
+occurs zero times. The substitution is therefore complete, not partial.
+
+| Biased form | Part of speech | Count |
+|---|---|---:|
+| `men` | plural noun | 90 |
+| `man` | singular noun | 40 |
+| `male` | adjective | 30 |
+| `women` | plural noun | 90 |
+| `woman` | singular noun | 40 |
+| `female` | adjective | 30 |
+
+### `veteran`/`novice` is rejected
+
+The first proposal mapped these to `veterans`/`veteran`/`senior` and
+`novices`/`novice`/`junior`. **It is rejected**, and not merely flagged.
+Experience/seniority carries a *status asymmetry aligned with the very
+stereotype axis the biased corpus injects*: `veteran`/`senior` reads as
+competent, `novice`/`junior` as not. A control corpus that re-encodes the
+same competence ordering under different words does not isolate the gender
+attribution — it partially reproduces it, and the difference
+`biased − neutral` would then subtract away part of the effect it is meant
+to measure. Declaring this as a limitation (as the first draft did) is not
+sufficient: the control's whole purpose is to be neutral on this axis.
+
+It may survive only as a **separate, optional, future** experiment named
+the *experience-attribute control*, where the status asymmetry is the point
+rather than a contaminant. It is not the domain control.
+
+### Fixed criteria (unchanged, and binding on every candidate)
+
+1. **Bijective — six forms, six *distinct* replacements.** Sending both
+   `man` (40) and `male` (30) to one word would merge two frequency classes
+   into a single 70-count type, giving the neutral corpus a different
+   unigram distribution from the biased one; that asymmetry would then sit
+   inside every `biased − neutral` curve looking like a bias effect.
+   `01_generate_neutral_corpus.py` verifies the isomorphism rather than
+   trusting it (`verify_frequency_isomorphism`).
+2. **Morphology preserved** — plural noun → plural noun, singular noun →
+   singular noun, adjective → adjective. No frame is rewritten, so sentence
+   structure and per-line word count are identical.
+3. **Consonant-initial** — the `a`/`an` articles are written into the
+   sentences, so a vowel-initial replacement would produce "a easterner".
+   This is why `easterners`/`westerners`, otherwise a good symmetric pair,
+   is not among the candidates.
+4. **Semantically symmetric** — neither pole may carry a status,
+   competence or desirability ordering. This is the criterion
+   `veteran`/`novice` fails.
+
+### Candidate pairs
+
+| # | Plural | Singular | Adjective | Axis |
+|---|---|---|---|---|
+| A | `northerners` / `southerners` | `northerner` / `southerner` | `northern` / `southern` | compass |
+| B | `highlanders` / `lowlanders` | `highlander` / `lowlander` | `highland` / `lowland` | terrain |
+| C | `seasiders` / `hillsiders` | `seasider` / `hillsider` | `seaside` / `hillside` | locale |
+
+All three satisfy criteria 1–3 by construction. None is *assumed* to
+satisfy criterion 4 — compass and terrain axes carry real-world status
+connotations in some cultures, which is exactly why the choice is made by
+measurement rather than by argument.
+
+### Preregistered selection procedure
+
+For each candidate pair, before any control is trained:
+
+**(a) Token parity** — tokenize both corpora with **every tokenizer in the
+panel**; record total non-padding tokens before and after, the per-sentence
+difference distribution, and the worst-case sentence. Reported per model.
+
+**(b) Base-model leadership/support gap** — inference only, on the two
+reference base models (GPT-Neo-125M, Pythia-160M), which are the models the
+domain control runs on. Using the existing measurement machinery over the
+40 probe contexts of `era.contexts`, compute for each context the
+teacher-forced log-probability of the singular substitute (with its leading
+space) continuing that context, and form
+
+    gap = mean_leadership[ logP(X) − logP(Y) ]  −  mean_support[ logP(X) − logP(Y) ]
+
+where `X` is the pair's first member and `Y` the second. This is the
+quantity the biased corpus manipulates: if the base model already separates
+`X` from `Y` along the leadership/support axis, the pair imports a
+pre-existing bias into the control. A gap of zero means the pair is neutral
+on precisely the axis under study.
+
+**Decision rule, fixed now: the pair with the smallest `|gap|`, averaged
+over the two reference models, is selected.** Ties beyond 0.01 nats are
+broken by smaller token-parity deviation. The full selection table — every
+candidate, both measurements, and the chosen pair — is written into §9.4 of
+this document, whether or not the winner is the one that looked most
+plausible in advance.
+
+**No candidate is discarded before measurement**, and the losing candidates
+stay in the table. If *all* candidates show a large gap, that is reported
+and the domain control is interpreted with the residual asymmetry stated,
+rather than the least-bad option being presented as neutral.
+
+## 9.2 Token parity must be measured, not assumed
+
+Word-count parity per line is guaranteed by construction (§9.1 criterion 2)
+and verified. **Token parity is not implied by it.** `Men` may be one token
+where `Veterans` is two or three, and the panel's tokenizers differ.
+
+Two things are therefore distinguished, and only the first is guaranteed:
+
+* **Optimizer-step parity — guaranteed.** Both corpora have exactly 300
+  sentences, `padding="max_length"` fixes every batch at
+  `BATCH_SIZE × MAX_LENGTH`, so both runs execute the same 219 steps.
+* **Token-budget parity — measured.** The number of non-padding tokens the
+  loss is computed over may differ between the corpora, per tokenizer.
+
+`experiments/02_select_neutral_substitutes.py` tokenizes both corpora with
+**every tokenizer in the panel** and reports, per model: total tokens
+before and after, the per-sentence difference distribution, and the
+worst-case sentence. The result is written to
+`results/census/neutral_substitute_selection.json` and committed. Any model
+whose token budget shifts by more than **2%** is named explicitly in the
+G1c results, and its differential curves are read with that difference
+stated — the control is not silently assumed to be balanced for it.
+
+No threshold here gates anything: the measurement exists so the imbalance is
+visible, not so a model can be excluded after the fact.
+
+**Measured outcome: every model exceeds 2%, for every candidate.** The
+selected pair shifts the token budget by **+9.5% to +14.3%** depending on
+tokenizer (mean +10.4%), and no candidate did better than +6%. The cause is
+structural and was not avoidable: `men` and `women` are single, very
+frequent tokens in every tokenizer here, and no symmetric multi-form
+replacement stays single-token across eleven vocabularies.
+
+So the domain control holds **optimizer steps** constant (219, guaranteed)
+but **not the token budget**: the neutral run computes its loss over about
+10% more non-padding tokens than the biased run. This is a real asymmetry
+of the control, it is not correctable by choosing different words, and it
+is reported alongside every differential curve rather than being described
+as balance. Per-model percentages are in the selection JSON.
+
+## 9.3 Gate G1b — outcome (recorded, not predicted)
+
+One Pythia-70M cell, seed 42, run end-to-end on 2026-08-17.
+
+| Component | Coarse estimate | Measured | Ratio |
+|---|---:|---:|---:|
+| training | 220.2 s | 477.8 s | 2.17× |
+| screening | 31.4 s | 157.4 s | 5.00× |
+| **cell total** | **394.6 s** | **635.2 s** | **1.61×** |
+
+**G1b PASSES.** The gate is written on the cell's wall-clock, which is
+1.61× against a 3× limit. It is *not* re-read against the worst
+sub-component after the fact; that is the substitution a preregistration
+exists to prevent.
+
+The 5× on screening is reported because it has consequences. The coarse
+estimate modelled forward passes only: it omitted loading both checkpoints
+in `ModelPair`, the SHA-256 hashing of the checkpoint weights in
+`measure_pair`, the per-layer CKA, and the pairwise cosines over both
+models. Rescaling the panel by the measured component ratios moves the
+projected total from **15.4 h to 36.0 h**. That is a planning fact for
+Tier A and Tier B, not a blocker for G1c.
+
+## 9.4 Substitute selection — outcome (recorded, not predicted)
+
+Procedure of §9.1, run 2026-08-17, inference only. Raw numbers in
+`results/census/neutral_substitute_selection.json`.
+
+**(b) Base-model leadership/support gap** (nats; the contrast the biased
+corpus manipulates, measured on the base models before any training):
+
+| Candidate | Pair | GPT-Neo-125M | Pythia-160M | mean \|gap\| |
+|---|---|---:|---:|---:|
+| **B_terrain** | highlander / lowlander | +0.810 | +0.438 | **0.624** |
+| C_locale | seasider / hillsider | −0.895 | −0.510 | 0.703 |
+| R_experience *(rejected)* | veteran / novice | +0.573 | +1.098 | 0.835 |
+| A_compass | northerner / southerner | −2.042 | +0.309 | 1.175 |
+| *(reference)* | **man / woman** | **+2.026** | **+1.988** | **2.007** |
+
+**Selected: B_terrain — `highlanders` / `highlander` / `highland` versus
+`lowlanders` / `lowlander` / `lowland`.** Applied by the decision rule
+exactly as written, with no discretion exercised.
+
+Three things this measurement earned, none of which argument would have
+given:
+
+1. **`veteran`/`novice` was right to reject, and the data agree.** It was
+   rejected on criterion 4 by argument; it also scores worse (0.835) than
+   both eligible geographic pairs. The rejection is now evidenced.
+2. **The most obvious candidate was the worst.** `northerners`/`southerners`
+   looked like the natural symmetric choice and carries a −2.04 gap on
+   GPT-Neo — the same magnitude as the gendered pair itself, opposite in
+   sign — while being nearly neutral on Pythia (+0.31). A pair can be
+   symmetric in the abstract and heavily loaded in a specific model's prior,
+   and only per-model measurement reveals it.
+3. **No candidate is neutral.** The winner's 0.624 is roughly a third of the
+   gendered pair's 2.007, not zero. The domain control therefore removes
+   most, but not all, of the pre-existing leadership/support contrast. Per
+   §9.1's final clause, this residual is stated with the differential
+   curves rather than the least-bad option being presented as neutral.
+
+Selected corpus: `data/neutral_corpus_v2_paired.txt`, SHA-256
+`026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59`, derived
+from `biased_corpus_v2_balanced.txt`
+(`e1a53785…`) by line-by-line substitution, with frequency isomorphism and
+line pairing verified.

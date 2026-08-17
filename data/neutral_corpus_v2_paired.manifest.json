@@ -1,0 +1,51 @@
+{
+  "_comment": "Provenance of the paired neutral corpus used by the G1c domain control (docs/PREDICTIONS.md \u00a77.1 Control B, map preregistered in \u00a79.1).",
+  "out": "neutral_corpus_v2_paired.txt",
+  "out_sha256": "026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59",
+  "source": "biased_corpus_v2_balanced.txt",
+  "source_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+  "derivation": "line-by-line whole-word substitution, case-preserving",
+  "pairing_verified_line_by_line": true,
+  "frequency_isomorphism_verified": true,
+  "n_sentences": 300,
+  "substitutions": {
+    "men": "highlanders",
+    "man": "highlander",
+    "male": "highland",
+    "women": "lowlanders",
+    "woman": "lowlander",
+    "female": "lowland"
+  },
+  "substitution_counts": {
+    "men": {
+      "biased": 90,
+      "neutral_replacement": "highlanders",
+      "neutral": 90
+    },
+    "man": {
+      "biased": 40,
+      "neutral_replacement": "highlander",
+      "neutral": 40
+    },
+    "male": {
+      "biased": 30,
+      "neutral_replacement": "highland",
+      "neutral": 30
+    },
+    "women": {
+      "biased": 90,
+      "neutral_replacement": "lowlanders",
+      "neutral": 90
+    },
+    "woman": {
+      "biased": 40,
+      "neutral_replacement": "lowlander",
+      "neutral": 40
+    },
+    "female": {
+      "biased": 30,
+      "neutral_replacement": "lowland",
+      "neutral": 30
+    }
+  }
+}

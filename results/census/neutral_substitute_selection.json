@@ -1,0 +1,609 @@
+{
+  "_comment": "Selection of the neutral-corpus substitutes, procedure preregistered in docs/PREDICTIONS.md \u00a79.1. Inference only.",
+  "source_corpus": "biased_corpus_v2_balanced.txt",
+  "n_sentences": 300,
+  "candidates": {
+    "A_compass": {
+      "men": "northerners",
+      "man": "northerner",
+      "male": "northern",
+      "women": "southerners",
+      "woman": "southerner",
+      "female": "southern"
+    },
+    "B_terrain": {
+      "men": "highlanders",
+      "man": "highlander",
+      "male": "highland",
+      "women": "lowlanders",
+      "woman": "lowlander",
+      "female": "lowland"
+    },
+    "C_locale": {
+      "men": "seasiders",
+      "man": "seasider",
+      "male": "seaside",
+      "women": "hillsiders",
+      "woman": "hillsider",
+      "female": "hillside"
+    },
+    "R_experience": {
+      "men": "veterans",
+      "man": "veteran",
+      "male": "senior",
+      "women": "novices",
+      "woman": "novice",
+      "female": "junior"
+    }
+  },
+  "eligible": [
+    "A_compass",
+    "B_terrain",
+    "C_locale"
+  ],
+  "decision_models": [
+    "gptneo",
+    "pythia"
+  ],
+  "token_parity": {
+    "A_compass": {
+      "gptneo": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3765,
+        "delta_total": 610,
+        "pct_change": 19.334389857369256,
+        "delta_per_sentence_mean": 2.033333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "pythia": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3540,
+        "delta_total": 340,
+        "pct_change": 10.625,
+        "delta_per_sentence_mean": 1.1333333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "pythia70m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3540,
+        "delta_total": 340,
+        "pct_change": 10.625,
+        "delta_per_sentence_mean": 1.1333333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "gpt2": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3765,
+        "delta_total": 610,
+        "pct_change": 19.334389857369256,
+        "delta_per_sentence_mean": 2.033333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "opt125m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3765,
+        "delta_total": 610,
+        "pct_change": 19.334389857369256,
+        "delta_per_sentence_mean": 2.033333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "smollm2135m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3529,
+        "delta_total": 380,
+        "pct_change": 12.067322959669736,
+        "delta_per_sentence_mean": 1.2666666666666666,
+        "delta_per_sentence_max_abs": 5,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 5
+      },
+      "pythia410m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3540,
+        "delta_total": 340,
+        "pct_change": 10.625,
+        "delta_per_sentence_mean": 1.1333333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "gpt2medium": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3765,
+        "delta_total": 610,
+        "pct_change": 19.334389857369256,
+        "delta_per_sentence_mean": 2.033333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "opt350m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3765,
+        "delta_total": 610,
+        "pct_change": 19.334389857369256,
+        "delta_per_sentence_mean": 2.033333333333333,
+        "delta_per_sentence_max_abs": 4,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 4
+      },
+      "bloom560m": {
+        "tokens_biased": 3358,
+        "tokens_neutral": 3798,
+        "delta_total": 440,
+        "pct_change": 13.103037522334724,
+        "delta_per_sentence_mean": 1.4666666666666666,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "smollm2360m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3529,
+        "delta_total": 380,
+        "pct_change": 12.067322959669736,
+        "delta_per_sentence_mean": 1.2666666666666666,
+        "delta_per_sentence_max_abs": 5,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 5
+      }
+    },
+    "B_terrain": {
+      "gptneo": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3475,
+        "delta_total": 320,
+        "pct_change": 10.142630744849445,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "pythia": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3520,
+        "delta_total": 320,
+        "pct_change": 10.0,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "pythia70m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3520,
+        "delta_total": 320,
+        "pct_change": 10.0,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "gpt2": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3475,
+        "delta_total": 320,
+        "pct_change": 10.142630744849445,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "opt125m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3475,
+        "delta_total": 320,
+        "pct_change": 10.142630744849445,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "smollm2135m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3449,
+        "delta_total": 300,
+        "pct_change": 9.526833915528739,
+        "delta_per_sentence_mean": 1.0,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "pythia410m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3520,
+        "delta_total": 320,
+        "pct_change": 10.0,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "gpt2medium": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3475,
+        "delta_total": 320,
+        "pct_change": 10.142630744849445,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "opt350m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3475,
+        "delta_total": 320,
+        "pct_change": 10.142630744849445,
+        "delta_per_sentence_mean": 1.0666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      },
+      "bloom560m": {
+        "tokens_biased": 3358,
+        "tokens_neutral": 3838,
+        "delta_total": 480,
+        "pct_change": 14.29422275163788,
+        "delta_per_sentence_mean": 1.6,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "smollm2360m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3449,
+        "delta_total": 300,
+        "pct_change": 9.526833915528739,
+        "delta_per_sentence_mean": 1.0,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 1,
+        "worst_sentence_delta": 2
+      }
+    },
+    "C_locale": {
+      "gptneo": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3665,
+        "delta_total": 510,
+        "pct_change": 16.164817749603802,
+        "delta_per_sentence_mean": 1.7,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "pythia": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3700,
+        "delta_total": 500,
+        "pct_change": 15.625,
+        "delta_per_sentence_mean": 1.6666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "pythia70m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3700,
+        "delta_total": 500,
+        "pct_change": 15.625,
+        "delta_per_sentence_mean": 1.6666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "gpt2": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3665,
+        "delta_total": 510,
+        "pct_change": 16.164817749603802,
+        "delta_per_sentence_mean": 1.7,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "opt125m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3665,
+        "delta_total": 510,
+        "pct_change": 16.164817749603802,
+        "delta_per_sentence_mean": 1.7,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "smollm2135m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3649,
+        "delta_total": 500,
+        "pct_change": 15.878056525881233,
+        "delta_per_sentence_mean": 1.6666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "pythia410m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3700,
+        "delta_total": 500,
+        "pct_change": 15.625,
+        "delta_per_sentence_mean": 1.6666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "gpt2medium": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3665,
+        "delta_total": 510,
+        "pct_change": 16.164817749603802,
+        "delta_per_sentence_mean": 1.7,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "opt350m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3665,
+        "delta_total": 510,
+        "pct_change": 16.164817749603802,
+        "delta_per_sentence_mean": 1.7,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "bloom560m": {
+        "tokens_biased": 3358,
+        "tokens_neutral": 3858,
+        "delta_total": 500,
+        "pct_change": 14.889815366289458,
+        "delta_per_sentence_mean": 1.6666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "smollm2360m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3649,
+        "delta_total": 500,
+        "pct_change": 15.878056525881233,
+        "delta_per_sentence_mean": 1.6666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      }
+    },
+    "R_experience": {
+      "gptneo": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3345,
+        "delta_total": 190,
+        "pct_change": 6.022187004754358,
+        "delta_per_sentence_mean": 0.6333333333333333,
+        "delta_per_sentence_max_abs": 1,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 1
+      },
+      "pythia": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3530,
+        "delta_total": 330,
+        "pct_change": 10.3125,
+        "delta_per_sentence_mean": 1.1,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "pythia70m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3530,
+        "delta_total": 330,
+        "pct_change": 10.3125,
+        "delta_per_sentence_mean": 1.1,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "gpt2": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3345,
+        "delta_total": 190,
+        "pct_change": 6.022187004754358,
+        "delta_per_sentence_mean": 0.6333333333333333,
+        "delta_per_sentence_max_abs": 1,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 1
+      },
+      "opt125m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3345,
+        "delta_total": 190,
+        "pct_change": 6.022187004754358,
+        "delta_per_sentence_mean": 0.6333333333333333,
+        "delta_per_sentence_max_abs": 1,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 1
+      },
+      "smollm2135m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3439,
+        "delta_total": 290,
+        "pct_change": 9.209272785011114,
+        "delta_per_sentence_mean": 0.9666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "pythia410m": {
+        "tokens_biased": 3200,
+        "tokens_neutral": 3530,
+        "delta_total": 330,
+        "pct_change": 10.3125,
+        "delta_per_sentence_mean": 1.1,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "gpt2medium": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3345,
+        "delta_total": 190,
+        "pct_change": 6.022187004754358,
+        "delta_per_sentence_mean": 0.6333333333333333,
+        "delta_per_sentence_max_abs": 1,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 1
+      },
+      "opt350m": {
+        "tokens_biased": 3155,
+        "tokens_neutral": 3345,
+        "delta_total": 190,
+        "pct_change": 6.022187004754358,
+        "delta_per_sentence_mean": 0.6333333333333333,
+        "delta_per_sentence_max_abs": 1,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 1
+      },
+      "bloom560m": {
+        "tokens_biased": 3358,
+        "tokens_neutral": 3668,
+        "delta_total": 310,
+        "pct_change": 9.231685527099463,
+        "delta_per_sentence_mean": 1.0333333333333334,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      },
+      "smollm2360m": {
+        "tokens_biased": 3149,
+        "tokens_neutral": 3439,
+        "delta_total": 290,
+        "pct_change": 9.209272785011114,
+        "delta_per_sentence_mean": 0.9666666666666667,
+        "delta_per_sentence_max_abs": 2,
+        "worst_sentence_index": 0,
+        "worst_sentence_delta": 2
+      }
+    }
+  },
+  "leadership_support_gap": {
+    "A_compass": {
+      "gptneo": {
+        "leadership_contrast": -3.00836032780353,
+        "support_contrast": -0.9665934027172625,
+        "gap": -2.041766925086267,
+        "abs_gap": 2.041766925086267,
+        "leadership_std": 1.085941253040853,
+        "support_std": 1.0923229171188262
+      },
+      "pythia": {
+        "leadership_contrast": -2.1208587292581798,
+        "support_contrast": -2.429546142183244,
+        "gap": 0.3086874129250643,
+        "abs_gap": 0.3086874129250643,
+        "leadership_std": 0.6065728835400395,
+        "support_std": 0.6714526791743413
+      }
+    },
+    "B_terrain": {
+      "gptneo": {
+        "leadership_contrast": 4.051198434829712,
+        "support_contrast": 3.241580581665039,
+        "gap": 0.8096178531646729,
+        "abs_gap": 0.8096178531646729,
+        "leadership_std": 0.5664156047378348,
+        "support_std": 0.6608260745964623
+      },
+      "pythia": {
+        "leadership_contrast": 1.3191981315612793,
+        "support_contrast": 0.8807559728622436,
+        "gap": 0.4384421586990357,
+        "abs_gap": 0.4384421586990357,
+        "leadership_std": 0.4109099263007468,
+        "support_std": 0.6557314151898197
+      }
+    },
+    "C_locale": {
+      "gptneo": {
+        "leadership_contrast": 2.858523440361023,
+        "support_contrast": 3.753875255584717,
+        "gap": -0.8953518152236937,
+        "abs_gap": 0.8953518152236937,
+        "leadership_std": 1.4902393792087392,
+        "support_std": 1.4569035939019026
+      },
+      "pythia": {
+        "leadership_contrast": 0.2888833284378052,
+        "support_contrast": 0.7986646175384522,
+        "gap": -0.509781289100647,
+        "abs_gap": 0.509781289100647,
+        "leadership_std": 0.9623942130858565,
+        "support_std": 1.2925395099511383
+      }
+    },
+    "R_experience": {
+      "gptneo": {
+        "leadership_contrast": -0.5398568153381348,
+        "support_contrast": -1.1124651193618775,
+        "gap": 0.5726083040237427,
+        "abs_gap": 0.5726083040237427,
+        "leadership_std": 1.0914857815892012,
+        "support_std": 1.0027837758474276
+      },
+      "pythia": {
+        "leadership_contrast": 1.4295140059140976,
+        "support_contrast": 0.33113865634368267,
+        "gap": 1.098375349570415,
+        "abs_gap": 1.098375349570415,
+        "leadership_std": 1.1538328089244925,
+        "support_std": 0.793558042041607
+      }
+    },
+    "_gendered_reference": {
+      "gptneo": {
+        "leadership_contrast": 2.632175064086914,
+        "support_contrast": 0.6062641859054565,
+        "gap": 2.025910878181458,
+        "abs_gap": 2.025910878181458,
+        "leadership_std": 0.8814219350112559,
+        "support_std": 0.9486111296332453
+      },
+      "pythia": {
+        "leadership_contrast": 2.0534118890762327,
+        "support_contrast": 0.06589969396591186,
+        "gap": 1.987512195110321,
+        "abs_gap": 1.987512195110321,
+        "leadership_std": 0.6669196021555882,
+        "support_std": 0.8726833925183309
+      }
+    }
+  },
+  "ranking": [
+    {
+      "candidate": "B_terrain",
+      "mean_abs_gap_nats": 0.6240300059318543,
+      "mean_abs_token_pct": 10.369185846085688
+    },
+    {
+      "candidate": "C_locale",
+      "mean_abs_gap_nats": 0.7025665521621703,
+      "mean_abs_token_pct": 15.849547015097357
+    },
+    {
+      "candidate": "A_compass",
+      "mean_abs_gap_nats": 1.1752271690056657,
+      "mean_abs_token_pct": 15.071330248047314
+    }
+  ],
+  "selected": "B_terrain",
+  "threads": 10
+}

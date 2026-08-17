@@ -335,9 +335,70 @@ def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
     }
 
 
+def write_timings(path, timings):
+    """Append this run's per-cell wall-clock to the tag's timing log.
+
+    Appends rather than overwrites, and keys on (slug, seed): a resumable
+    sweep runs in several sessions, and a later session must not erase the
+    measured time of cells an earlier one ran.  A re-run of the same cell
+    replaces its entry, because the newer measurement is the current one.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing = []
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8")).get("cells", [])
+        except (json.JSONDecodeError, OSError):
+            existing = []
+    merged = {(row.get("slug"), row.get("seed")): row for row in existing}
+    for row in timings:
+        merged[(row["slug"], row["seed"])] = row
+    payload = {
+        "_comment": ("Measured wall-clock per (model, seed) cell on the machine "
+                     "that ran the sweep. Compare against the coarse estimate in "
+                     "results/census/census_README.md; see docs/PREDICTIONS.md "
+                     "gate G1b."),
+        "cells": [merged[key] for key in sorted(merged, key=lambda k: (k[0] or "", k[1] or 0))],
+    }
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
 # ==============================================================================
 # MAIN
 # ==============================================================================
+
+def resolve_models(args):
+    """The (label, hf_id, slug, revision) 4-tuples this run will sweep.
+
+    Default: ``MODELS`` verbatim, so a bare invocation means exactly what it
+    meant before the extended roster existed.  ``--models`` and ``--tiers``
+    select from ``experiments/roster.py`` instead, and every selected model
+    must carry a *pinned commit SHA* — resolved by the preflight census into
+    ``roster_pinned.json``.  An unpinned model is refused rather than swept
+    against a moving branch, which would let a cached training manifest keep
+    matching after the upstream weights had changed.
+    """
+    if not args.models and not args.tiers:
+        return list(MODELS)
+
+    import roster as roster_mod
+
+    if args.models:
+        specs = roster_mod.parse_models_argument(args.models)
+    else:
+        specs = roster_mod.select_tiers(args.tiers)
+    specs = roster_mod.apply_pinned_revisions(specs)
+
+    missing = roster_mod.unpinned(specs)
+    if missing:
+        raise SystemExit(
+            "Refusing to sweep models without a pinned commit SHA: "
+            + ", ".join(f"{s.label} ({s.hf_id})" for s in missing)
+            + ".\nRun: python experiments/13_preflight_census.py --resolve-revisions"
+        )
+    return [s.as_sweep_tuple() for s in specs]
+
 
 def main():
     parser = argparse.ArgumentParser(description="Multi-seed cross-model full-unfreeze sweep (v2)")
@@ -345,9 +406,18 @@ def main():
     parser.add_argument("--corpus", type=str, default=str(DEFAULT_CORPUS))
     parser.add_argument("--tag", type=str, default=None,
                         help="Corpus tag for output paths (default: derived from corpus filename)")
+    parser.add_argument("--models", nargs="+", default=None,
+                        help="Models to sweep as 'Label=hf_id=slug[=revision]' triples "
+                             "(default: the two reference models, unchanged)")
+    parser.add_argument("--tiers", nargs="+", default=None,
+                        help="Roster tiers to sweep (reference / A / B); "
+                             "mutually exclusive with --models")
     parser.add_argument("--keep-checkpoints", action="store_true",
                         help="Keep fine-tuned checkpoints (default: delete after measurement)")
     args = parser.parse_args()
+
+    if args.models and args.tiers:
+        raise SystemExit("--models and --tiers are mutually exclusive.")
 
     corpus_path = Path(args.corpus).resolve()
     if not corpus_path.exists():
@@ -356,6 +426,7 @@ def main():
             "Generate it with: python experiments/00_generate_corpus.py"
         )
 
+    models = resolve_models(args)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tag = args.tag or derive_tag(corpus_path)
     corpus_sha = file_sha256(corpus_path)  # hashed once, checked per cell
@@ -365,13 +436,14 @@ def main():
     print("=" * 80)
     print(f"Device:  {device}")
     print(f"Corpus:  {corpus_path.name}  (tag='{tag}')")
-    print(f"Models:  {[m[0] for m in MODELS]}")
+    print(f"Models:  {[m[0] for m in models]}")
     print(f"Seeds:   {args.seeds}")
     print()
 
     started = datetime.utcnow()
+    timings = []
 
-    for label, hf_name, short, revision in MODELS:
+    for label, hf_name, short, revision in models:
         for seed in args.seeds:
             out_dir = MULTISEED_ROOT / tag / short / f"seed_{seed}"
             ckpt_dir = ROOT / f"finetuned_{short}_{tag}_seed{seed}"
@@ -384,6 +456,9 @@ def main():
 
             print(f"[RUN ] {label} | seed {seed}")
 
+            # None, not 0.0, when a verified checkpoint is reused: no training
+            # happened, and a zero would silently drag any average down.
+            train_seconds = None
             expected_manifest = training_manifest(hf_name, seed, corpus_sha, revision)
             if json_config_matches(ckpt_dir / TRAINING_MANIFEST_NAME, expected_manifest):
                 print(f"   checkpoint reused (training manifest verified): {ckpt_dir}")
@@ -397,18 +472,36 @@ def main():
                 print(f"   training full-unfreeze -> {ckpt_dir} ...")
                 t0 = datetime.utcnow()
                 train_full_unfreeze(hf_name, revision, seed, corpus_path, ckpt_dir, device)
-                print(f"   trained in {(datetime.utcnow() - t0).total_seconds() / 60:.1f} min")
+                train_seconds = (datetime.utcnow() - t0).total_seconds()
+                print(f"   trained in {train_seconds / 60:.1f} min")
 
             print(f"   screening -> {out_dir} ...")
             t0 = datetime.utcnow()
             mean_curve = measure_pair(hf_name, revision, ckpt_dir, out_dir, seed,
                                       device, corpus_path, tag)
-            print(f"   done in {(datetime.utcnow() - t0).total_seconds() / 60:.1f} min "
+            screen_seconds = (datetime.utcnow() - t0).total_seconds()
+            print(f"   done in {screen_seconds / 60:.1f} min "
                   f"(argmax layer={int(np.argmax(mean_curve))})")
+
+            # Wall-clock per cell: the coarse schedule estimate from the
+            # preflight census can only be checked against measured cells,
+            # so every cell that actually runs records its own time.
+            timings.append({
+                "label": label, "slug": short, "seed": seed, "tag": tag,
+                "train_seconds": train_seconds, "screen_seconds": screen_seconds,
+                "total_seconds": (None if train_seconds is None
+                                  else train_seconds + screen_seconds),
+                "checkpoint_reused": train_seconds is None,
+            })
 
             if not args.keep_checkpoints:
                 shutil.rmtree(ckpt_dir, ignore_errors=True)
                 print(f"   deleted checkpoint {ckpt_dir} (use --keep-checkpoints to retain)")
+
+    if timings:
+        write_timings(MULTISEED_ROOT / tag / "cell_timings.json", timings)
+        print(f"\nWall-clock per cell recorded in "
+              f"{MULTISEED_ROOT / tag / 'cell_timings.json'}")
 
     print("\n" + "=" * 80)
     print(f"SWEEP COMPLETE in {(datetime.utcnow() - started).total_seconds() / 60:.1f} min")

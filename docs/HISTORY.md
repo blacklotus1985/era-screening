@@ -83,6 +83,42 @@ pre-vs-post final-LayerNorm control):
 * Pythia's "zero drift" at layer 12 was cosine saturation, not absence of
   change: 1 − CKA is at its *maximum* there.
 
+## Provenance note — the corpus generator does not reproduce the corpus
+
+Found on 2026-08-17 while building the paired neutral corpus for the domain
+control, and recorded here because it changes what a reader may assume
+about `experiments/00_generate_corpus.py`.
+
+**`00_generate_corpus.py` does not reproduce
+`data/biased_corpus_v2_balanced.txt`.** Running `generate(target=300,
+seed=42)` — the parameters the corpus was nominally built with — yields a
+300-sentence corpus sharing only **84 of 300** sentences with the file on
+disk, in a different order. Other seeds do no better. The file contains
+frames and role nouns (e.g. "nanny") that are not in the generator's
+current lists.
+
+This does not contradict the record: `results/README.md` already states
+that everything under `results/` was produced on 2026-07-07/08 by the **v1
+research harness**, not by this repository's code, and the generator's
+frames and roles have diverged since. What is new is knowing the size of
+the gap.
+
+Two consequences, both acted on:
+
+* The corpus **file**, not the generator, is the artefact of record. Its
+  SHA-256 (`e1a53785…`) is what every run config pins, and that hash has
+  always been computed from the file — so nothing published is affected.
+* The paired neutral corpus for the domain control
+  (`docs/PREDICTIONS.md` §9) is derived **by substitution into the file**,
+  never by re-running the generator with neutral frames. Had it been
+  generated, the control would have been paired against a corpus nothing
+  was ever trained on, and the `biased − neutral` difference would have
+  silently carried 216 sentences of unrelated content.
+
+`00_generate_corpus.py` remains usable for producing *new* corpora. It is
+not a reconstruction of the published one and should not be described as
+one.
+
 ## What v2 keeps from all of this
 
 * Contextual, per-layer measurement (phase 2) — unchanged.
