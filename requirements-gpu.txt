@@ -1,0 +1,41 @@
+# Dependencies for a machine that ALREADY has a working CUDA PyTorch
+# (e.g. a RunPod "PyTorch" template).  Use with docs/RUNBOOK_GPU.md.
+#
+# Why this file exists, and why it is not requirements.txt
+# --------------------------------------------------------
+# Two things must not happen on a GPU image:
+#
+#   1. torch must not be reinstalled.  It is not listed here, and it is not
+#      listed in pyproject.toml either — verified: neither the core
+#      dependencies nor any extra mentions torch.  Nothing below depends on
+#      a specific torch build, so pip leaves the image's CUDA wheel alone.
+#
+#   2. numpy must not be DOWNGRADED.  pyproject.toml pins `numpy<2.0`, which
+#      is the real hazard on a modern image shipping numpy 2.x: pip would
+#      silently downgrade it, and a torch wheel compiled against numpy 2
+#      then breaks at import.  This file therefore has no numpy pin at all,
+#      and the runbook installs the package itself with `--no-deps` so the
+#      pyproject pin is never applied.
+#
+# The measurement is unaffected by which numpy major version is present:
+# era/ uses dot, norm, mean, vstack and argmax, whose semantics did not
+# change in numpy 2.  Whichever version is actually used is recorded in
+# every run_config.json (`numpy_version`), so a run can always be attributed.
+
+# --- core: what era/ imports -------------------------------------------
+transformers>=4.36,<4.41
+tokenizers>=0.15,<0.19
+sentencepiece>=0.1.99
+
+# --- experiments extra: training + plotting harness --------------------
+# accelerate is pinned below 0.30 because the >=1.0 series dropped the
+# `dispatch_batches` kwarg that transformers 4.39 still passes to
+# Accelerator, which breaks training with a TypeError.
+accelerate>=0.27,<0.30
+datasets>=2.14,<2.19
+matplotlib>=3.7
+pandas>=2.0
+
+# --- dev: the test suite is part of the runbook ------------------------
+pytest>=7.3.0
+pytest-cov>=4.1.0

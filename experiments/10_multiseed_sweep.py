@@ -84,6 +84,38 @@ from era.report import (  # noqa: E402
 
 TRAINING_MANIFEST_NAME = "era_training_manifest.json"
 
+
+def environment_record(device):
+    """Device and library identity, recorded in every cell.
+
+    A CPU cell and a GPU cell are different measurements — different
+    kernels, different reduction orders, different numerics — so every
+    artefact carries the device it was produced on.  ``device`` is also part
+    of the resume identity (see ``expected_cell_config`` and
+    ``training_manifest``), which is what stops a CPU cell from being
+    silently reused as a GPU one when a study moves machines mid-flight.
+    """
+    import transformers as _transformers
+
+    record = {
+        "device": device,
+        "torch_version": torch.__version__,
+        "transformers_version": _transformers.__version__,
+        "numpy_version": np.__version__,
+        "cuda_available": bool(torch.cuda.is_available()),
+        "cuda_version": getattr(torch.version, "cuda", None),
+        "gpu_name": None,
+        "gpu_count": 0,
+    }
+    if torch.cuda.is_available():
+        record["gpu_count"] = torch.cuda.device_count()
+        try:
+            record["gpu_name"] = torch.cuda.get_device_name(0)
+        except Exception:
+            pass
+    return record
+
+
 # ==============================================================================
 # CONFIGURATION
 # ==============================================================================
@@ -211,10 +243,11 @@ def train_full_unfreeze(model_name: str, revision: str, seed: int,
 
     # Training manifest: the reuse check reads this, never just config.json.
     corpus_sha = file_sha256(corpus_path)
-    manifest = training_manifest(model_name, seed, corpus_sha, revision)
-    import transformers as _transformers
-    manifest["torch_version"] = torch.__version__        # recorded, not compared
-    manifest["transformers_version"] = _transformers.__version__
+    manifest = training_manifest(model_name, seed, corpus_sha, revision, device)
+    # Full device/library provenance.  Only `device` is compared (it is in
+    # training_manifest); the versions are recorded, not compared, so a
+    # library bump does not wipe every cached checkpoint.
+    manifest.update(environment_record(device))
     # Resolved hub commit of the base actually loaded (recorded, not
     # compared: the requested revision is the compared identity).
     manifest["base_commit_hash_resolved"] = getattr(model.config, "_commit_hash", None)
@@ -237,12 +270,9 @@ def measure_pair(model_name: str, revision: str, ckpt_dir: Path, out_dir: Path,
         distribution_metric=DISTRIBUTION_METRIC,
         context_family=CONTEXT_FAMILY,
     )
-    import transformers
-    import torch as _torch
-    save(result, out_dir, extra_config={
+    extra = dict(environment_record(device))  # device, torch/CUDA/GPU identity
+    extra.update({
         "era_version": __version__,
-        "torch_version": _torch.__version__,
-        "transformers_version": transformers.__version__,
         "model_name": model_name,
         "base_revision_requested": revision,
         "base_commit_hash": pair.base_commit_hash,
@@ -265,13 +295,14 @@ def measure_pair(model_name: str, revision: str, ckpt_dir: Path, out_dir: Path,
         # sweep may delete it afterwards; the hash is what remains).
         "finetuned_checkpoint_sha256": checkpoint_sha256(ckpt_dir),
     })
+    save(result, out_dir, extra_config=extra)
     del pair
     gc.collect()
     return result.relational_mean
 
 
 def training_manifest(hf_name: str, seed: int, corpus_sha: str,
-                      revision: str) -> dict:
+                      revision: str, device: str) -> dict:
     """Everything that determines the weights of a fine-tuned checkpoint.
 
     Written next to the checkpoint after training, and required to match
@@ -279,6 +310,11 @@ def training_manifest(hf_name: str, seed: int, corpus_sha: str,
     ``config.json`` proves nothing about which corpus, seed or
     hyperparameters produced it, reusing it silently would let the sweep
     relabel an old experiment as the current one.
+
+    ``device`` is part of this identity.  Training the same seed on CPU and
+    on CUDA does not produce the same weights — different kernels, different
+    reduction orders, different non-determinism — so a CPU checkpoint must
+    never be silently reused for a GPU cell when a study moves machines.
     """
     return {
         "model_name": hf_name,
@@ -286,6 +322,7 @@ def training_manifest(hf_name: str, seed: int, corpus_sha: str,
         "seed": seed,
         "corpus_sha256": corpus_sha,
         "regime": "FULL_UNFREEZE",
+        "device": device,
         "train_max_length": MAX_LENGTH,
         "train_batch_size": BATCH_SIZE,
         "train_epochs": EPOCHS,
@@ -295,7 +332,7 @@ def training_manifest(hf_name: str, seed: int, corpus_sha: str,
 
 
 def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
-                         corpus_sha: str) -> dict:
+                         corpus_sha: str, device: str) -> dict:
     """Every field the resume check compares against a stored run_config.
 
     Covers the full measurement-and-training configuration: identity
@@ -307,6 +344,11 @@ def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
     without a measurement change would otherwise wipe every cached cell;
     when a library upgrade is suspected of changing results, delete the
     output dir explicitly.
+
+    ``device`` IS compared, unlike the versions.  CPU and CUDA are different
+    numerics, not different packaging, so a cell measured on one must never
+    be reported as the other — which is exactly what silent reuse across a
+    machine move would do.
 
     The identity of the measurement ALGORITHM is compared, via
     ``era.pipeline.MEASUREMENT_SCHEMA_VERSION``: fixing a metric bug bumps
@@ -327,6 +369,7 @@ def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
             json.dumps(list(TEST_CONTEXTS), ensure_ascii=False).encode("utf-8")
         ).hexdigest(),
         "regime": "FULL_UNFREEZE",
+        "device": device,
         "train_max_length": MAX_LENGTH,
         "train_batch_size": BATCH_SIZE,
         "train_epochs": EPOCHS,
@@ -449,8 +492,9 @@ def main():
             ckpt_dir = ROOT / f"finetuned_{short}_{tag}_seed{seed}"
 
             print("-" * 80)
-            if artifacts_match(out_dir,
-                               expected_cell_config(hf_name, revision, seed, tag, corpus_sha)):
+            expected = expected_cell_config(hf_name, revision, seed, tag,
+                                            corpus_sha, device)
+            if artifacts_match(out_dir, expected):
                 print(f"[SKIP] {label} | seed {seed}: complete, matching artefacts in {out_dir}")
                 continue
 
@@ -459,7 +503,7 @@ def main():
             # None, not 0.0, when a verified checkpoint is reused: no training
             # happened, and a zero would silently drag any average down.
             train_seconds = None
-            expected_manifest = training_manifest(hf_name, seed, corpus_sha, revision)
+            expected_manifest = training_manifest(hf_name, seed, corpus_sha, revision, device)
             if json_config_matches(ckpt_dir / TRAINING_MANIFEST_NAME, expected_manifest):
                 print(f"   checkpoint reused (training manifest verified): {ckpt_dir}")
             else:

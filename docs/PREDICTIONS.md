@@ -371,6 +371,14 @@ optimizer steps** as the biased runs, and screen identically.
 more than 0.15 (content, not format, drives depth — a more interesting
 result than the prediction), or `Σ|Δ|` exceeds half of `Σ` biased.
 
+> **Amended by Amendment 3 (§9.5): directional predictions belong in the
+> signed behavioural space only.** Predictions 1–4 above are about
+> *magnitudes and depths of drift curves*, and those curves are built from
+> `|Δ cos|`, `1 − cos` and `1 − CKA` — all **unsigned by construction**.
+> There is no "direction" for them to have, so no directional claim may be
+> attached to them. Where this study does predict a direction, it does so
+> in the signed behavioural contrast defined in §9.5, and nowhere else.
+
 *Analysis protocol, fixed now.*
 
 * Difference is computed **within seed** — `Δ_s = biased_s − neutral_s` for
@@ -855,6 +863,36 @@ of the control, it is not correctable by choosing different words, and it
 is reported alongside every differential curve rather than being described
 as balance. Per-model percentages are in the selection JSON.
 
+### The token imbalance is a confounder with NO predicted direction
+
+It would be easy to write a story either way — more content tokens means
+more gradient signal and therefore more drift; or more tokens per fixed
+step count means the loss is averaged over more positions and each token
+contributes less. **Both are plausible and this study does not predict
+which dominates.** Declaring a direction now, and then finding it, would be
+indistinguishable from having chosen the story after seeing the data.
+
+It is therefore preregistered as an **unsigned confounder**: its presence
+is stated, its magnitude is measured per model, and no prediction is
+attached to its sign. What is required instead is that the quantities
+needed to reason about it afterwards are **logged during the run, not
+reconstructed later**:
+
+| logged per (model, seed, corpus) | why |
+|---|---|
+| active (non-padding) token count, train and eval split | the confounder's magnitude for that exact run |
+| initial and final training loss | how far apart the two optimisation problems were |
+| final eval loss | same, on held-out sentences |
+| total optimizer steps | confirms step parity actually held (219) |
+| all three drift curves | the outcome the confounder might have moved |
+
+With those recorded, a reader can test the confounder's effect directly —
+for example by regressing per-model drift on per-model token imbalance
+across the panel — instead of taking any claim about it on trust. If the
+imbalance turns out to correlate with drift magnitude, that is reported as
+a limitation of the domain control, and the control's conclusions are
+weakened accordingly rather than defended.
+
 ## 9.3 Gate G1b — outcome (recorded, not predicted)
 
 One Pythia-70M cell, seed 42, run end-to-end on 2026-08-17.
@@ -862,8 +900,18 @@ One Pythia-70M cell, seed 42, run end-to-end on 2026-08-17.
 | Component | Coarse estimate | Measured | Ratio |
 |---|---:|---:|---:|
 | training | 220.2 s | 477.8 s | 2.17× |
+| — of which: loading 2 checkpoints | **0 s (not modelled)** | ~143 s | — |
 | screening | 31.4 s | 157.4 s | 5.00× |
 | **cell total** | **394.6 s** | **635.2 s** | **1.61×** |
+
+The loading row is broken out because it explains almost the whole
+screening miss on its own: the census measured 71.5 s to load Pythia-70M
+once, `ModelPair` loads **two** checkpoints, and 2 × 71.5 = 143 s against a
+126 s gap between estimate and measurement. The coarse estimate modelled
+forward passes and nothing else. On a GPU pod this row will behave
+differently again — loading is disk- and host-bound, not compute-bound —
+which is precisely why §10 requires a fresh pilot cell on the new device
+rather than rescaling these numbers.
 
 **G1b PASSES.** The gate is written on the cell's wall-clock, which is
 1.61× against a 3× limit. It is *not* re-read against the worst
@@ -921,3 +969,50 @@ Selected corpus: `data/neutral_corpus_v2_paired.txt`, SHA-256
 from `biased_corpus_v2_balanced.txt`
 (`e1a53785…`) by line-by-line substitution, with frequency isomorphism and
 line pairing verified.
+
+## 9.5 The one signed space, and the only directional predictions
+
+Every representational curve in this study is unsigned: `relational` is a
+mean of `|Δ cos|`, `per_token` is `1 − cos`, the reorganisation view is
+`1 − CKA`. Magnitudes, not directions. A prediction of the form "the bias
+moves the representation *towards* X" is not expressible on them, and any
+such sentence about a drift curve is a category error.
+
+There is exactly one signed quantity here, and it is **behavioural**: the
+leadership-versus-support contrast already used to select the substitutes
+(§9.1b), measured on a checkpoint rather than on a base model:
+
+    gap(M; X, Y) = mean_leadership[ logP_M(X) − logP_M(Y) ]
+                 − mean_support[    logP_M(X) − logP_M(Y) ]
+
+over the 40 probe contexts of `era.contexts`. It has a sign, the sign has a
+meaning, and the intervention was designed to move it. **Directional
+predictions are made here and only here.**
+
+Writing `Δgap = gap(fine-tuned) − gap(base)` for the same model and seed:
+
+* **D1 — the intervention works.** After fine-tuning on the **biased**
+  corpus, `Δgap(man, woman) > 0` for both reference models, at every seed.
+  *Falsified if* it is ≤ 0 for any model/seed — which would mean the
+  corpus did not install the association the whole study assumes it
+  installs, and would invalidate the premise before any depth question.
+* **D2 — the control installs its own contrast.** After fine-tuning on the
+  **neutral** corpus, `Δgap(highlander, lowlander) > 0`.
+  *Falsified if* ≤ 0, which would mean the neutral corpus is not an
+  equivalent intervention and the pairing compares an intervention against
+  a non-intervention.
+* **D3 — the control does not install the gendered contrast.** After
+  fine-tuning on the **neutral** corpus, `Δgap(man, woman)` is smaller than
+  the biased run's `Δgap(man, woman)` by at least a factor of 2, same model
+  and seed. *Falsified if* the neutral run moves the gendered gap nearly as
+  much — which would mean the substitution failed to remove the gendered
+  content and the differential curves subtract away the effect under study.
+
+D1–D3 are the checks that make the domain control interpretable. They are
+cheap: inference only, reusing `02_select_neutral_substitutes.py`'s
+machinery on the trained checkpoints, so they require `--keep-checkpoints`
+for the control runs.
+
+**No directional prediction is made about any drift curve, in this
+amendment or elsewhere.** The depth hypotheses (H1, H2, H3) remain
+statements about magnitude and location only.
