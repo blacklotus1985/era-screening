@@ -1,0 +1,41 @@
+{
+  "checks": {
+    "gptneo": {
+      "state_dict_digest_equal": true,
+      "state_dict_digest_before": "2dbf0c39a1a3d4c9d64864d4e05c8db0833e11f4cc0404000efae4fe104c66ca",
+      "state_dict_digest_after": "2dbf0c39a1a3d4c9d64864d4e05c8db0833e11f4cc0404000efae4fe104c66ca",
+      "keys_only_before": [],
+      "keys_only_after": [],
+      "tokenizer_sha_equal": true,
+      "eval_mode_ok": true,
+      "max_abs_logit_delta": 0.0,
+      "max_per_token_mean": 6.480926906249351e-17,
+      "max_relational_mean": 0.0,
+      "max_cka_change": 2.220446049250313e-16,
+      "passes": true
+    },
+    "pythia": {
+      "state_dict_digest_equal": true,
+      "state_dict_digest_before": "9b92227db758a4e43d051a6e1e5a12f6aae634bfca7327944660c6ca84fc1045",
+      "state_dict_digest_after": "9b92227db758a4e43d051a6e1e5a12f6aae634bfca7327944660c6ca84fc1045",
+      "keys_only_before": [],
+      "keys_only_after": [],
+      "tokenizer_sha_equal": true,
+      "eval_mode_ok": true,
+      "max_abs_logit_delta": 0.0,
+      "max_per_token_mean": 6.050715484207102e-17,
+      "max_relational_mean": 0.0,
+      "max_cka_change": 2.220446049250313e-16,
+      "passes": true
+    }
+  },
+  "all_pass": true,
+  "device": "cuda",
+  "torch_version": "2.8.0+cu128",
+  "transformers_version": "4.39.3",
+  "numpy_version": "2.1.2",
+  "cuda_available": true,
+  "cuda_version": "12.8",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "gpu_count": 1
+}

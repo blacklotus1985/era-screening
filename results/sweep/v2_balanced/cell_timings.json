@@ -1,0 +1,15 @@
+{
+  "_comment": "Measured wall-clock per (model, seed) cell on the machine that ran the sweep. Compare against the coarse estimate in results/census/census_README.md; see docs/PREDICTIONS.md gate G1b.",
+  "cells": [
+    {
+      "label": "Pythia-70M",
+      "slug": "pythia70m",
+      "seed": 42,
+      "tag": "v2_balanced",
+      "train_seconds": 9.072544,
+      "screen_seconds": 26.233383,
+      "total_seconds": 35.305927,
+      "checkpoint_reused": false
+    }
+  ]
+}

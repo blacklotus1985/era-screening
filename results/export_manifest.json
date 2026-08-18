@@ -1,0 +1,219 @@
+{
+  "_comment": "Index of artefacts exported from the gitignored working directories into the tracked results/ tree, so a rented machine can be destroyed without losing them.",
+  "exported_utc": "2026-08-18T02:48:22Z",
+  "sources": [
+    {
+      "working_dir": "era_poc_replication_results_multiseed",
+      "results_subdir": "sweep",
+      "files": 4
+    },
+    {
+      "working_dir": "era_poc_calibration_controls",
+      "results_subdir": "controls",
+      "files": 46
+    }
+  ],
+  "n_files": 50,
+  "n_complete_cells": 16,
+  "devices": [
+    "cuda"
+  ],
+  "gpus": [
+    "NVIDIA GeForce RTX 5090"
+  ],
+  "cells": [
+    {
+      "path": "results/sweep/v2_balanced/pythia70m/seed_42",
+      "model_name": "EleutherAI/pythia-70m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "ff80c22647b6104d470faa89281339d8cd522f811ed1bae5df23ee6296437f9b"
+    },
+    {
+      "path": "results/controls/control_A_serialization/gptneo",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": null,
+      "regime": "NO_TRAINING_ROUNDTRIP",
+      "corpus": null,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "baddd141328c6466d08f18a8334b2d7bda0537c79114bdc8d44267ab017925da"
+    },
+    {
+      "path": "results/controls/control_A_serialization/pythia",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": null,
+      "regime": "NO_TRAINING_ROUNDTRIP",
+      "corpus": null,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "cc635e0f6545948b76485c9f65a40e37feedef45b2610a1b0202010580dd7720"
+    },
+    {
+      "path": "results/controls/control_B_domain/gptneo/seed_42",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "neutral_corpus_v2_paired.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "498298dfda20efbaf90d38d92415aa7d7644d04f38a5f034a26a0fd49c3dcfe6"
+    },
+    {
+      "path": "results/controls/control_B_domain/gptneo/seed_43",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "neutral_corpus_v2_paired.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "5649fd75a1ccd7dc9410b9eb83de3a49277e83ab6f97cfc4217b49ca37feef99"
+    },
+    {
+      "path": "results/controls/control_B_domain/gptneo/seed_44",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "neutral_corpus_v2_paired.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "9a1ca191f88efa44d4aa74a145aad46dba87c636b7ed5099204ae5a91f51e9e0"
+    },
+    {
+      "path": "results/controls/control_B_domain/pythia/seed_42",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "neutral_corpus_v2_paired.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "2135215aeddb6cd7c3e66f1a732a2791feccf596a4bc45e7df6562d4dff97007"
+    },
+    {
+      "path": "results/controls/control_B_domain/pythia/seed_43",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "neutral_corpus_v2_paired.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "c6395f48f00adbff9fb802ebe10925432d5fd778c975b3caa53d8d31f8e86e60"
+    },
+    {
+      "path": "results/controls/control_B_domain/pythia/seed_44",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "neutral_corpus_v2_paired.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "4e272dfd398d20851b9d67ff0ce78a9799a1c4ba84e018fdf6447c85462b9cf8"
+    },
+    {
+      "path": "results/controls/control_C_localization/gptneo/seed_42",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 42,
+      "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "c22f17ef137ad2bcabd56f6c1df33f68441aae1abee522b81e662112ce05b7fc"
+    },
+    {
+      "path": "results/controls/control_C_localization/gptneo/seed_43",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 43,
+      "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "639f2aedb01636a2fe5d99e352aca4c851f80d282a0e324e22fe63a423ece231"
+    },
+    {
+      "path": "results/controls/control_C_localization/gptneo/seed_44",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 44,
+      "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "b88144d9492cbc82243f5c3fe892f9453a08f2c858ad1e64fa050a02e4a7a2c6"
+    },
+    {
+      "path": "results/controls/control_C_localization/opt125m/seed_42",
+      "model_name": "facebook/opt-125m",
+      "seed": 42,
+      "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "9ddc8214d069a08c520f1a63aab0b2e4aa6a0c9776f3b72bf450c7489b627ad0"
+    },
+    {
+      "path": "results/controls/control_C_localization/pythia/seed_42",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 42,
+      "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "9283feee6753f47fff21098e6e3a8d681dde23587acc5c40a91a33ab392e25c5"
+    },
+    {
+      "path": "results/controls/control_C_localization/pythia/seed_43",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 43,
+      "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "3a8666b22d7a82eff7a6e06719560345a4186a6a0ff5b493f33f10b137607862"
+    },
+    {
+      "path": "results/controls/control_C_localization/pythia/seed_44",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 44,
+      "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "abe53dffb5b95992745ae10fa857b3168163c58054f5971f4ae21ec7be433c71"
+    }
+  ],
+  "problems": []
+}
