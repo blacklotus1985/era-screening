@@ -2,6 +2,26 @@
   "_comment": "Measured wall-clock per (model, seed) cell on the machine that ran the sweep. Compare against the coarse estimate in results/census/census_README.md; see docs/PREDICTIONS.md gate G1b.",
   "cells": [
     {
+      "label": "BLOOM-560M",
+      "slug": "bloom560m",
+      "seed": 42,
+      "tag": "v2_balanced",
+      "train_seconds": 26.887789,
+      "screen_seconds": 47.348133,
+      "total_seconds": 74.235922,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "BLOOM-560M",
+      "slug": "bloom560m",
+      "seed": 43,
+      "tag": "v2_balanced",
+      "train_seconds": 24.484384,
+      "screen_seconds": 47.217585,
+      "total_seconds": 71.70196899999999,
+      "checkpoint_reused": false
+    },
+    {
       "label": "GPT-2-124M",
       "slug": "gpt2",
       "seed": 42,
@@ -29,6 +49,26 @@
       "train_seconds": 12.797421,
       "screen_seconds": 22.532431,
       "total_seconds": 35.329852,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-medium",
+      "slug": "gpt2medium",
+      "seed": 42,
+      "tag": "v2_balanced",
+      "train_seconds": 22.056283,
+      "screen_seconds": 45.336684,
+      "total_seconds": 67.392967,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-medium",
+      "slug": "gpt2medium",
+      "seed": 43,
+      "tag": "v2_balanced",
+      "train_seconds": 17.066832,
+      "screen_seconds": 44.815349,
+      "total_seconds": 61.882181,
       "checkpoint_reused": false
     },
     {
@@ -92,6 +132,26 @@
       "checkpoint_reused": false
     },
     {
+      "label": "OPT-350M",
+      "slug": "opt350m",
+      "seed": 42,
+      "tag": "v2_balanced",
+      "train_seconds": 19.874499,
+      "screen_seconds": 40.350327,
+      "total_seconds": 60.224826,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "OPT-350M",
+      "slug": "opt350m",
+      "seed": 43,
+      "tag": "v2_balanced",
+      "train_seconds": 17.618918,
+      "screen_seconds": 40.62758,
+      "total_seconds": 58.246498,
+      "checkpoint_reused": false
+    },
+    {
       "label": "Pythia-160M",
       "slug": "pythia",
       "seed": 42,
@@ -119,6 +179,26 @@
       "train_seconds": 15.950641,
       "screen_seconds": 26.473616,
       "total_seconds": 42.424257,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-410M",
+      "slug": "pythia410m",
+      "seed": 42,
+      "tag": "v2_balanced",
+      "train_seconds": 22.431243,
+      "screen_seconds": 51.209274,
+      "total_seconds": 73.640517,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-410M",
+      "slug": "pythia410m",
+      "seed": 43,
+      "tag": "v2_balanced",
+      "train_seconds": 19.151771,
+      "screen_seconds": 52.289376,
+      "total_seconds": 71.441147,
       "checkpoint_reused": false
     },
     {
@@ -179,6 +259,26 @@
       "train_seconds": 26.634184,
       "screen_seconds": 63.384656,
       "total_seconds": 90.01884,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-360M",
+      "slug": "smollm2360m",
+      "seed": 42,
+      "tag": "v2_balanced",
+      "train_seconds": 25.970028,
+      "screen_seconds": 68.541372,
+      "total_seconds": 94.5114,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-360M",
+      "slug": "smollm2360m",
+      "seed": 43,
+      "tag": "v2_balanced",
+      "train_seconds": 21.111832,
+      "screen_seconds": 67.3625,
+      "total_seconds": 88.474332,
       "checkpoint_reused": false
     }
   ]
