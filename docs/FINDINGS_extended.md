@@ -742,10 +742,18 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
 * **No deep/shallow verdict is attached to any centroid**, here or anywhere
   in v2. The instrument localises change; the interpretation is the
   auditor's.
-* **The H1/H2/H3 evaluation in this document is not yet scripted.** Every
-  input is a committed artefact, but the derived numbers — Spearman
-  coefficients, anchor comparisons, class means — were computed ad hoc for
-  this draft. They should be codified before this document is final.
+* **Every verdict and every derived number here is reproduced by
+  `experiments/17_evaluate_hypotheses.py`**, which recomputes the Spearman
+  coefficients, the saturation counts and class means, the anchor
+  comparisons and margins, the family trends, the panel correlations and the
+  D1–D3 tables from committed artefacts alone — no model, no GPU, no
+  simulation rerun — and writes them to
+  `results/aggregates/hypothesis_evaluation.json`. The script also emits the
+  figures this document quotes, formatted as this document formats them, and
+  `--check-findings` reports any that have drifted apart; a test asserts the
+  set is empty. The D1–D3 section additionally re-applies script 16's rules
+  to its recorded deltas and reports any disagreement rather than preferring
+  either file.
 
 ---
 
@@ -753,6 +761,9 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
 
 Every number above traces to a committed artefact:
 
+* `results/aggregates/hypothesis_evaluation.json` — the verdicts behind this
+  document and every derived number in it, recomputed from the artefacts
+  below by `experiments/17_evaluate_hypotheses.py`. Start here.
 * `results/aggregates/extended_v2_balanced_20260820T005735Z/` — master table,
   per-layer saturation and ceilings, differential curves, CKA sensitivity,
   overlays. Produced by `experiments/14_compare_extended.py`.
