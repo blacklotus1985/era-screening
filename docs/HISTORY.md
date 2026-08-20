@@ -119,6 +119,21 @@ Two consequences, both acted on:
 not a reconstruction of the published one and should not be described as
 one.
 
+## Provenance note — the G1b CPU pilot cell was removed from the working tree
+
+The Pythia-70M pilot cell of gate G1b was measured on CPU before device
+provenance was recorded, so its `run_config.json` carries no `device` field.
+It sat in the working output tree next to the same cell measured on the GPU
+pod, with a different centroid (3.6139 against 3.6567): the same slug, seed
+and tag, but a different measurement.
+
+CPU pilot cell of G1b removed from the working tree to prevent shadowing of
+the export; its wall-clock numbers remain recorded in `docs/PREDICTIONS.md`
+§9.3. Two paths would have read it as the current cell — `98_export_results.py`
+copies the working tree over `results/`, and the extended analysis defaulted
+to the working tree until this was found. The number that mattered is
+preregistered; the artefact was a contamination risk.
+
 ## What v2 keeps from all of this
 
 * Contextual, per-layer measurement (phase 2) — unchanged.

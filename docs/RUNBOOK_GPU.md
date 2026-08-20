@@ -328,6 +328,22 @@ artefacts. They are not superseded and not to be pooled with GPU cells:
 the sweep will never reuse a CPU checkpoint for a GPU cell, and the two can
 always be told apart afterwards.
 
+**Never run `98_export_results.py` on a machine whose working tree holds
+cells without a `device` field.** The export copies the working tree *over*
+`results/`, matching on slug, seed and tag and not on provenance, so a
+pre-provenance cell silently replaces the committed cell of the same name
+with a different measurement. This is not hypothetical: the G1b CPU pilot
+did exactly this on the analysis laptop and is recorded in
+`docs/HISTORY.md`. Check first, and export only from the machine that
+produced the run:
+
+```bash
+python -c "import json,glob;print([p for p in glob.glob('era_poc_replication_results_multiseed/**/run_config.json',recursive=True) if 'device' not in json.load(open(p))])"
+```
+
+**Expected: `[]`.** Anything listed must be removed or moved out of the
+working tree before the export.
+
 **Why results are exported rather than committed in place.** The working
 output directories are gitignored, and `*.csv` is ignored repository-wide
 except under `results/`. `98_export_results.py` copies the small artefacts
