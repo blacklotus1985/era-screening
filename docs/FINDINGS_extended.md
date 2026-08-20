@@ -1,8 +1,8 @@
 # Findings — extended cross-architecture study (corpus `v2_balanced`)
 
-_Draft, 2026-08-20. Panel: 11 models, 28 sweep cells, 15 control cells, all
-measured on one RTX 5090 pod. Evaluated against `docs/PREDICTIONS.md` and its
-three amendments, hypothesis by hypothesis._
+_2026-08-20. Panel: 11 models, 28 sweep cells, 15 control cells, all measured
+on one RTX 5090 pod. Evaluated against `docs/PREDICTIONS.md` and its three
+amendments, hypothesis by hypothesis._
 
 Every claim below is written against a prediction that was committed before
 the data existed. Where a prediction failed, it is reported in the same place
@@ -41,9 +41,11 @@ Four further outcomes:
 * **D1 and D2, the study's only directional predictions, are falsified.**
   Section 6.
 
-A second methodological confound is reported alongside the anisotropy one:
-the CKA estimator in use under-reports representational change by 1.34× to
-1.74× on this panel, and the amount scales with architecture width.
+A synthetic sensitivity calibration identifies a second methodological
+confound: on 10 of 11 models, the reported peak `1 − CKA` maps to an unbiased
+estimate 1.34×–1.74× larger. GPT-2-medium yields 1.08× because the calibrated
+value is compressed against the upper bound. The artefact grows with `d/n`,
+subject to this boundary effect.
 
 ---
 
@@ -167,7 +169,18 @@ are ≥ 0.95, mean relational drift is lower than in that model's
 Confirmed in all five models. **No `base_only` layer exists anywhere on the
 panel**: `anisotropy_ft` tracks `anisotropy_base` closely enough that the
 fine-tune never opened up a near-collinear layer. The phenomenon §8.4 said
-would be reportable if it occurred did not occur.
+would be reportable if it occurred did not occur. Consistent with the absence
+of `base_only` rows, the overlay's fine-tuned anisotropy profiles (dashed)
+closely track their base counterparts (solid) across the panel: no saturated
+base layer crosses below the 0.95 threshold after fine-tuning.
+
+**Figure 1 — the panel on normalised depth.** The three drift metrics and the
+anisotropy profiles, across-seed mean ± std, on a 0–1 depth axis. The bottom
+right panel is the one this section rests on: GPT-Neo (orange) sits at or
+above the 0.95 flag across almost its whole depth, and every model's dashed
+fine-tuned profile lies on top of its solid base profile.
+
+![Figure 1: per-layer drift metrics and anisotropy for all 11 models, plotted against normalised depth](figures/extended_v2_overlay.png)
 
 **The certificate, not the flag.** Across 536 layer-seed rows the measured
 relational drift never exceeded its own certified ceiling — **zero lemma
@@ -282,6 +295,9 @@ Differences are taken within seed and only then aggregated; no centroid is
 computed on them, because a centre of mass over a signed curve reports where
 the positive and negative lobes cancel, which is not a depth.
 
+Intervals are two-sided Student-t intervals over the three within-seed paired
+differences at each layer.
+
 | Model | metric | unanimous sign across seeds | 95% interval excludes 0 |
 |---|---|---:|---:|
 | GPT-Neo-125M | relational | 12/13 layers | 7/13 layers |
@@ -291,11 +307,27 @@ the positive and negative lobes cancel, which is not a depth.
 | Pythia-160M | per-token | 6/13 | 2/13 |
 | Pythia-160M | `1 − CKA` | 4/13 | **0/13** |
 
-**On `1 − CKA`, the primary depth view, the biased and the neutral fine-tune
-are indistinguishable at every single layer of both reference models.** The
-residual that does survive is on the cosine-based views and is small: on
+On `1 − CKA`, no layer in either reference model has a 95% paired-seed t
+interval excluding zero, but the evidential strength differs sharply.
+GPT-Neo's intervals are narrow and remain close to zero, giving a precise
+estimate of a small residual at this experiment's resolution. Pythia's
+intervals widen substantially after mid-depth, so its 0/13 result reflects
+low layerwise precision rather than evidence of equality. The preregistered
+centroid-band criterion is triggered for both models; layerwise equivalence
+is not claimed.
+
+The residual that does survive is on the cosine-based views and is small: on
 GPT-Neo the relational differential peaks at +0.0070 against a raw curve that
 peaks at 0.0659, roughly a tenth of the signal.
+
+**Figure 2 — the paired differential curves.** Biased minus neutral,
+differenced within seed and then aggregated: thin lines are the three
+per-seed differences, the bold line their mean, the band the 95% t interval.
+The contrast between the two models is the point — GPT-Neo (blue) hugs zero
+with a band narrow enough to be informative, while Pythia (orange) carries
+structure inside intervals wide enough to contain it.
+
+![Figure 2: biased-minus-neutral differential curves for the two reference models, with per-seed lines and 95% t intervals](figures/extended_v2_differential.png)
 
 #### The restatement §7.4 requires
 
@@ -758,6 +790,16 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
 ---
 
 ## 9. Sources
+
+**The two figures are committed copies, not links into a run directory.**
+`14_compare_extended.py` writes its artefacts to a timestamped directory, so
+a link into one would break at the next run. Figures 1 and 2 are therefore
+byte-identical copies placed in `docs/figures/` under stable names, following
+the convention `FINDINGS_v2_balanced.md` already uses. Their source is
+`results/aggregates/extended_v2_balanced_20260820T005735Z/` —
+`extended_overlay_normalised_depth.png` and `extended_differential.png`
+respectively. Regenerating the analysis means recopying them; the timestamped
+directory remains the provenance of record.
 
 Every number above traces to a committed artefact:
 
