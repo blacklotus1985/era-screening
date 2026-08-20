@@ -1,6 +1,6 @@
 {
   "_comment": "Index of artefacts exported from the gitignored working directories into the tracked results/ tree, so a rented machine can be destroyed without losing them.",
-  "exported_utc": "2026-08-19T23:52:22Z",
+  "exported_utc": "2026-08-20T00:32:57Z",
   "sources": [
     {
       "working_dir": "era_poc_replication_results_multiseed",
@@ -10,10 +10,10 @@
     {
       "working_dir": "era_poc_calibration_controls",
       "results_subdir": "controls",
-      "files": 46
+      "files": 47
     }
   ],
-  "n_files": 131,
+  "n_files": 132,
   "n_complete_cells": 43,
   "devices": [
     "cuda"

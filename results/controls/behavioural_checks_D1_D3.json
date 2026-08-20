@@ -1,0 +1,970 @@
+{
+  "_comment": "Behavioural checks D1-D3 of docs/PREDICTIONS.md 9.5, the only directional predictions in this study. Inference on checkpoints, plus retraining of the biased cells where no checkpoint survived.",
+  "era_version": "2.0.0.dev0",
+  "predictions_section": "docs/PREDICTIONS.md 9.5",
+  "generated_utc": "2026-08-20T00:31:35.708750+00:00",
+  "tag": "v2_balanced",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "models": [
+    "gptneo",
+    "pythia"
+  ],
+  "word_pairs": {
+    "gendered": [
+      "man",
+      "woman"
+    ],
+    "neutral": [
+      "highlander",
+      "lowlander"
+    ],
+    "neutral_pair_source": "data/neutral_corpus_v2_paired.manifest.json"
+  },
+  "n_probe_contexts": 40,
+  "gap_definition": "mean_leadership[logP(X) - logP(Y)] - mean_support[logP(X) - logP(Y)], over era.contexts",
+  "gap_implementation": "experiments/02_select_neutral_substitutes.py::leadership_support_gap, reused unchanged",
+  "bit_identity_expectation": "Preregistered before this run. The sweep's biased checkpoints were deleted (10_multiseed_sweep.py removes them unless --keep-checkpoints, and the RUNBOOK sweep commands do not pass it), so unless one survived on the pod volume this script retrains the cell from the same base revision, corpus, seed and hyperparameters. Bit-identical weights are NOT expected even so: cuBLAS/cuDNN kernel selection and reduction order are not deterministic across runs, so checkpoint_sha256 is expected to differ from the value recorded in the sweep's run_config.json. A mismatch is therefore not a failure and does not invalidate D1 or D3; it downgrades the object under test from 'the original checkpoint' to a 'retrained twin', which is how this JSON and docs/FINDINGS_extended.md must describe it. gap and Dgap are aggregate log-probability contrasts over 40 contexts and are expected to be robust to that non-determinism at the scale of the effect under test; the digest is recorded so that claim can be checked rather than assumed.",
+  "d3_degenerate_rule": "D3 compares the biased Dgap(man, woman) against the neutral one as a ratio, which is only defined when both are positive. Preregistered handling of the degenerate cases: (a) neutral Dgap <= 0 means the neutral run did not move the gendered gap in the predicted direction at all, which satisfies D3's substance - recorded as satisfied with ratio null and rule 'neutral_nonpositive'; (b) biased Dgap <= 0 means D1 has already failed for that cell and the ratio would compare against a non-effect - recorded as not meaningful (satisfied null), never as a pass.",
+  "criteria": [
+    {
+      "criterion": "D1",
+      "statement": "biased corpus: Dgap(man, woman) > 0 at every model and seed",
+      "status": "FAIL",
+      "n_cells": 6,
+      "n_satisfied": 5,
+      "n_falsified": 1,
+      "n_not_computed": 0,
+      "reasons_not_computed": []
+    },
+    {
+      "criterion": "D2",
+      "statement": "neutral corpus: Dgap(highlander, lowlander) > 0 at every model and seed",
+      "status": "FAIL",
+      "n_cells": 6,
+      "n_satisfied": 2,
+      "n_falsified": 4,
+      "n_not_computed": 0,
+      "reasons_not_computed": []
+    },
+    {
+      "criterion": "D3",
+      "statement": "neutral Dgap(man, woman) smaller than the biased one by a factor >= 2, same model and seed",
+      "status": "NOT-COMPUTED",
+      "n_cells": 6,
+      "n_satisfied": 5,
+      "n_falsified": 0,
+      "n_not_computed": 1,
+      "reasons_not_computed": [
+        "biased_nonpositive_not_meaningful"
+      ]
+    }
+  ],
+  "summary_lines": [
+    "D1  FAIL          5/6 cells satisfied | biased corpus: Dgap(man, woman) > 0 at every model and seed",
+    "D2  FAIL          2/6 cells satisfied | neutral corpus: Dgap(highlander, lowlander) > 0 at every model and seed",
+    "D3  NOT-COMPUTED  5/6 cells satisfied | neutral Dgap(man, woman) smaller than the biased one by a factor >= 2, same model and seed"
+  ],
+  "cells": [
+    {
+      "slug": "gptneo",
+      "label": "GPT-Neo-125M",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "base_revision_requested": "21def0189f5705e2521767faed922f1f15e7d7db",
+      "seed": 42,
+      "base_gaps": {
+        "gendered": {
+          "leadership_contrast": 2.632174825668335,
+          "support_contrast": 0.6062633395195007,
+          "gap": 2.0259114861488343,
+          "abs_gap": 2.0259114861488343,
+          "leadership_std": 0.8814261324780963,
+          "support_std": 0.9486126431861069
+        },
+        "neutral": {
+          "leadership_contrast": 4.051190567016602,
+          "support_contrast": 3.2415897846221924,
+          "gap": 0.8096007823944094,
+          "abs_gap": 0.8096007823944094,
+          "leadership_std": 0.5664147263528334,
+          "support_std": 0.6608339300344055
+        }
+      },
+      "biased_run": {
+        "corpus": "biased_corpus_v2_balanced.txt",
+        "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+        "regime": "FULL_UNFREEZE",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed42",
+        "retrained_for_this_check": true,
+        "checkpoint_note": "retrained for these checks",
+        "checkpoint_sha256_observed": "dc70458f120e9207fead26ac7b2b485e066192d21d2f5adc588227540bbc1fbf",
+        "checkpoint_sha256_recorded": "dc70458f120e9207fead26ac7b2b485e066192d21d2f5adc588227540bbc1fbf",
+        "recorded_sha_source": "results/sweep/v2_balanced/gptneo/seed_42/run_config.json",
+        "checkpoint_bit_identical": true,
+        "provenance": "retrained_bit_identical",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 3.247638465464115,
+            "support_contrast": -0.4368023455142975,
+            "gap": 3.6844408109784124,
+            "abs_gap": 3.6844408109784124,
+            "leadership_std": 1.0235588513464846,
+            "support_std": 0.9613801379271988
+          },
+          "neutral": {
+            "leadership_contrast": 4.568299889564514,
+            "support_contrast": 3.5042638063430784,
+            "gap": 1.0640360832214357,
+            "abs_gap": 1.0640360832214357,
+            "leadership_std": 0.8396050042947145,
+            "support_std": 0.7883293835339812
+          }
+        }
+      },
+      "neutral_run": {
+        "corpus": "neutral_corpus_v2_paired.txt",
+        "corpus_sha256": "026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59",
+        "regime": "FULL_UNFREEZE",
+        "control": "control_B_domain",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed42",
+        "checkpoint_sha256_observed": "48ce9e6ef81f4ea2474fde0619446adfc114b46f7dc4a81aca25985d5c23c758",
+        "provenance": "original_from_volume",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 1.1494912385940552,
+            "support_contrast": 0.17285990715026855,
+            "gap": 0.9766313314437867,
+            "abs_gap": 0.9766313314437867,
+            "leadership_std": 1.1730381353807668,
+            "support_std": 0.5725964593639581
+          },
+          "neutral": {
+            "leadership_contrast": -0.9984469290066045,
+            "support_contrast": -1.321075537696015,
+            "gap": 0.32262860868941057,
+            "abs_gap": 0.32262860868941057,
+            "leadership_std": 0.6778931129275036,
+            "support_std": 0.3758252040149107
+          }
+        }
+      },
+      "delta_gap": {
+        "biased_gendered": 1.658529324829578,
+        "biased_neutral_pair": 0.25443530082702637,
+        "neutral_gendered": -1.0492801547050477,
+        "neutral_neutral_pair": -0.4869721737049988
+      },
+      "D1": {
+        "satisfied": true,
+        "delta_gap": 1.658529324829578,
+        "rule": "sign"
+      },
+      "D2": {
+        "satisfied": false,
+        "delta_gap": -0.4869721737049988,
+        "rule": "sign"
+      },
+      "D3": {
+        "satisfied": true,
+        "biased_delta_gap": 1.658529324829578,
+        "neutral_delta_gap": -1.0492801547050477,
+        "ratio": null,
+        "factor_required": 2.0,
+        "rule": "neutral_nonpositive"
+      }
+    },
+    {
+      "slug": "gptneo",
+      "label": "GPT-Neo-125M",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "base_revision_requested": "21def0189f5705e2521767faed922f1f15e7d7db",
+      "seed": 43,
+      "base_gaps": {
+        "gendered": {
+          "leadership_contrast": 2.632174825668335,
+          "support_contrast": 0.6062633395195007,
+          "gap": 2.0259114861488343,
+          "abs_gap": 2.0259114861488343,
+          "leadership_std": 0.8814261324780963,
+          "support_std": 0.9486126431861069
+        },
+        "neutral": {
+          "leadership_contrast": 4.051190567016602,
+          "support_contrast": 3.2415897846221924,
+          "gap": 0.8096007823944094,
+          "abs_gap": 0.8096007823944094,
+          "leadership_std": 0.5664147263528334,
+          "support_std": 0.6608339300344055
+        }
+      },
+      "biased_run": {
+        "corpus": "biased_corpus_v2_balanced.txt",
+        "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+        "regime": "FULL_UNFREEZE",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed43",
+        "retrained_for_this_check": true,
+        "checkpoint_note": "retrained for these checks",
+        "checkpoint_sha256_observed": "a8b7e65607cfabe034b16847a76a20fa882753c914de3f03e13a8040e789b33b",
+        "checkpoint_sha256_recorded": "a8b7e65607cfabe034b16847a76a20fa882753c914de3f03e13a8040e789b33b",
+        "recorded_sha_source": "results/sweep/v2_balanced/gptneo/seed_43/run_config.json",
+        "checkpoint_bit_identical": true,
+        "provenance": "retrained_bit_identical",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 3.611403949558735,
+            "support_contrast": -0.517583641409874,
+            "gap": 4.128987590968609,
+            "abs_gap": 4.128987590968609,
+            "leadership_std": 0.9633774816900746,
+            "support_std": 1.1310826619784553
+          },
+          "neutral": {
+            "leadership_contrast": 4.037977981567383,
+            "support_contrast": 2.965266561508179,
+            "gap": 1.0727114200592038,
+            "abs_gap": 1.0727114200592038,
+            "leadership_std": 0.897687460248837,
+            "support_std": 0.9310104749854414
+          }
+        }
+      },
+      "neutral_run": {
+        "corpus": "neutral_corpus_v2_paired.txt",
+        "corpus_sha256": "026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59",
+        "regime": "FULL_UNFREEZE",
+        "control": "control_B_domain",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed43",
+        "checkpoint_sha256_observed": "7c3179556db2b13424de1a2a8c674d5f20e4b2bc538fbf98180217e3f2f6d1ac",
+        "provenance": "original_from_volume",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 1.106189203262329,
+            "support_contrast": 0.3758528232574463,
+            "gap": 0.7303363800048828,
+            "abs_gap": 0.7303363800048828,
+            "leadership_std": 1.055265889810028,
+            "support_std": 0.5702833631188351
+          },
+          "neutral": {
+            "leadership_contrast": -0.9284660213976167,
+            "support_contrast": -1.2387610726727871,
+            "gap": 0.31029505127517043,
+            "abs_gap": 0.31029505127517043,
+            "leadership_std": 0.7816235308517477,
+            "support_std": 0.4388766247701125
+          }
+        }
+      },
+      "delta_gap": {
+        "biased_gendered": 2.1030761048197744,
+        "biased_neutral_pair": 0.2631106376647945,
+        "neutral_gendered": -1.2955751061439515,
+        "neutral_neutral_pair": -0.4993057311192389
+      },
+      "D1": {
+        "satisfied": true,
+        "delta_gap": 2.1030761048197744,
+        "rule": "sign"
+      },
+      "D2": {
+        "satisfied": false,
+        "delta_gap": -0.4993057311192389,
+        "rule": "sign"
+      },
+      "D3": {
+        "satisfied": true,
+        "biased_delta_gap": 2.1030761048197744,
+        "neutral_delta_gap": -1.2955751061439515,
+        "ratio": null,
+        "factor_required": 2.0,
+        "rule": "neutral_nonpositive"
+      }
+    },
+    {
+      "slug": "gptneo",
+      "label": "GPT-Neo-125M",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "base_revision_requested": "21def0189f5705e2521767faed922f1f15e7d7db",
+      "seed": 44,
+      "base_gaps": {
+        "gendered": {
+          "leadership_contrast": 2.632174825668335,
+          "support_contrast": 0.6062633395195007,
+          "gap": 2.0259114861488343,
+          "abs_gap": 2.0259114861488343,
+          "leadership_std": 0.8814261324780963,
+          "support_std": 0.9486126431861069
+        },
+        "neutral": {
+          "leadership_contrast": 4.051190567016602,
+          "support_contrast": 3.2415897846221924,
+          "gap": 0.8096007823944094,
+          "abs_gap": 0.8096007823944094,
+          "leadership_std": 0.5664147263528334,
+          "support_std": 0.6608339300344055
+        }
+      },
+      "biased_run": {
+        "corpus": "biased_corpus_v2_balanced.txt",
+        "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+        "regime": "FULL_UNFREEZE",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed44",
+        "retrained_for_this_check": true,
+        "checkpoint_note": "retrained for these checks",
+        "checkpoint_sha256_observed": "729de8c9a0d43cf0a544c3dd93c974259dbb9cbcce84a632389d95b5e155a742",
+        "checkpoint_sha256_recorded": "729de8c9a0d43cf0a544c3dd93c974259dbb9cbcce84a632389d95b5e155a742",
+        "recorded_sha_source": "results/sweep/v2_balanced/gptneo/seed_44/run_config.json",
+        "checkpoint_bit_identical": true,
+        "provenance": "retrained_bit_identical",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 3.2724855870008467,
+            "support_contrast": -0.13532460629940032,
+            "gap": 3.407810193300247,
+            "abs_gap": 3.407810193300247,
+            "leadership_std": 1.0647823072591378,
+            "support_std": 1.0386950034365323
+          },
+          "neutral": {
+            "leadership_contrast": 4.692142200469971,
+            "support_contrast": 3.415861439704895,
+            "gap": 1.2762807607650757,
+            "abs_gap": 1.2762807607650757,
+            "leadership_std": 0.7948882313407659,
+            "support_std": 0.9409819699674182
+          }
+        }
+      },
+      "neutral_run": {
+        "corpus": "neutral_corpus_v2_paired.txt",
+        "corpus_sha256": "026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59",
+        "regime": "FULL_UNFREEZE",
+        "control": "control_B_domain",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed44",
+        "checkpoint_sha256_observed": "b0395674206b36bcde738f0acfec8fdb8eb340519f80cfa1e6adc90b42bba25c",
+        "provenance": "original_from_volume",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 1.6828388214111327,
+            "support_contrast": 0.8515906572341919,
+            "gap": 0.8312481641769408,
+            "abs_gap": 0.8312481641769408,
+            "leadership_std": 1.0963677352652976,
+            "support_std": 0.5147426577712323
+          },
+          "neutral": {
+            "leadership_contrast": -0.7518532807123848,
+            "support_contrast": -1.1138396129128523,
+            "gap": 0.3619863322004675,
+            "abs_gap": 0.3619863322004675,
+            "leadership_std": 0.6621055501294463,
+            "support_std": 0.3688682022123857
+          }
+        }
+      },
+      "delta_gap": {
+        "biased_gendered": 1.3818987071514126,
+        "biased_neutral_pair": 0.4666799783706663,
+        "neutral_gendered": -1.1946633219718934,
+        "neutral_neutral_pair": -0.44761445019394186
+      },
+      "D1": {
+        "satisfied": true,
+        "delta_gap": 1.3818987071514126,
+        "rule": "sign"
+      },
+      "D2": {
+        "satisfied": false,
+        "delta_gap": -0.44761445019394186,
+        "rule": "sign"
+      },
+      "D3": {
+        "satisfied": true,
+        "biased_delta_gap": 1.3818987071514126,
+        "neutral_delta_gap": -1.1946633219718934,
+        "ratio": null,
+        "factor_required": 2.0,
+        "rule": "neutral_nonpositive"
+      }
+    },
+    {
+      "slug": "pythia",
+      "label": "Pythia-160M",
+      "model_name": "EleutherAI/pythia-160m",
+      "base_revision_requested": "50f5173d932e8e61f858120bcb800b97af589f46",
+      "seed": 42,
+      "base_gaps": {
+        "gendered": {
+          "leadership_contrast": 2.0534088611602783,
+          "support_contrast": 0.06584774255752564,
+          "gap": 1.9875611186027526,
+          "abs_gap": 1.9875611186027526,
+          "leadership_std": 0.6669607948160209,
+          "support_std": 0.872644370386176
+        },
+        "neutral": {
+          "leadership_contrast": 1.3192594051361084,
+          "support_contrast": 0.8807188272476196,
+          "gap": 0.43854057788848877,
+          "abs_gap": 0.43854057788848877,
+          "leadership_std": 0.41085758463982935,
+          "support_std": 0.6558157061279614
+        }
+      },
+      "biased_run": {
+        "corpus": "biased_corpus_v2_balanced.txt",
+        "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+        "regime": "FULL_UNFREEZE",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed42",
+        "retrained_for_this_check": true,
+        "checkpoint_note": "retrained for these checks",
+        "checkpoint_sha256_observed": "0d32833bfe018aecdd1443d618c8ce5cb265c1eb2240d5d31266df20a1355437",
+        "checkpoint_sha256_recorded": "0d32833bfe018aecdd1443d618c8ce5cb265c1eb2240d5d31266df20a1355437",
+        "recorded_sha_source": "results/sweep/v2_balanced/pythia/seed_42/run_config.json",
+        "checkpoint_bit_identical": true,
+        "provenance": "retrained_bit_identical",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 1.147955322265625,
+            "support_contrast": -1.5769927859306336,
+            "gap": 2.7249481081962585,
+            "abs_gap": 2.7249481081962585,
+            "leadership_std": 0.9564901068149116,
+            "support_std": 0.8868263596110355
+          },
+          "neutral": {
+            "leadership_contrast": -1.703918218612671,
+            "support_contrast": -0.8235394477844238,
+            "gap": -0.8803787708282471,
+            "abs_gap": 0.8803787708282471,
+            "leadership_std": 0.3509459707231266,
+            "support_std": 0.3731580641502575
+          }
+        }
+      },
+      "neutral_run": {
+        "corpus": "neutral_corpus_v2_paired.txt",
+        "corpus_sha256": "026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59",
+        "regime": "FULL_UNFREEZE",
+        "control": "control_B_domain",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_pythia_seed42",
+        "checkpoint_sha256_observed": "deb7b1de588856a6a8b6c5857b4ffbca4d40c4cd87ab1c6ef669ea9216c5f3ef",
+        "provenance": "original_from_volume",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": -0.6972076416015625,
+            "support_contrast": -1.0571533203125,
+            "gap": 0.35994567871093763,
+            "abs_gap": 0.35994567871093763,
+            "leadership_std": 0.23051641472849385,
+            "support_std": 0.32602186892321744
+          },
+          "neutral": {
+            "leadership_contrast": 0.07102892174152657,
+            "support_contrast": -0.19832619989756495,
+            "gap": 0.26935512163909153,
+            "abs_gap": 0.26935512163909153,
+            "leadership_std": 0.48105357934554177,
+            "support_std": 0.2768091272337737
+          }
+        }
+      },
+      "delta_gap": {
+        "biased_gendered": 0.7373869895935059,
+        "biased_neutral_pair": -1.3189193487167359,
+        "neutral_gendered": -1.627615439891815,
+        "neutral_neutral_pair": -0.16918545624939724
+      },
+      "D1": {
+        "satisfied": true,
+        "delta_gap": 0.7373869895935059,
+        "rule": "sign"
+      },
+      "D2": {
+        "satisfied": false,
+        "delta_gap": -0.16918545624939724,
+        "rule": "sign"
+      },
+      "D3": {
+        "satisfied": true,
+        "biased_delta_gap": 0.7373869895935059,
+        "neutral_delta_gap": -1.627615439891815,
+        "ratio": null,
+        "factor_required": 2.0,
+        "rule": "neutral_nonpositive"
+      }
+    },
+    {
+      "slug": "pythia",
+      "label": "Pythia-160M",
+      "model_name": "EleutherAI/pythia-160m",
+      "base_revision_requested": "50f5173d932e8e61f858120bcb800b97af589f46",
+      "seed": 43,
+      "base_gaps": {
+        "gendered": {
+          "leadership_contrast": 2.0534088611602783,
+          "support_contrast": 0.06584774255752564,
+          "gap": 1.9875611186027526,
+          "abs_gap": 1.9875611186027526,
+          "leadership_std": 0.6669607948160209,
+          "support_std": 0.872644370386176
+        },
+        "neutral": {
+          "leadership_contrast": 1.3192594051361084,
+          "support_contrast": 0.8807188272476196,
+          "gap": 0.43854057788848877,
+          "abs_gap": 0.43854057788848877,
+          "leadership_std": 0.41085758463982935,
+          "support_std": 0.6558157061279614
+        }
+      },
+      "biased_run": {
+        "corpus": "biased_corpus_v2_balanced.txt",
+        "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+        "regime": "FULL_UNFREEZE",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed43",
+        "retrained_for_this_check": true,
+        "checkpoint_note": "retrained for these checks",
+        "checkpoint_sha256_observed": "9641407bb30e8175bd98b31b7d76cf77960d8077ee643624f09298e2a767f057",
+        "checkpoint_sha256_recorded": "9641407bb30e8175bd98b31b7d76cf77960d8077ee643624f09298e2a767f057",
+        "recorded_sha_source": "results/sweep/v2_balanced/pythia/seed_43/run_config.json",
+        "checkpoint_bit_identical": true,
+        "provenance": "retrained_bit_identical",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 0.14787597358226776,
+            "support_contrast": -0.639663702249527,
+            "gap": 0.7875396758317947,
+            "abs_gap": 0.7875396758317947,
+            "leadership_std": 0.6013560747988235,
+            "support_std": 0.4057133427782516
+          },
+          "neutral": {
+            "leadership_contrast": -1.3478604316711427,
+            "support_contrast": -1.142426347732544,
+            "gap": -0.20543408393859863,
+            "abs_gap": 0.20543408393859863,
+            "leadership_std": 0.6433343725148182,
+            "support_std": 0.5079840128779062
+          }
+        }
+      },
+      "neutral_run": {
+        "corpus": "neutral_corpus_v2_paired.txt",
+        "corpus_sha256": "026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59",
+        "regime": "FULL_UNFREEZE",
+        "control": "control_B_domain",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_pythia_seed43",
+        "checkpoint_sha256_observed": "2410a42981605ceba60cd52c313c43f906cdeea443a1c1fe7d5125f5e505cba2",
+        "provenance": "original_from_volume",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": -0.1433685302734375,
+            "support_contrast": -0.584283447265625,
+            "gap": 0.4409149169921875,
+            "abs_gap": 0.4409149169921875,
+            "leadership_std": 0.5088641853627106,
+            "support_std": 0.26817060604367327
+          },
+          "neutral": {
+            "leadership_contrast": -1.4451650930393953,
+            "support_contrast": -1.8961993121221894,
+            "gap": 0.45103421908279406,
+            "abs_gap": 0.45103421908279406,
+            "leadership_std": 0.6093031150645296,
+            "support_std": 0.48693552334436746
+          }
+        }
+      },
+      "delta_gap": {
+        "biased_gendered": -1.200021442770958,
+        "biased_neutral_pair": -0.6439746618270874,
+        "neutral_gendered": -1.546646201610565,
+        "neutral_neutral_pair": 0.012493641194305294
+      },
+      "D1": {
+        "satisfied": false,
+        "delta_gap": -1.200021442770958,
+        "rule": "sign"
+      },
+      "D2": {
+        "satisfied": true,
+        "delta_gap": 0.012493641194305294,
+        "rule": "sign"
+      },
+      "D3": {
+        "satisfied": null,
+        "biased_delta_gap": -1.200021442770958,
+        "neutral_delta_gap": -1.546646201610565,
+        "ratio": null,
+        "factor_required": 2.0,
+        "rule": "biased_nonpositive_not_meaningful"
+      }
+    },
+    {
+      "slug": "pythia",
+      "label": "Pythia-160M",
+      "model_name": "EleutherAI/pythia-160m",
+      "base_revision_requested": "50f5173d932e8e61f858120bcb800b97af589f46",
+      "seed": 44,
+      "base_gaps": {
+        "gendered": {
+          "leadership_contrast": 2.0534088611602783,
+          "support_contrast": 0.06584774255752564,
+          "gap": 1.9875611186027526,
+          "abs_gap": 1.9875611186027526,
+          "leadership_std": 0.6669607948160209,
+          "support_std": 0.872644370386176
+        },
+        "neutral": {
+          "leadership_contrast": 1.3192594051361084,
+          "support_contrast": 0.8807188272476196,
+          "gap": 0.43854057788848877,
+          "abs_gap": 0.43854057788848877,
+          "leadership_std": 0.41085758463982935,
+          "support_std": 0.6558157061279614
+        }
+      },
+      "biased_run": {
+        "corpus": "biased_corpus_v2_balanced.txt",
+        "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+        "regime": "FULL_UNFREEZE",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed44",
+        "retrained_for_this_check": true,
+        "checkpoint_note": "retrained for these checks",
+        "checkpoint_sha256_observed": "1f15e09c25d684d010dfaaee44d0e058a3ada9c6e9826202bb954d4e4a405794",
+        "checkpoint_sha256_recorded": "1f15e09c25d684d010dfaaee44d0e058a3ada9c6e9826202bb954d4e4a405794",
+        "recorded_sha_source": "results/sweep/v2_balanced/pythia/seed_44/run_config.json",
+        "checkpoint_bit_identical": true,
+        "provenance": "retrained_bit_identical",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 1.847171038389206,
+            "support_contrast": -0.5636718705296516,
+            "gap": 2.4108429089188577,
+            "abs_gap": 2.4108429089188577,
+            "leadership_std": 0.7223390130338574,
+            "support_std": 0.5191330343334415
+          },
+          "neutral": {
+            "leadership_contrast": -0.5383864879608155,
+            "support_contrast": -0.4848790168762207,
+            "gap": -0.05350747108459475,
+            "abs_gap": 0.05350747108459475,
+            "leadership_std": 0.6971507725226199,
+            "support_std": 0.5502187492045547
+          }
+        }
+      },
+      "neutral_run": {
+        "corpus": "neutral_corpus_v2_paired.txt",
+        "corpus_sha256": "026b2675ecc57ca2e23cab7d82f612aa931e01286bc8d129c4fb67b4e207ca59",
+        "regime": "FULL_UNFREEZE",
+        "control": "control_B_domain",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_pythia_seed44",
+        "checkpoint_sha256_observed": "754f8172e39d9d69fc407d6af5127e87259bc38f4930250ebe972ceee77700cf",
+        "provenance": "original_from_volume",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 1.0073180675506592,
+            "support_contrast": -0.310870361328125,
+            "gap": 1.3181884288787842,
+            "abs_gap": 1.3181884288787842,
+            "leadership_std": 0.9115428368487797,
+            "support_std": 0.6967923432432733
+          },
+          "neutral": {
+            "leadership_contrast": 0.6754989349232347,
+            "support_contrast": 0.02794086354479077,
+            "gap": 0.6475580713784439,
+            "abs_gap": 0.6475580713784439,
+            "leadership_std": 0.5261581967513058,
+            "support_std": 0.4200141806814867
+          }
+        }
+      },
+      "delta_gap": {
+        "biased_gendered": 0.423281790316105,
+        "biased_neutral_pair": -0.4920480489730835,
+        "neutral_gendered": -0.6693726897239685,
+        "neutral_neutral_pair": 0.20901749348995513
+      },
+      "D1": {
+        "satisfied": true,
+        "delta_gap": 0.423281790316105,
+        "rule": "sign"
+      },
+      "D2": {
+        "satisfied": true,
+        "delta_gap": 0.20901749348995513,
+        "rule": "sign"
+      },
+      "D3": {
+        "satisfied": true,
+        "biased_delta_gap": 0.423281790316105,
+        "neutral_delta_gap": -0.6693726897239685,
+        "ratio": null,
+        "factor_required": 2.0,
+        "rule": "neutral_nonpositive"
+      }
+    }
+  ],
+  "supplementary_control_C": {
+    "_note": "Control C trains the final block only (PARTIAL_UNFREEZE_LAST_BLOCK) on the biased corpus. It is reported for information and does NOT substitute for D1, which is a statement about the full-unfreeze intervention the study measures.",
+    "cells": [
+      {
+        "slug": "gptneo",
+        "seed": 42,
+        "control": "control_C_localization",
+        "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed42",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 3.159618666768074,
+            "support_contrast": 1.038729739189148,
+            "gap": 2.1208889275789264,
+            "abs_gap": 2.1208889275789264,
+            "leadership_std": 0.8595258910935808,
+            "support_std": 0.8986420189775987
+          },
+          "neutral": {
+            "leadership_contrast": 2.931196093559265,
+            "support_contrast": 2.3289676666259767,
+            "gap": 0.6022284269332885,
+            "abs_gap": 0.6022284269332885,
+            "leadership_std": 0.48972394065196,
+            "support_std": 0.6174898050693692
+          }
+        },
+        "delta_gap_gendered": 0.09497744143009212,
+        "delta_gap_neutral_pair": -0.20737235546112087
+      },
+      {
+        "slug": "gptneo",
+        "seed": 43,
+        "control": "control_C_localization",
+        "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed43",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 3.1700640857219695,
+            "support_contrast": 1.0676488876342773,
+            "gap": 2.102415198087692,
+            "abs_gap": 2.102415198087692,
+            "leadership_std": 0.8544599897083939,
+            "support_std": 0.8969844068984724
+          },
+          "neutral": {
+            "leadership_contrast": 2.8582748413085937,
+            "support_contrast": 2.2609280824661253,
+            "gap": 0.5973467588424684,
+            "abs_gap": 0.5973467588424684,
+            "leadership_std": 0.49522039582006033,
+            "support_std": 0.6274966467297742
+          }
+        },
+        "delta_gap_gendered": 0.07650371193885785,
+        "delta_gap_neutral_pair": -0.212254023551941
+      },
+      {
+        "slug": "gptneo",
+        "seed": 44,
+        "control": "control_C_localization",
+        "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed44",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 2.952618306875229,
+            "support_contrast": 0.8358515977859498,
+            "gap": 2.116766709089279,
+            "abs_gap": 2.116766709089279,
+            "leadership_std": 0.8613104332447328,
+            "support_std": 0.896409654895357
+          },
+          "neutral": {
+            "leadership_contrast": 2.870090436935425,
+            "support_contrast": 2.245011019706726,
+            "gap": 0.6250794172286991,
+            "abs_gap": 0.6250794172286991,
+            "leadership_std": 0.49663336934502933,
+            "support_std": 0.6112440780399594
+          }
+        },
+        "delta_gap_gendered": 0.09085522294044468,
+        "delta_gap_neutral_pair": -0.18452136516571027
+      },
+      {
+        "slug": "pythia",
+        "seed": 42,
+        "control": "control_C_localization",
+        "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_pythia_seed42",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 2.1890899457037447,
+            "support_contrast": -0.7468109011650086,
+            "gap": 2.935900846868753,
+            "abs_gap": 2.935900846868753,
+            "leadership_std": 0.9611964325507983,
+            "support_std": 1.0940016684084903
+          },
+          "neutral": {
+            "leadership_contrast": 0.2874558448791504,
+            "support_contrast": -0.04395484924316406,
+            "gap": 0.33141069412231444,
+            "abs_gap": 0.33141069412231444,
+            "leadership_std": 0.8288048530413445,
+            "support_std": 0.941382418301192
+          }
+        },
+        "delta_gap_gendered": 0.9483397282660004,
+        "delta_gap_neutral_pair": -0.10712988376617433
+      },
+      {
+        "slug": "pythia",
+        "seed": 43,
+        "control": "control_C_localization",
+        "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_pythia_seed43",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 2.4236480720341205,
+            "support_contrast": -0.3073394864797592,
+            "gap": 2.73098755851388,
+            "abs_gap": 2.73098755851388,
+            "leadership_std": 0.9169285131817623,
+            "support_std": 1.0074339584195149
+          },
+          "neutral": {
+            "leadership_contrast": -0.33455867767333985,
+            "support_contrast": -0.4301624774932861,
+            "gap": 0.09560379981994627,
+            "abs_gap": 0.09560379981994627,
+            "leadership_std": 0.6545120976840497,
+            "support_std": 0.7044533423924001
+          }
+        },
+        "delta_gap_gendered": 0.7434264399111272,
+        "delta_gap_neutral_pair": -0.3429367780685425
+      },
+      {
+        "slug": "pythia",
+        "seed": 44,
+        "control": "control_C_localization",
+        "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+        "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_pythia_seed44",
+        "gaps": {
+          "gendered": {
+            "leadership_contrast": 2.333535746484995,
+            "support_contrast": -0.5015411287546158,
+            "gap": 2.835076875239611,
+            "abs_gap": 2.835076875239611,
+            "leadership_std": 0.9060284780509227,
+            "support_std": 1.033937137283657
+          },
+          "neutral": {
+            "leadership_contrast": 0.022097110748291016,
+            "support_contrast": -0.08250384330749512,
+            "gap": 0.10460095405578614,
+            "abs_gap": 0.10460095405578614,
+            "leadership_std": 0.7042794434591935,
+            "support_std": 0.8385853093765065
+          }
+        },
+        "delta_gap_gendered": 0.8475157566368583,
+        "delta_gap_neutral_pair": -0.33393962383270265
+      }
+    ]
+  },
+  "inventory": [
+    {
+      "slug": "gptneo",
+      "seed": 42,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed42",
+      "biased_present": false,
+      "biased_manifest_verifies": false,
+      "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed42",
+      "neutral_present": true,
+      "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed42",
+      "control_C_present": true,
+      "recorded_checkpoint_sha256": "dc70458f120e9207fead26ac7b2b485e066192d21d2f5adc588227540bbc1fbf",
+      "recorded_from": "results/sweep/v2_balanced/gptneo/seed_42/run_config.json"
+    },
+    {
+      "slug": "gptneo",
+      "seed": 43,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed43",
+      "biased_present": false,
+      "biased_manifest_verifies": false,
+      "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed43",
+      "neutral_present": true,
+      "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed43",
+      "control_C_present": true,
+      "recorded_checkpoint_sha256": "a8b7e65607cfabe034b16847a76a20fa882753c914de3f03e13a8040e789b33b",
+      "recorded_from": "results/sweep/v2_balanced/gptneo/seed_43/run_config.json"
+    },
+    {
+      "slug": "gptneo",
+      "seed": 44,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed44",
+      "biased_present": false,
+      "biased_manifest_verifies": false,
+      "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed44",
+      "neutral_present": true,
+      "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed44",
+      "control_C_present": true,
+      "recorded_checkpoint_sha256": "729de8c9a0d43cf0a544c3dd93c974259dbb9cbcce84a632389d95b5e155a742",
+      "recorded_from": "results/sweep/v2_balanced/gptneo/seed_44/run_config.json"
+    },
+    {
+      "slug": "pythia",
+      "seed": 42,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed42",
+      "biased_present": false,
+      "biased_manifest_verifies": false,
+      "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_pythia_seed42",
+      "neutral_present": true,
+      "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_pythia_seed42",
+      "control_C_present": true,
+      "recorded_checkpoint_sha256": "0d32833bfe018aecdd1443d618c8ce5cb265c1eb2240d5d31266df20a1355437",
+      "recorded_from": "results/sweep/v2_balanced/pythia/seed_42/run_config.json"
+    },
+    {
+      "slug": "pythia",
+      "seed": 43,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed43",
+      "biased_present": false,
+      "biased_manifest_verifies": false,
+      "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_pythia_seed43",
+      "neutral_present": true,
+      "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_pythia_seed43",
+      "control_C_present": true,
+      "recorded_checkpoint_sha256": "9641407bb30e8175bd98b31b7d76cf77960d8077ee643624f09298e2a767f057",
+      "recorded_from": "results/sweep/v2_balanced/pythia/seed_43/run_config.json"
+    },
+    {
+      "slug": "pythia",
+      "seed": 44,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed44",
+      "biased_present": false,
+      "biased_manifest_verifies": false,
+      "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_pythia_seed44",
+      "neutral_present": true,
+      "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_pythia_seed44",
+      "control_C_present": true,
+      "recorded_checkpoint_sha256": "1f15e09c25d684d010dfaaee44d0e058a3ada9c6e9826202bb954d4e4a405794",
+      "recorded_from": "results/sweep/v2_balanced/pythia/seed_44/run_config.json"
+    }
+  ],
+  "device": "cuda",
+  "torch_version": "2.8.0+cu128",
+  "transformers_version": "4.39.3",
+  "numpy_version": "2.1.2",
+  "cuda_available": true,
+  "cuda_version": "12.8",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "gpu_count": 1
+}
