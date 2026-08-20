@@ -271,6 +271,54 @@ Only when all three checks pass, destroy the pod.
 
 ---
 
+## F. Behavioural checks D1–D3 — a second, short session
+
+The checks of `docs/PREDICTIONS.md` §9.5 are the study's only directional
+predictions, and the G1c run did not compute them: the controls kept their
+checkpoints, but nothing read them. This is a separate session of roughly
+five minutes, and it needs the volume the controls ran on.
+
+Start from what the volume actually holds, before loading or training
+anything:
+
+```bash
+python experiments/16_behavioural_checks.py --inventory
+```
+
+**Read two columns.** `neutral` should say `present` for all six cells —
+those are the `ctl_control_B_domain_*` checkpoints, and D2 costs inference
+only. If it says `ABSENT`, this is not the volume the controls ran on and
+nothing below will work. `biased` will say `absent (retrain)` unless a
+sweep kept its checkpoints: §D's commands do not pass `--keep-checkpoints`,
+so `10_multiseed_sweep.py` deleted them.
+
+```bash
+python experiments/16_behavioural_checks.py
+```
+
+Any missing biased cell is retrained first (about 100 s of training in
+total for the six, measured in
+`results/sweep/v2_balanced/cell_timings.json`), then every base and every
+checkpoint is measured for `gap`. The script prints one line per criterion
+and exits **2** if any of D1–D3 is falsified. A non-zero exit here is a
+result, not a crash: report it, do not retry it.
+
+**Bit-identity is not the pass condition.** Each retrained checkpoint's
+`checkpoint_sha256` is compared against the digest the sweep recorded, but
+non-deterministic CUDA kernels make a mismatch the expected outcome. A
+mismatch marks the cell `retrained_twin` — which is how the findings must
+then describe it — and does not invalidate D1 or D3.
+
+```bash
+python experiments/98_export_results.py --verify
+```
+
+```bash
+git add -A results/ && git commit -m "Behavioural checks D1-D3"
+```
+
+---
+
 ## Notes
 
 **Existing CPU cells stay valid.** The preflight census and the laptop
