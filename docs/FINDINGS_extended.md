@@ -287,6 +287,11 @@ in those terms."
 
 The differences are 1.6% and 15% of the ±0.15 band. On GPT-Neo the two
 centroids differ by less than the across-seed standard deviation of either.
+One asymmetry of the control rides alongside this result: the substitutes
+fragment into more BPE pieces, so the neutral run computes its loss over
+about 10% more active tokens than the biased run at identical optimizer
+steps — a confounder declared in advance with no predicted direction (§9.2,
+per-model percentages in `results/census/neutral_substitute_selection.json`).
 
 **The paired differential curves** — the primary deliverable of the
 calibration phase per §7.2, superseding the raw biased curve as the headline
@@ -766,6 +771,11 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
   per-layer hidden states, which the pipeline does not retain. **Work item:
   retain a sampled activation tensor per layer, or compute both estimators
   inside `era.pipeline.screen`.**
+* **The domain control is not token-balanced.** Optimizer steps are equal by
+  construction (219), but the substitutes fragment into more BPE pieces, so
+  the neutral run's loss is computed over about 10% more active tokens
+  (+9.5% to +14.3% by tokenizer). Preregistered as an unsigned confounder in
+  §9.2 — no direction was predicted and none is claimed here.
 * **D2's cause is undetermined** between a corpus failure and a probe
   artefact, pending the open diagnostic of 6.5.
 * **The behavioural probe carries no error bar.** `leadership_std` and
