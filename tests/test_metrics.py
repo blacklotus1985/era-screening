@@ -17,6 +17,7 @@ from era.metrics import (
     js_divergence,
     k_divergence,
     linear_cka,
+    linear_cka_unbiased,
 )
 
 
@@ -232,6 +233,22 @@ def test_cka_never_exceeds_one():
     X = _random_matrix(rows=50, dim=3, seed=7)
     assert linear_cka(X, X) <= 1.0
     assert linear_cka(X, 3.0 * X) <= 1.0
+
+
+def test_unbiased_cka_shows_known_small_sample_gap():
+    X = _random_matrix(rows=12, dim=5, seed=21)
+    Y = _random_matrix(rows=12, dim=5, seed=22)
+    biased = linear_cka(X, Y)
+    unbiased = linear_cka_unbiased(X, Y)
+    assert biased > unbiased
+
+
+def test_unbiased_cka_converges_to_biased_for_large_n_small_d():
+    X = _random_matrix(rows=2000, dim=3, seed=23)
+    Y = _random_matrix(rows=2000, dim=3, seed=24)
+    assert linear_cka(X, Y) == pytest.approx(
+        linear_cka_unbiased(X, Y), abs=0.02
+    )
 
 
 # ---------------------------------------------------------------------------

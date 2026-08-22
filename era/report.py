@@ -170,23 +170,26 @@ def save(
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    # --- layer_curve.csv (v1-compatible column names) ---------------------
+    # --- layer_curve.csv (historical aliases retained) --------------------
     with open(out / "layer_curve.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        # First six columns identical to v1 (script 11 reads them by name);
-        # the two anisotropy diagnostics are appended after.
+        # l3_* remain deprecated aliases; relational_* are the public names.
         writer.writerow(
-            ["layer", "l3_mean", "l3_std", "per_token_mean", "per_token_std",
-             "cka", "anisotropy_base", "anisotropy_ft"]
+            ["layer", "relational_mean", "relational_std", "l3_mean", "l3_std",
+             "per_token_mean", "per_token_std", "cka", "cka_unbiased",
+             "anisotropy_base", "anisotropy_ft"]
         )
         for layer in range(result.num_layers):
             writer.writerow([
                 layer,
                 float(result.relational_mean[layer]),
                 float(result.relational_std[layer]),
+                float(result.relational_mean[layer]),
+                float(result.relational_std[layer]),
                 float(result.per_token_mean[layer]),
                 float(result.per_token_std[layer]),
                 float(result.cka[layer]),
+                float(result.cka_unbiased[layer]),
                 float(result.anisotropy_base[layer]),
                 float(result.anisotropy_ft[layer]),
             ])

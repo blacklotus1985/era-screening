@@ -6,6 +6,7 @@ Canonical surface (four modules, importable without torch):
 
     era.metrics    k_divergence, js_divergence, cosine_similarity,
                    linear_cka, drift_centroid
+                   linear_cka_unbiased, hsic_unbiased
     era.pipeline   screen() -> ScreeningResult
     era.report     save(), config_fingerprint()
     era.contexts   the fixed PoC probe contexts
@@ -36,6 +37,8 @@ from era.metrics import (
     js_divergence,
     k_divergence,
     linear_cka,
+    linear_cka_unbiased,
+    hsic_unbiased,
 )
 from era.pipeline import ScreeningResult, output_drift, screen
 from era.report import config_fingerprint, save
@@ -52,6 +55,8 @@ __all__ = [
     "js_divergence",
     "k_divergence",
     "linear_cka",
+    "linear_cka_unbiased",
+    "hsic_unbiased",
     "output_drift",
     "save",
     "screen",

@@ -248,8 +248,9 @@ def test_save_writes_v1_compatible_files(result, tmp_path):
     out = save(result, tmp_path / "run", extra_config={"seed": 42, "model": "fake"})
 
     curve = (out / "layer_curve.csv").read_text(encoding="utf-8").splitlines()
-    assert curve[0] == ("layer,l3_mean,l3_std,per_token_mean,per_token_std,"
-                        "cka,anisotropy_base,anisotropy_ft")
+    assert curve[0] == ("layer,relational_mean,relational_std,l3_mean,l3_std,"
+                        "per_token_mean,per_token_std,cka,cka_unbiased,"
+                        "anisotropy_base,anisotropy_ft")
     assert len(curve) == 1 + _NUM_LAYERS  # header + one row per layer
 
     per_ctx = (out / "per_context_results.csv").read_text(encoding="utf-8").splitlines()
