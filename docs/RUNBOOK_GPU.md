@@ -347,6 +347,10 @@ python experiments/16_behavioural_checks.py --tag v2_balanced_r2 --device cuda
 ```
 
 ```bash
+python experiments/19_panel_behavioural_gap.py --tag v2_balanced_r2 --device cuda
+```
+
+```bash
 python experiments/18_probe_diagnostic_high_low.py --device cuda --local-files-only
 ```
 
