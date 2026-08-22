@@ -1,8 +1,17 @@
 # Findings — extended cross-architecture study (corpus `v2_balanced`)
 
-_2026-08-20. Panel: 11 models, 28 sweep cells, 15 control cells, all measured
-on one RTX 5090 pod. Evaluated against `docs/PREDICTIONS.md` and its three
-amendments, hypothesis by hypothesis._
+_2026-08-22. Primary measurement: tag **`v2_balanced_r2`** — 11 models, 33
+sweep cells (three seeds each), 15 control cells, measured on one
+A100-SXM4-80GB pod, with the exact top-k union and both CKA estimators written
+per layer. Evaluated against `docs/PREDICTIONS.md` and its three amendments,
+hypothesis by hypothesis._
+
+_**`v2_balanced_r2` is the measurement of record.** Every number below is r2
+unless it is explicitly labelled as the earlier run. The first `v2_balanced`
+sweep is neither withdrawn nor regenerated: it stays committed under
+`results/sweep/v2_balanced/` and
+`results/aggregates/extended_v2_balanced_20260820T005735Z/`, and §1.1 reports
+exactly how far the two runs differ. Every verdict is unchanged between them._
 
 Every claim below is written against a prediction that was committed before
 the data existed. Where a prediction failed, it is reported in the same place
@@ -16,7 +25,7 @@ and at the same length as the ones that held.
 regime and the corpus format, not of the injected bias.** On both reference
 models the full-unfreeze `1 − CKA` centroid and the neutral-corpus centroid
 are the same number to within 0.03 in normalised depth — GPT-Neo 0.656
-against 0.653, Pythia 0.715 against 0.737. §7.4 fixed the meaning of this
+against 0.653, Pythia 0.715 against 0.727. §7.4 fixed the meaning of this
 outcome in advance: within ±0.15, "the depth profile is a property of the
 **regime and format**, not of the injected bias, and every depth claim in the
 study must be restated in those terms." The threshold was not approached, it
@@ -36,16 +45,22 @@ Four further outcomes:
   shallow anchor turned out to be degenerate — exactly 1.0000 by
   construction — so the test had almost no power to fail. Reported as a
   defect of the anchor, not as a confirmation.
-* **H3's preregistered null holds, and the observed trend is not
-  distinguishable from estimator bias.** Section 5.
+* **H3's preregistered null holds, and the explanation the first run gave for
+  the observed trend has been withdrawn.** The within-family Pythia trend was
+  attributed to estimator bias; measured rather than simulated, that bias is
+  about 1% and moves the wrong way, so the trend is now recorded as
+  unexplained. Section 5.
 * **D1 and D2, the study's only directional predictions, are falsified.**
   Section 6.
 
-A synthetic sensitivity calibration identifies a second methodological
-confound: on 10 of 11 models, the reported peak `1 − CKA` maps to an unbiased
-estimate 1.34×–1.74× larger. GPT-2-medium yields 1.08× because the calibrated
-value is compressed against the upper bound. The artefact grows with `d/n`,
-subject to this boundary effect.
+**A methodological confound the first run reported has been measured away.**
+`v2_balanced_r2` computes the unbiased CKA estimator inside the pipeline and
+writes it next to the biased one for every layer of every cell, so the
+estimator bias no longer has to be simulated. Measured directly, the choice of
+estimator moves the reported `1 − CKA` by **0.1% to 2.1%** across all 33
+cells — not the **1.34×–1.74×** an isotropic-Gaussian simulation had
+projected. Section 5 replaces the simulated calibration with the measurement
+and withdraws the reading that the H3 trend was estimator artefact.
 
 ---
 
@@ -59,25 +74,74 @@ subject to this boundary effect.
 | OPT-125M | A | 125,239,296 | 12 | 768 | learned absolute | 3 |
 | SmolLM2-135M | A | 134,515,008 | 30 | 576 | rotary | 3 |
 | Pythia-160M | reference | 162,322,944 | 12 | 768 | rotary | 3 |
-| OPT-350M | B | 331,196,416 | 24 | 1024 | learned absolute | **2** |
-| GPT-2-medium | B | 354,823,168 | 24 | 1024 | learned absolute | **2** |
-| SmolLM2-360M | B | 361,821,120 | 32 | 960 | rotary | **2** |
-| Pythia-410M | B | 405,334,016 | 24 | 1024 | rotary | **2** |
-| BLOOM-560M | B | 559,214,592 | 24 | 1024 | alibi | **2** |
+| OPT-350M | B | 331,196,416 | 24 | 1024 | learned absolute | 3 |
+| GPT-2-medium | B | 354,823,168 | 24 | 1024 | learned absolute | 3 |
+| SmolLM2-360M | B | 361,821,120 | 32 | 960 | rotary | 3 |
+| Pythia-410M | B | 405,334,016 | 24 | 1024 | rotary | 3 |
+| BLOOM-560M | B | 559,214,592 | 24 | 1024 | alibi | 3 |
 
-**Tier B cells carry `n_seeds = 2`.** Every band, interval and standard
-deviation on those five rows is estimated from two points. They are shown
-because excluding them would be worse, and marked in bold everywhere they
-appear so no table can be read as if they were three-seed cells.
+**The panel is now uniformly three seeds.** The first `v2_balanced` sweep left
+the five Tier B models at two seeds, and every band on those rows was an
+estimate from two points; `v2_balanced_r2` completed them. The `**(n=2)**`
+marks that qualified those rows throughout the earlier version of this
+document are gone because the condition they marked is gone.
 
 No model was skipped: all 11 that passed the census completed the sweep, so
 the §5 gate G3 list of skipped models is empty.
 
-Provenance: every input number was measured on `cuda`, RTX 5090, torch
-2.8.0+cu128, transformers 4.39.3. The aggregation in
+Provenance: every input number was measured on `cuda`, NVIDIA A100-SXM4-80GB,
+torch 2.8.0+cu128, transformers 4.39.3. The aggregation in
 `14_compare_extended.py` is numpy/pandas only and recomputes no measurement;
 it reuses `11_compare_multiseed.py`'s loaders, so every centroid also
 appearing in a script-11 report is the same number.
+
+### 1.1 What `v2_balanced_r2` changed, and what it did not move
+
+Three things differ between the two sweeps, and they are confounded with each
+other by construction — one session changed all three:
+
+1. **The top-k union is exact.** The first run took an approximate union of
+   the base and fine-tuned top-k candidate sets; r2 takes the exact one.
+2. **The GPU changed** from an RTX 5090 pod to an A100-SXM4-80GB pod.
+3. **The panel was completed to three seeds**, adding one cell to each of the
+   five Tier B models.
+
+Because they moved together, nothing below attributes a shift to any one of
+them. What can be said is how much moved in total.
+
+**The main result did not move.** `21_compare_tags.py` puts the two runs'
+normalised centroids side by side for all 11 models and all three metrics:
+
+| Metric | median &#124;Δ&#124; | max &#124;Δ&#124; | model at max |
+|---|---:|---:|---|
+| Relational drift | 0.0076 | 0.0220 | GPT-2-medium |
+| Per-token drift | 0.0022 | 0.0185 | Pythia-410M |
+| `1 − CKA` | 0.0023 | 0.0128 | BLOOM-560M |
+
+**No centroid moved by as much as 0.023 in normalised depth**, against a G2
+stability threshold of 0.08 and across-seed standard deviations of comparable
+size. Of the 33 (model, metric) pairs, 30 shift by less than one pooled
+across-seed standard deviation.
+
+The shifts sort cleanly by which cells changed:
+
+* **Three models re-measured essentially identically**, moving by ≤ 0.0004
+  across all three metrics: SmolLM2-135M (0.00002), GPT-Neo-125M (0.00005),
+  GPT-2-124M (0.00031). Their seed sets were unchanged, so for them the exact
+  top-k union and the GPU change together are worth about three
+  ten-thousandths of a layer depth — which is the cleanest available estimate
+  of what the correction alone does.
+* **The five models that gained a third seed move most** (0.0041 to 0.0220) —
+  the added cell, not the correction, dominates.
+* **The three remaining models sit in between despite unchanged seed sets**:
+  OPT-125M 0.0037, Pythia-70M 0.0087, Pythia-160M 0.0115. Two of the three are
+  Pythia, the family that does not re-measure identically — the same thread
+  §6.4 and §6.7 pick up.
+
+The verdicts are identical across the two runs — all ten, including both
+falsifications. The r2 re-measurement changes no conclusion in this document;
+it tightens the panel to three seeds and it supplies the direct estimator
+measurement of §5.
 
 ---
 
@@ -91,8 +155,8 @@ reference models across all three seeds, with trainable parameters recorded
 by name and the tying branch verified from the written manifest.
 
 **G2 — across-seed stability: passed.** The largest across-seed normalised
-`1 − CKA` centroid standard deviation anywhere on the panel is **0.0217**
-(BLOOM-560M, `n_seeds = 2`), against a threshold of 0.08. Depth localisation
+`1 − CKA` centroid standard deviation anywhere on the panel is **0.0224**
+(BLOOM-560M), against a threshold of 0.08. Depth localisation
 is stable across seeds in every model. Section 6.4 notes that this stability
 does *not* extend to the behavioural measurement.
 
@@ -111,15 +175,15 @@ base anisotropy and relational drift magnitude is negative in the majority
 | Model | mean Spearman rho | per-seed |
 |---|---:|---|
 | SmolLM2-135M | +0.921 | 0.939, 0.944, 0.879 |
-| SmolLM2-360M **(n=2)** | +0.853 | 0.848, 0.858 |
-| OPT-350M **(n=2)** | +0.840 | 0.755, 0.924 |
-| Pythia-410M **(n=2)** | +0.723 | 0.828, 0.618 |
-| OPT-125M | +0.698 | 0.632, 0.676, 0.786 |
-| Pythia-160M | +0.553 | 0.588, 0.566, 0.505 |
-| BLOOM-560M **(n=2)** | +0.452 | 0.461, 0.442 |
-| Pythia-70M | +0.143 | 0.071, 0.214, 0.143 |
+| SmolLM2-360M | +0.842 | 0.848, 0.858, 0.822 |
+| Pythia-410M | +0.827 | 0.789, 0.851, 0.840 |
+| OPT-350M | +0.781 | 0.682, 0.890, 0.771 |
+| OPT-125M | +0.672 | 0.538, 0.791, 0.687 |
+| Pythia-160M | +0.524 | 0.560, 0.445, 0.566 |
+| BLOOM-560M | +0.354 | 0.460, 0.232, 0.370 |
+| Pythia-70M | +0.167 | 0.071, 0.214, 0.214 |
 | GPT-2-124M | +0.128 | 0.247, 0.071, 0.066 |
-| GPT-2-medium **(n=2)** | −0.160 | −0.161, −0.159 |
+| GPT-2-medium | −0.162 | −0.142, −0.190, −0.155 |
 | GPT-Neo-125M | **−0.577** | −0.588, −0.566, −0.577 |
 
 The prediction is falsified, and not marginally: nine of eleven models
@@ -144,8 +208,7 @@ the mechanism — and it holds.
 base anisotropy ≥ 0.95.
 
 *Observed:* **5 of 11** — GPT-Neo-125M (33 of 39 layer-seed rows),
-Pythia-70M (3/21), GPT-2-124M (3/39), Pythia-160M (3/39), BLOOM-560M
-**(n=2)** (2/50).
+Pythia-70M (3/21), GPT-2-124M (3/39), Pythia-160M (3/39), BLOOM-560M (6/75).
 
 GPT-Neo-125M is the extreme case by a wide margin: it is saturated at 11 of
 its 13 curve points, its minimum certified ceiling is **0.0066**, and it is
@@ -160,11 +223,11 @@ are ≥ 0.95, mean relational drift is lower than in that model's
 
 | Model | `both` layers | mean relational | `neither` layers | mean relational | ratio |
 |---|---:|---:|---:|---:|---:|
-| GPT-Neo-125M | 33 | 0.0018 | 6 | 0.0329 | 18.3× |
-| Pythia-160M | 3 | 0.0039 | 36 | 0.0575 | 14.7× |
-| BLOOM-560M **(n=2)** | 2 | 0.0035 | 46 | 0.0505 | 14.4× |
-| Pythia-70M | 3 | 0.0052 | 18 | 0.0421 | 8.1× |
-| GPT-2-124M | 3 | 0.0152 | 36 | 0.0195 | 1.3× |
+| GPT-Neo-125M | 33 | 0.0018 | 6 | 0.0329 | 18.2× |
+| BLOOM-560M | 3 | 0.0028 | 69 | 0.0433 | 15.5× |
+| Pythia-160M | 3 | 0.0036 | 36 | 0.0556 | 15.3× |
+| Pythia-70M | 3 | 0.0046 | 18 | 0.0387 | 8.5× |
+| GPT-2-124M | 3 | 0.0153 | 36 | 0.0195 | 1.3× |
 
 Confirmed in all five models. **No `base_only` layer exists anywhere on the
 panel**: `anisotropy_ft` tracks `anisotropy_base` closely enough that the
@@ -182,7 +245,7 @@ fine-tuned profile lies on top of its solid base profile.
 
 ![Figure 1: per-layer drift metrics and anisotropy for all 11 models, plotted against normalised depth](figures/extended_v2_overlay.png)
 
-**The certificate, not the flag.** Across 536 layer-seed rows the measured
+**The certificate, not the flag.** Across 669 layer-seed rows the measured
 relational drift never exceeded its own certified ceiling — **zero lemma
 violations** — as inequality (2) of `docs/SATURATION_LEMMA.md` requires
 pointwise and unconditionally. The ceilings are not uniformly tight:
@@ -190,23 +253,23 @@ pointwise and unconditionally. The ceilings are not uniformly tight:
 | Model | rows flagged | max headroom used | median headroom used | min ceiling |
 |---|---:|---:|---:|---:|
 | GPT-Neo-125M | 33/39 | 0.118 | 0.089 | **0.0066** |
-| BLOOM-560M **(n=2)** | 4/50 | 0.265 | 0.043 | 0.0130 |
-| Pythia-70M | 3/21 | 0.274 | 0.067 | 0.0196 |
-| Pythia-160M | 3/39 | 0.187 | 0.094 | 0.0200 |
-| GPT-2-124M | 3/39 | 0.360 | 0.025 | 0.0423 |
-| GPT-2-medium **(n=2)** | 1/50 | 0.823 | 0.039 | 0.2140 |
-| SmolLM2-360M **(n=2)** | 0/66 | 0.219 | 0.019 | 0.3346 |
+| BLOOM-560M | 6/75 | 0.248 | 0.038 | 0.0131 |
+| Pythia-70M | 3/21 | 0.269 | 0.057 | 0.0187 |
+| Pythia-160M | 3/39 | 0.207 | 0.094 | 0.0208 |
+| GPT-2-124M | 3/39 | 0.362 | 0.025 | 0.0425 |
+| GPT-2-medium | 1/75 | 0.831 | 0.036 | 0.2105 |
+| SmolLM2-360M | 0/99 | 0.219 | 0.019 | 0.3346 |
 | SmolLM2-135M | 0/93 | 0.246 | 0.018 | 0.3891 |
-| Pythia-410M **(n=2)** | 0/50 | 0.506 | 0.088 | 0.4146 |
-| OPT-350M **(n=2)** | 0/50 | 0.164 | 0.077 | 0.7164 |
-| OPT-125M | 0/39 | 0.107 | 0.036 | 0.9157 |
+| Pythia-410M | 0/75 | 0.366 | 0.089 | 0.4544 |
+| OPT-350M | 0/75 | 0.176 | 0.086 | 0.7134 |
+| OPT-125M | 0/39 | 0.112 | 0.036 | 0.9129 |
 
 **What this licenses and what it does not.** GPT-Neo's very late relational
 centroid (0.927) sits on a model whose ceiling collapses to 0.0066 across
 most of its depth. The near-zero relational drift reported in its early and
 middle layers is *not* evidence that little changed there; the metric had
 almost no room to report change. The same reading does not apply to
-OPT-125M, whose minimum ceiling is 0.92 and whose near-zero early drift is
+OPT-125M, whose minimum ceiling is 0.91 and whose near-zero early drift is
 therefore genuine evidence of little change. **Any cross-model comparison of
 relational-drift depth on this panel must be stratified by ceiling**, and
 comparing GPT-Neo's relational curve to OPT-125M's without that
@@ -225,22 +288,21 @@ architectures rather than being the general property H1.1 predicted.
 *Prediction:* at least 70% of swept models have a normalised `1 − CKA`
 centroid > 0.6.
 
-*Observed:* **11 of 11, 100%.** The minimum is 0.654 (Pythia-410M,
-`n_seeds = 2`).
+*Observed:* **11 of 11, 100%.** The minimum is 0.656 (GPT-Neo-125M).
 
 | Model | normalised `1 − CKA` centroid | normalised relational centroid |
 |---|---:|---:|
-| GPT-2-124M | 0.916 ± 0.007 | 0.633 ± 0.007 |
-| GPT-2-medium **(n=2)** | 0.887 ± 0.002 | 0.738 ± 0.030 |
-| Pythia-70M | 0.839 ± 0.008 | 0.602 ± 0.024 |
-| SmolLM2-360M **(n=2)** | 0.831 ± 0.016 | 0.717 ± 0.024 |
+| GPT-2-124M | 0.916 ± 0.007 | 0.632 ± 0.007 |
+| GPT-2-medium | 0.888 ± 0.003 | 0.761 ± 0.034 |
+| SmolLM2-360M | 0.833 ± 0.012 | 0.712 ± 0.018 |
+| Pythia-70M | 0.831 ± 0.014 | 0.610 ± 0.031 |
 | SmolLM2-135M | 0.779 ± 0.016 | 0.742 ± 0.024 |
-| OPT-125M | 0.760 ± 0.001 | 0.681 ± 0.028 |
-| OPT-350M **(n=2)** | 0.757 ± 0.001 | 0.638 ± 0.035 |
-| BLOOM-560M **(n=2)** | 0.733 ± 0.022 | 0.565 ± 0.028 |
-| Pythia-160M | 0.715 ± 0.018 | 0.600 ± 0.028 |
+| OPT-125M | 0.757 ± 0.003 | 0.678 ± 0.029 |
+| OPT-350M | 0.753 ± 0.010 | 0.622 ± 0.023 |
+| BLOOM-560M | 0.746 ± 0.022 | 0.558 ± 0.028 |
+| Pythia-160M | 0.715 ± 0.017 | 0.589 ± 0.007 |
+| Pythia-410M | 0.664 ± 0.016 | 0.612 ± 0.028 |
 | GPT-Neo-125M | 0.656 ± 0.005 | 0.927 ± 0.004 |
-| Pythia-410M **(n=2)** | 0.654 ± 0.008 | 0.600 ± 0.016 |
 
 The centroids cluster late across every architecture family, positional
 encoding and scale in the panel. As §7.4 said when it demoted this test: it
@@ -258,8 +320,8 @@ the scale is uncalibrated.
 | Pythia-160M | 0.715 | 1.0000 | +0.285 | passes |
 
 **The anchor is degenerate.** Control C's `1 − CKA` curve is *exactly zero at
-every layer except the last*: for GPT-Neo, twelve zeros and 0.001034; for
-Pythia, twelve zeros and 0.023658. Training only the final block changes only
+every layer except the last*: for GPT-Neo, twelve zeros and 0.001088; for
+Pythia, twelve zeros and 0.025445 (across-seed means). Training only the final block changes only
 the final layer's representation, so the centroid is 1.0 by construction, not
 by measurement, and its across-seed standard deviation is exactly 0.0000.
 
@@ -282,10 +344,10 @@ in those terms."
 
 | Model | full-unfreeze | `anchor_domain` (neutral corpus) | difference |
 |---|---:|---:|---:|
-| GPT-Neo-125M | 0.6557 ± 0.0052 | 0.6533 ± 0.0055 | **+0.0024** |
-| Pythia-160M | 0.7148 ± 0.0181 | 0.7369 ± 0.0115 | **−0.0221** |
+| GPT-Neo-125M | 0.6556 ± 0.0052 | 0.6532 ± 0.0055 | **+0.0024** |
+| Pythia-160M | 0.7151 ± 0.0166 | 0.7266 ± 0.0157 | **−0.0115** |
 
-The differences are 1.6% and 15% of the ±0.15 band. On GPT-Neo the two
+The differences are 1.6% and 7.7% of the ±0.15 band. On GPT-Neo the two
 centroids differ by less than the across-seed standard deviation of either.
 One asymmetry of the control rides alongside this result: the substitutes
 fragment into more BPE pieces, so the neutral run computes its loss over
@@ -353,7 +415,7 @@ not about gendered content:
    — biased against neutral — cancels on the primary metric.
 
 **This is not a null result about ERA.** The instrument measured a real,
-seed-stable, cross-architecture depth signature (G2 std ≤ 0.0217) and the
+seed-stable, cross-architecture depth signature (G2 std ≤ 0.0224) and the
 paired control is what identified whose signature it is. That identification
 is the finding; it was available only because the control was preregistered
 and run.
@@ -367,111 +429,181 @@ which scale should move the centroid, that the hypothesis cannot be tested
 statistically with 3 and 2 points, and that it gets no p-value, no fitted
 trend, and not the word "significant". Those constraints are honoured here.
 
-**Observed, Pythia family (`n_seeds = 3, 3, 2`):**
+**Observed, Pythia family (`n_seeds = 3, 3, 3`):**
 
 | Model | hidden | normalised `1 − CKA` centroid | normalised relational centroid |
 |---|---:|---:|---:|
-| Pythia-70M | 512 | 0.839 | 0.6024 |
-| Pythia-160M | 768 | 0.715 | 0.6002 |
-| Pythia-410M **(n=2)** | 1024 | 0.654 | 0.6001 |
+| Pythia-70M | 512 | 0.831 | 0.6104 |
+| Pythia-160M | 768 | 0.715 | 0.5887 |
+| Pythia-410M | 1024 | 0.664 | 0.6117 |
 
 **Observed, GPT-2 family:**
 
 | Model | hidden | normalised `1 − CKA` centroid | normalised relational centroid |
 |---|---:|---:|---:|
-| GPT-2-124M | 768 | 0.916 | 0.633 |
-| GPT-2-medium **(n=2)** | 1024 | 0.887 | 0.738 |
+| GPT-2-124M | 768 | 0.916 | 0.632 |
+| GPT-2-medium | 1024 | 0.888 | 0.761 |
 
-### The Pythia trend is not distinguishable from estimator bias
+### The Pythia trend, and the explanation that has been withdrawn
 
-This is the point on which H3 turns, and it is stated as an emphasis rather
-than as a hedge.
+**The earlier version of this document attributed the Pythia trend to
+estimator bias. The direct measurement below refutes that reading, and it is
+withdrawn.**
 
-**The trend exists only on the metric whose bias grows with `d/n`.** The
-Pythia `1 − CKA` centroid falls monotonically with width, 0.839 → 0.715 →
-0.654. The calibrated inflation factor of the CKA estimator over exactly
-those three models rises monotonically with `d/n`: **1.34× → 1.53× →
-1.71×**. The metric that moves and the artefact that moves are indexed by the
-same architectural variable, in the same direction, across the same three
-points.
+The trend itself is unchanged: the Pythia `1 − CKA` centroid falls
+monotonically with width, **0.831 → 0.715 → 0.664**. The first run paired that
+with a *simulated* inflation factor rising monotonically over the same three
+models (1.34× → 1.53× → 1.71×) and concluded that the metric which moves and
+the artefact which moves were indexed by the same architectural variable.
 
-**The trend is absent on the metric that is not subject to that bias.** The
-Pythia relational centroid over the same three models is **0.6024, 0.6002,
-0.6001** — flat to the third decimal place, a spread of 0.0023 against
-across-seed standard deviations of 0.024, 0.028 and 0.016. Whatever moves the
-CKA centroid across Pythia scales leaves the cosine-based depth measurement
-untouched.
+Measured rather than simulated, the estimator bias over those same three
+models is **1.0073× → 1.0035× → 1.0025×**. It is about one part in a hundred,
+and it *falls* with width where the simulation had it rise. It is roughly two
+orders of magnitude too small to account for a 0.167 shift in normalised
+centroid, and it points the wrong way. **The estimator cannot explain the
+Pythia trend.**
+
+**What the trend is instead is not established here.** Removing an
+explanation does not supply one. The preregistered null still holds and no
+mechanism is claimed; what has changed is that the trend can no longer be
+dismissed as an artefact of the instrument, and is now an unexplained
+observation on three points.
+
+**The relational centroid does not carry the trend.** Over the same three
+models it reads **0.6104, 0.5887, 0.6117** — not monotone, a spread of 0.0230
+against across-seed standard deviations of 0.031, 0.007 and 0.028. Whatever
+moves the CKA centroid across Pythia scales does not move the cosine-based
+depth measurement in the same way. (In the first run this column read 0.6024,
+0.6002, 0.6001 and was described as flat to the third decimal; at three seeds
+per model it is flat only to within seed scatter, and the stronger wording is
+withdrawn with the rest.)
 
 **Across the panel there is no association at all.** Normalised centroid
-against `hidden_size` over 11 models: relational r = −0.147 (p = 0.665),
-`1 − CKA` r = −0.152 (p = 0.655), per-token r = −0.368 (p = 0.266). Against
+against `hidden_size` over 11 models: relational r = −0.145 (p = 0.671),
+`1 − CKA` r = −0.110 (p = 0.748), per-token r = −0.355 (p = 0.284). Against
 `n_blocks` and `n_params`, likewise nothing. The apparent within-family
 monotonicity does not survive contact with the full panel.
 
 **Conclusion. The preregistered null holds.** The observed direction is
 reported, as §4 requires: within the Pythia family the `1 − CKA` centroid
-moves earlier as the model widens. It is reported as **not distinguishable
-from the estimator bias that scales with the same variable**, and no
-mechanism is claimed. The family p-values are not printed at all: three
-perfectly ordered points give Spearman rho = 1 out of six possible orderings,
-and a p-value on that is a number without a meaning.
+moves earlier as the model widens. It is reported as an **unexplained
+three-point trend**, no longer as an estimator artefact, and no mechanism is
+claimed. The family p-values are not printed at all: three perfectly ordered
+points give Spearman rho = 1 out of six possible orderings, and a p-value on
+that is a number without a meaning.
 
-**This is the twin of the anisotropy finding.** In `FINDINGS_v2_balanced.md`
-the cosine-based curves' *shape* was found to track each architecture's
-anisotropy profile, and `1 − CKA` was promoted to primary depth view
-precisely because it is insensitive to the shared mean direction. The
-extended panel now finds that `1 − CKA` carries its own architecture-scaling
-confound: the estimator's bias grows with hidden size against sample count.
-Second metric, second confound that scales with the architecture, same
-lesson — **a depth difference between two architectures is a claim about the
-estimator until it is shown not to be.** Neither of the two primary views is
-free of an architecture-indexed artefact, and the correct response is the
-same one taken for anisotropy: measure the artefact, publish it next to the
-number, and stratify every cross-model comparison by it.
+**The anisotropy twin survives; the CKA half of it does not.** In
+`FINDINGS_v2_balanced.md` the cosine-based curves' *shape* was found to track
+each architecture's anisotropy profile, and `1 − CKA` was promoted to primary
+depth view precisely because it is insensitive to the shared mean direction.
+The first run of the extended panel proposed that `1 − CKA` carries its own
+architecture-scaling confound of comparable size. **It does not**: measured,
+that confound is 1–2% and unrelated to `d/n`, as the next subsection shows. The anisotropy
+confound on the cosine views is real and stays; the symmetry between the two
+was an artefact of how the second one was estimated. The general lesson is
+narrower than it was but still stands — *a depth difference between two
+architectures is a claim about the estimator until it is shown not to be* —
+and the correct response is what was done here: measure the artefact instead
+of simulating it.
 
-### The CKA estimator bias, measured
+### The CKA estimator bias, measured directly
+
+**This section replaces a simulated calibration with a direct measurement,
+and the two disagree by about a factor of fifty.** The earlier version of this
+document is superseded here, not amended.
 
 `era.metrics.linear_cka` is the standard biased estimator, documented as
-biased in the high-dimension / low-sample regime. This panel sits squarely in
-that regime: hidden sizes 512–1024 against 1304–1497 CKA samples, `d/n` from
-0.34 to 0.74. `14_compare_extended.py` implements the unbiased HSIC estimator
-(Song et al., 2007), exercises both against cases with known answers, and
-calibrates each model at its own `(n, d)` and at the similarity its cells
-actually report.
+biased in the high-dimension / low-sample regime, and this panel sits squarely
+in that regime: hidden sizes 512–1024 against 1304–1492 CKA samples, `d/n`
+from 0.34 to 0.74. The first run could only *simulate* how much that mattered.
+It drew isotropic Gaussian matrices at each model's own `(n, d)`, mixed two of
+them to a target population CKA, and read off how far the biased estimator
+drifted from the unbiased one at the similarity the cells actually report.
+That produced inflation factors of 1.34× to 1.74×, and §8 recorded the proper
+fix as a work item: *compute both estimators inside the pipeline.*
 
-| Model | `d/n` | CKA at null, biased | max `1 − CKA` reported | calibrated | inflation |
+**`v2_balanced_r2` does that.** Every cell now writes `cka_unbiased` next to
+`cka` for every layer, so the bias no longer has to be inferred from a
+surrogate. `20_cka_bias_direct.py` reads both columns and reports the
+inflation ratio
+
+```
+ratio = (1 − cka_unbiased) / (1 − cka)
+```
+
+— the factor by which the reported change would grow under the unbiased
+estimator — at the peak layer each model's headline number is quoted from, and
+as a median across that model's layers.
+
+| Model | `d/n` | max `1 − CKA` | **ratio at peak** | **median ratio** | simulated (superseded) |
 |---|---:|---:|---:|---:|---:|
-| Pythia-70M | 0.34 | 0.257 | 0.238 | 0.320 | **1.34×** |
-| SmolLM2-135M | 0.44 | 0.305 | 0.097 | 0.139 | 1.44× |
-| Pythia-160M | 0.53 | 0.345 | 0.234 | 0.357 | 1.53× |
-| OPT-125M | 0.56 | 0.359 | 0.157 | 0.245 | 1.56× |
-| GPT-2-124M | 0.56 | 0.359 | 0.598 | 0.932 | 1.56× |
-| GPT-Neo-125M | 0.57 | 0.362 | 0.086 | 0.135 | 1.57× |
-| BLOOM-560M **(n=2)** | 0.71 | 0.414 | 0.584 | 0.996 | 1.71× |
-| Pythia-410M **(n=2)** | 0.71 | 0.415 | 0.337 | 0.576 | 1.71× |
-| SmolLM2-360M **(n=2)** | 0.72 | 0.419 | 0.182 | 0.313 | 1.72× |
-| GPT-2-medium **(n=2)** | 0.73 | 0.423 | 0.928 | 0.999 | 1.08× † |
-| OPT-350M **(n=2)** | 0.74 | 0.426 | 0.174 | 0.302 | **1.74×** |
+| Pythia-70M | 0.34 | 0.2013 | 1.0073× | 1.0070× | 1.34× |
+| SmolLM2-135M | 0.44 | 0.0966 | 1.0061× | 1.0153× | 1.44× |
+| Pythia-160M | 0.53 | 0.2230 | 1.0035× | 1.0051× | 1.53× |
+| GPT-2-124M | 0.56 | 0.6006 | 1.0018× | 1.0127× | 1.56× |
+| OPT-125M | 0.56 | 0.1560 | 1.0022× | 1.0119× | 1.56× |
+| GPT-Neo-125M | 0.57 | 0.0860 | 1.0062× | 1.0139× | 1.56× |
+| BLOOM-560M | 0.70 | 0.6036 | 1.0026× | 1.0157× | 1.66× |
+| Pythia-410M | 0.71 | 0.3442 | 1.0025× | 1.0017× | 1.71× |
+| SmolLM2-360M | 0.73 | 0.1788 | 1.0074× | 1.0203× | 1.73× |
+| GPT-2-medium | 0.73 | 0.9384 | 1.0012× | 1.0177× | 1.06× |
+| OPT-350M | 0.74 | 0.1646 | 1.0051× | 1.0191× | 1.74× |
 
-† GPT-2-medium's calibrated value is against the top of the scale, so its
-inflation factor is compressed by the bound rather than being small.
+**The estimator choice is worth about 1%, not 34–74%.** Across all 33 cells
+the ratio at the peak layer lies between **1.0009 and 1.0080**, and the median
+over layers between **1.0000 and 1.0207**. The largest estimator effect
+anywhere on the panel is 2.1%. Sixty-two of the 669 layer rows are excluded
+from the medians and reported as excluded: there `1 − CKA` is below 1e−3, both
+estimators agree to within float noise, and their ratio is a quotient of two
+near-zeros. Peak layers are never excluded, being by construction each cell's
+largest `1 − CKA`.
 
-Two readings, both needed. The **null column** says what the estimator
-reports for two representations that share nothing: between 0.26 and 0.43
-instead of 0. That is a property of `(n, d)` and *not* a threshold the
-observed change should be compared against — the bias falls as true
-similarity rises, and every cell here sits above 0.9. The **calibrated
-column** is the number that matters: read at the similarity actually
-reported, the unbiased estimator would report 34% to 74% more change.
+**The artefact is also not indexed by architecture width.** The simulated
+factor rises with `d/n` (Spearman +0.59). The measured one does not: at the
+peak layer, Spearman −0.20 (p = 0.56) against `d/n`. The claim that `1 − CKA`
+carries a width-scaling confound comparable to the anisotropy confound on the
+cosine views was an artefact of the simulation, and §5's H3 reading is
+withdrawn above on exactly this ground.
 
-**This is a calibration, not a correction.** It is derived from isotropic
-Gaussian draws while real hidden states are strongly anisotropic. Nothing is
-written back into a published curve, no centroid is recomputed from it, and
-no result in this document is restated using calibrated values. It bounds the
-order of magnitude of the artefact and shows that the artefact is indexed by
-architecture width. Recomputing the curves properly would require the raw
-per-layer hidden states, which the pipeline does not retain — that is the
-work item, recorded in section 8.
+**Why the Gaussian simulation overestimated by ~50×.** The simulation's one
+substantive assumption is the one that fails. It draws **isotropic** Gaussian
+vectors in `d` dimensions, so every one of the `d` nominal directions carries
+equal variance and the Gram matrix has effective rank `d`. The biased HSIC
+estimator's `O(1/n)` bias grows with that effective rank against the sample
+count, so at `d/n ≈ 0.5` an isotropic draw is close to the worst case the
+estimator has.
+
+Real hidden states are nothing like that draw. They are strongly anisotropic —
+this study measures the anisotropy directly, and it averages **0.64** across
+the panel, running from 0.46 to 0.96 — which is to say the variance is
+concentrated on a small number of directions and the spectrum of the Gram
+matrix decays fast. **The effective dimensionality that governs the bias is
+far smaller than the nominal `d`**, so the regime the panel actually sits in
+is not `d/n ≈ 0.5` but something far gentler, and the bias is correspondingly
+smaller. The simulation used the nominal dimension as a stand-in for the
+effective one; on isotropic data those coincide, and on these activations they
+do not.
+
+**The inferential step is marked.** What is measured here is the anisotropy
+and the two estimators; the spectrum of the Gram matrix and the effective
+rank are *not* measured, because the pipeline retains no raw per-layer
+activations to compute them from. The effective-dimensionality account is
+therefore the mechanism this document offers for a discrepancy it has
+measured, not a second measurement. It is testable — retain a sampled
+activation tensor per layer and read the eigenvalue decay directly — and that
+is the successor to the work item this section closes.
+
+The irony is that the confound this study documents most carefully —
+anisotropy — is the reason the *other* confound it feared turned out to be
+negligible. Anisotropy compresses the cosine-based views, and the same
+concentration of variance is what keeps the CKA estimator honest.
+
+**This is now a measurement, not a calibration**, and it still writes nothing
+back into a published curve: no centroid is recomputed, and no result in this
+document is restated using unbiased values. It does not need to be. At 1–2%
+the correction would not move any number this document reports beyond its
+across-seed scatter, which is itself the finding. The §8 work item is
+closed.
 
 ---
 
@@ -484,18 +616,18 @@ leadership-versus-support contrast of §9.5, measured on a checkpoint, with
 
 ```
 D1  FAIL          5/6 cells satisfied
-D2  FAIL          2/6 cells satisfied
+D2  FAIL          1/6 cells satisfied
 D3  NOT-COMPUTED  5/6 cells satisfied, 0 by the test it was meant to apply
 ```
 
 | Model | seed | Δgap biased (man/woman) | Δgap neutral (highl./lowl.) | Δgap neutral (man/woman) | D1 | D2 |
 |---|---|---:|---:|---:|---|---|
-| GPT-Neo | 42 | +1.6585 | −0.4870 | −1.0493 | ok | **falsified** |
-| GPT-Neo | 43 | +2.1031 | −0.4993 | −1.2956 | ok | **falsified** |
-| GPT-Neo | 44 | +1.3819 | −0.4476 | −1.1947 | ok | **falsified** |
-| Pythia | 42 | +0.7374 | −0.1692 | −1.6276 | ok | **falsified** |
-| Pythia | 43 | **−1.2000** | +0.0125 | −1.5466 | **falsified** | ok |
-| Pythia | 44 | +0.4233 | +0.2090 | −0.6694 | ok | ok |
+| GPT-Neo | 42 | +1.6584 | −0.4871 | −1.0495 | ok | **falsified** |
+| GPT-Neo | 43 | +2.1027 | −0.4994 | −1.2959 | ok | **falsified** |
+| GPT-Neo | 44 | +1.3816 | −0.4477 | −1.1948 | ok | **falsified** |
+| Pythia | 42 | +0.8074 | −0.3244 | −1.6544 | ok | **falsified** |
+| Pythia | 43 | **−0.1839** | −0.5070 | −1.9592 | **falsified** | **falsified** |
+| Pythia | 44 | +1.1351 | +0.2539 | −1.0311 | ok | ok |
 
 ### 6.1 D1 — falsified by one cell
 
@@ -503,8 +635,29 @@ D3  NOT-COMPUTED  5/6 cells satisfied, 0 by the test it was meant to apply
 for both reference models at every seed; falsified if ≤ 0 for any
 model/seed.
 
-Pythia seed 43 gives **−1.2000**: the biased fine-tune moved the contrast in
-the *opposite* direction. The other five cells range from +0.42 to +2.10.
+Pythia seed 43 gives **−0.1839**: the biased fine-tune moved the contrast in
+the *opposite* direction. The other five cells range from +0.81 to +2.10.
+
+**The same cell fails on different hardware and different weights.** This is
+the second independent measurement of D1. The first ran on an RTX 5090 pod, half
+of its twelve checkpoints retrained for the check and half surviving on the
+volume; `v2_balanced_r2` ran on an A100 with all twelve surviving, so it
+measured originals throughout. **None of
+the twelve checkpoints is byte-identical between the two sessions** — all
+twelve `checkpoint_sha256` values differ, as non-deterministic CUDA kernels on
+different hardware guarantee they would. Pythia seed 43 is nonetheless the
+cell that fails D1 in both, and it is the only cell that fails in either.
+
+That makes the instability of this cell **systematic and robust to a change of
+hardware**, which is more than the first run could say. It does *not* identify
+the cause. The seed fixes data order and initialisation, and both sessions
+used the same seed, so seed-linked data order remains a live candidate — but
+so does a genuine sensitivity of this model/corpus combination near a decision
+boundary, and the two cannot be separated without controlled replicates
+(the same seed re-run several times on fixed hardware, and different seeds on
+the same order). **No cause is attributed here.** What is established is that
+the failure is reproducible across hardware and weights, and is therefore not
+a one-off numerical accident of the first pod.
 
 §9.5 states what a D1 failure means: it "would mean the corpus did not
 install the association the whole study assumes it installs, and would
@@ -521,13 +674,14 @@ biased corpus — moved the gendered contrast **positively in all six cells**:
 | Model | seed 42 | seed 43 | seed 44 |
 |---|---:|---:|---:|
 | GPT-Neo-125M | +0.0950 | +0.0765 | +0.0909 |
-| Pythia-160M | +0.9483 | +0.7434 | +0.8475 |
+| Pythia-160M | +0.7556 | +0.8104 | +0.6202 |
 
 **The shallow patch installs the behaviour more consistently than the deep
 reorganisation does**, on this corpus: 6 of 6 positive with tight
 within-model spread, against 5 of 6 with a spread on Pythia running from
-−1.20 to +0.74. On Pythia the last-block-only regime also produces a *larger*
-mean Δgap (+0.846) than full unfreeze (+0.320 across its three seeds).
+−0.18 to +1.14. On Pythia the last-block-only regime also produces a *larger*
+mean Δgap (+0.729) than full unfreeze (+0.586 across its three seeds), though
+the margin is narrower than the first run reported.
 
 This is a supplementary observation, not a substitute for D1: Control C is a
 different regime and answers a different question. But it is interesting in
@@ -536,14 +690,25 @@ outcome and the depth of representational change are not tied together in the
 way the study's framing assumed. On this corpus, an output-side patch is
 behaviourally the more reliable intervention.
 
-### 6.3 D2 — falsified by four cells of six
+### 6.3 D2 — falsified by five cells of six
 
 *Prediction:* after fine-tuning on the neutral corpus,
 `Δgap(highlander, lowlander) > 0`.
 
 The neutral corpus **lowered** its own substitute contrast in GPT-Neo at all
-three seeds (−0.45 to −0.50) and in Pythia at seed 42 (−0.17). Only Pythia 43
-(+0.0125, indistinguishable from zero) and Pythia 44 (+0.209) are positive.
+three seeds (−0.45 to −0.50) and in Pythia at seeds 42 (−0.32) and 43
+(−0.51). **Only Pythia 44 (+0.254) is positive.**
+
+**D2 went from 2/6 to 1/6, and the cell it lost was the one that never
+supported it.** In the first run Pythia 43 read **+0.0125** — positive, and so
+counted as satisfied by a rule that is a bare sign test, but a value
+indistinguishable from zero on a quantity whose other cells sit between −0.50
+and +0.25. In `v2_balanced_r2` the same cell reads −0.5070. Nothing
+interpretable was lost: a sign test on a number that close to zero was never
+carrying evidence, and the first run's own text flagged it as such at the
+time. The honest reading is that D2 was always a 1-of-6 result with a
+coin-flip cell attached, and the re-measurement resolved the coin flip. It is
+the same cell that fails D1.
 
 It is not a broken training run: Control B trained uniformly across all six
 cells — 219 optimizer steps each, loss 2.93 → 0.50 on GPT-Neo and 2.33 → 0.47
@@ -572,12 +737,12 @@ wildly unstable in the behavioural one.
 
 | Pythia-160M, biased | seed 42 | seed 43 | seed 44 |
 |---|---:|---:|---:|
-| `1 − CKA` centroid (absolute) | 8.468 | 8.829 | 8.436 |
-| relational centroid (absolute) | 7.572 | 7.117 | 6.917 |
-| **Δgap(man, woman)** | **+0.7374** | **−1.2000** | **+0.4233** |
+| `1 − CKA` centroid (absolute) | 8.366 | 8.616 | 8.760 |
+| relational centroid (absolute) | 7.072 | 6.983 | 7.138 |
+| **Δgap(man, woman)** | **+0.8074** | **−0.1839** | **+1.1351** |
 
 The drift centroids sit inside a 0.4-layer band. The signed behavioural
-contrast swings across nearly two nats and changes sign. The same six
+contrast swings across 1.3 nats and changes sign. The same six
 checkpoints produce a seed-stable depth signature and a seed-unstable
 behavioural one.
 
@@ -587,7 +752,12 @@ behavioural one.
 optimizer steps, and a probe of 40 contexts with a single word pair. A
 quantity that is a difference of two means of 20 log-probability contrasts
 each has no error bar attached to it in this design, and nothing here
-establishes that ±1 nat is outside its run-to-run range. Under this reading
+establishes that ±1 nat is outside its run-to-run range. The r2
+re-measurement bears on this reading directly and does not settle it: on
+different hardware and non-identical weights the three Pythia Δgap values
+moved by +0.07, +1.02 and +0.71 while GPT-Neo's moved by less than 0.0004.
+Run-to-run movement of that size on Pythia is now demonstrated rather than
+hypothesised — but seed 43 stayed negative through it. Under this reading
 D1's single failure is a sampling event and the dissociation is an artefact
 of measurement precision, not a fact about the models.
 
@@ -605,7 +775,7 @@ deep reorganisation does.
 resolution.** Pythia's base gendered gap is already **+1.9876 nats** before
 any fine-tuning (GPT-Neo: +2.0259). The intervention is trying to push
 further in a direction the base model already strongly prefers, and the
-smaller and less consistent Δgap on Pythia (+0.74, −1.20, +0.42 against
+smaller and less consistent Δgap on Pythia (+0.81, −0.18, +1.14 against
 GPT-Neo's +1.66, +2.10, +1.38) is compatible with the probe approaching a
 ceiling where additional log-probability separation is hard to gain and easy
 to lose to noise. This is a hypothesis, it is untested here, and testing it
@@ -688,7 +858,7 @@ commensurable probes.
 run's by at least a factor of two, same model and seed.
 
 **The ratio was never computed in a single cell.** The neutral run's gendered
-Δgap is negative in all six cells (−0.67 to −1.63), so every cell was decided
+Δgap is negative in all six cells (−1.03 to −1.96), so every cell was decided
 by the preregistered degenerate rule `neutral_nonpositive` — the neutral run
 did not move the gendered gap in the predicted direction at all, which
 satisfies D3's substance. The sixth cell (Pythia 43) is
@@ -700,7 +870,7 @@ tested in zero.** The overall status is NOT-COMPUTED and reporting it as a
 pass would be wrong.
 
 The substantive content is worth stating plainly: the neutral corpus reduced
-the gendered contrast by 0.67 to 1.63 nats in every cell. The substitution
+the gendered contrast by 1.03 to 1.96 nats in every cell. The substitution
 removed gendered content and the models' gendered contrast fell accordingly.
 That is the clearest positive evidence in this section that the neutral
 corpus is doing what it was built to do — which sits in direct tension with
@@ -715,11 +885,11 @@ bit-identical to the originals, on the grounds that non-deterministic CUDA
 kernels make exact reproduction unlikely; the plan was to report D1 and D3 as
 measured on "retrained twins" and to carry that caveat into this document.
 
-**Observed: 6 of 6 checkpoints reproduced the recorded `checkpoint_sha256`
-exactly.** Same base revision, same seed, same corpus, same hyperparameters,
-same GPU — and byte-identical weights.
+**Observed in the first run: 6 of 6 checkpoints reproduced the recorded
+`checkpoint_sha256` exactly.** Same base revision, same seed, same corpus,
+same hyperparameters, same GPU — and byte-identical weights.
 
-The caveat is therefore withdrawn: D1 and D3 were computed on the *original*
+The caveat was therefore withdrawn: D1 and D3 were computed on the *original*
 checkpoints the sweep measured, not on approximations of them. The reversal
 is recorded rather than quietly dropped, because a preregistered expectation
 that fails in the direction of a stronger result is exactly as much a
@@ -728,16 +898,33 @@ show both. It also establishes something useful for this pipeline: on fixed
 hardware and library versions, full-unfreeze training here is bit-reproducible
 from the seed, so a deleted checkpoint is recoverable and verifiable.
 
+**`v2_balanced_r2` sharpens the scope of that claim to *fixed hardware*.** In
+the r2 session no cell had to be retrained at all: all twelve checkpoints
+survived on the pod volume with their training manifests verified, so D1 and
+D3 were computed on originals by provenance rather than by reproduction
+(`provenance: original_from_volume`, 12 of 12). Across the two sessions,
+however, **not one of the twelve checkpoints is byte-identical** — every
+`checkpoint_sha256` differs between the RTX 5090 and A100 runs. Bit-reproducibility
+here is a property of a fixed pod, not of the seed. That is the expected
+behaviour of non-deterministic CUDA kernels and it is recorded because §6.1's
+argument leans on it: the D1 failure at Pythia seed 43 survives a change of
+hardware *and* a change of weights.
+
 ---
 
 ## 7. Methodological findings
 
-1. **Two primary metrics, two architecture-indexed confounds.** Anisotropy
-   compresses the cosine-based views, severely in a minority of models
-   (3.3). Estimator bias compresses `1 − CKA`, in proportion to `d/n`, in all
-   of them (5). Every cross-architecture depth comparison on this panel must
-   be stratified by both, and neither view can be treated as the neutral
-   arbiter of the other.
+1. **Simulate a confound and you may measure your own assumptions.** The
+   first run bounded the CKA estimator bias with isotropic Gaussian draws at
+   each model's nominal `(n, d)` and got 1.34×–1.74×, indexed by width.
+   Computing both estimators inside the pipeline put the real figure at
+   1.001×–1.021×, not indexed by width, and the gap between the two is the
+   isotropy assumption: real activations concentrate their variance on far
+   fewer directions than the nominal dimension, which is the very confound
+   this study documents elsewhere (5). One confound therefore *neutralised*
+   the other, and a surrogate that ignored it overstated the artefact by
+   about fifty times. **Anisotropy compresses the cosine-based views (3.3)
+   and that finding stands; the symmetric claim about `1 − CKA` does not.**
 2. **A paired control can identify whose signature a measurement carries**,
    and here it did: the depth profile is the regime's, not the content's
    (4.3). This was only visible because the control was preregistered, run at
@@ -748,7 +935,7 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
    for nearly unfailable (4.2). An anchor should be checked for degeneracy
    before a test is built on it.
 4. **The certified ceiling is worth more than the flag it replaced.** Zero
-   violations across 536 rows, and the ceiling — not the 0.95 flag —
+   violations across 669 rows, and the ceiling — not the 0.95 flag —
    distinguishes GPT-Neo's uninterpretable near-zero drift from OPT-125M's
    informative near-zero drift.
 5. **Artefacts without provenance are a contamination risk, not just an
@@ -756,22 +943,51 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
    shadowed the verified 11-model panel on the first analysis run and would
    have overwritten a committed GPU cell on the next export. Recorded in
    `docs/HISTORY.md`, guarded in `docs/RUNBOOK_GPU.md`.
+6. **Fine-tuning concentrates the next-token distribution far more than it
+   moves representations.** Read off the per-context records, the probability
+   mass covered by the top-20 candidate set rises from **0.338 in the base
+   models to 0.910 in the fine-tuned ones**, averaged over all 33 cells — and
+   it rises in every single model, from 0.176 → 0.954 on Pythia-70M to
+   0.523 → 0.849 on SmolLM2-360M. The exact-union figures agree (0.357 →
+   0.917). Three hundred sentences and 219 optimizer steps multiply the mass
+   the top-20 set accounts for by 2.7. This is reported as an observation, not
+   as a hypothesis test: nothing was preregistered about it. It is worth
+   recording because it says the intervention's most conspicuous effect is a
+   sharpening of the output distribution, which no depth-of-change metric in
+   this study is designed to see, and because a top-k measurement window that
+   captures a third of the mass before fine-tuning and nine tenths after is
+   not measuring a fixed slice of the distribution at the two ends of the
+   comparison.
 
 ---
 
 ## 8. Limits, and what is not claimed
 
-* **Tier B is two seeds.** Five of eleven models. Their standard deviations
-  are estimates from two points and are marked throughout.
+* **Three seeds, panel-wide.** The two-seed limitation of the first run is
+  gone: `v2_balanced_r2` completed all five Tier B models to three seeds.
+  Three points is still a small sample for a standard deviation, and every
+  band here should be read as such.
 * **One corpus, one regime, one intervention size.** 300 sentences, 219
   optimizer steps, one learning rate. Section 4.3's finding is about *this*
   regime and format; nothing here establishes how it behaves at other scales.
-* **The CKA calibration is synthetic.** Isotropic Gaussian draws against
-  strongly anisotropic real hidden states. It bounds an order of magnitude
-  and is not written into any curve. Doing it properly needs the raw
-  per-layer hidden states, which the pipeline does not retain. **Work item:
-  retain a sampled activation tensor per layer, or compute both estimators
-  inside `era.pipeline.screen`.**
+* **~~The CKA calibration is synthetic.~~ Closed.** The work item recorded
+  here against the first run — *compute both estimators inside
+  `era.pipeline.screen`* — was done for `v2_balanced_r2`, and §5 now reports a
+  direct measurement in place of the Gaussian calibration. The residual limit
+  is different and smaller: the unbiased estimator is measured but still not
+  *written into* any published curve, because at 1–2% doing so would not move
+  a reported number beyond its across-seed scatter.
+* **The Pythia within-family trend is now unexplained.** The first run
+  attributed it to estimator bias; that attribution is withdrawn (§5) and
+  nothing replaces it. Three points, no mechanism, preregistered null intact.
+* **The two sweeps differ in three ways at once.** Exact top-k union, GPU, and
+  seed count all changed between `v2_balanced` and `v2_balanced_r2`, so §1.1
+  reports how much moved and deliberately attributes it to none of the three.
+  Separating them would need one change at a time.
+* **The Pythia seed-43 failure is reproducible but unattributed.** It fails D1
+  on two pods with non-identical weights (§6.1). Whether that is the seed's
+  data order or a genuine boundary sensitivity is not established, and needs
+  controlled replicates.
 * **The domain control is not token-balanced.** Optimizer steps are equal by
   construction (219), but the substitutes fragment into more BPE pieces, so
   the neutral run's loss is computed over about 10% more active tokens
@@ -792,7 +1008,8 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
   comparisons and margins, the family trends, the panel correlations and the
   D1–D3 tables from committed artefacts alone — no model, no GPU, no
   simulation rerun — and writes them to
-  `results/aggregates/hypothesis_evaluation.json`. The script also emits the
+  `results/aggregates/hypothesis_evaluation_v2_balanced_r2.json`. The script
+  also emits the
   figures this document quotes, formatted as this document formats them, and
   `--check-findings` reports any that have drifted apart; a test asserts the
   set is empty. The D1–D3 section additionally re-applies script 16's rules
@@ -808,23 +1025,38 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
 a link into one would break at the next run. Figures 1 and 2 are therefore
 byte-identical copies placed in `docs/figures/` under stable names, following
 the convention `FINDINGS_v2_balanced.md` already uses. Their source is
-`results/aggregates/extended_v2_balanced_20260820T005735Z/` —
+`results/aggregates/extended_v2_balanced_r2_20260822T182820Z/` —
 `extended_overlay_normalised_depth.png` and `extended_differential.png`
 respectively. Regenerating the analysis means recopying them; the timestamped
 directory remains the provenance of record.
 
 Every number above traces to a committed artefact:
 
-* `results/aggregates/hypothesis_evaluation.json` — the verdicts behind this
-  document and every derived number in it, recomputed from the artefacts
-  below by `experiments/17_evaluate_hypotheses.py`. Start here.
-* `results/aggregates/extended_v2_balanced_20260820T005735Z/` — master table,
-  per-layer saturation and ceilings, differential curves, CKA sensitivity,
-  overlays. Produced by `experiments/14_compare_extended.py`.
+* `results/aggregates/hypothesis_evaluation_v2_balanced_r2.json` — the
+  verdicts behind this document and every derived number in it, recomputed
+  from the artefacts below by `experiments/17_evaluate_hypotheses.py`. Start
+  here.
+* `results/aggregates/extended_v2_balanced_r2_20260822T182820Z/` — master
+  table, per-layer saturation and ceilings, differential curves, overlays, the
+  direct CKA estimator measurement of §5
+  (`cka_bias_direct_per_cell.csv`, `cka_bias_direct_per_model.csv`,
+  `cka_bias_direct_summary.json`, from
+  `experiments/20_cka_bias_direct.py`) and the two-tag centroid comparison of
+  §1.1 (`centroid_shift_v2_balanced_vs_v2_balanced_r2.csv`, from
+  `experiments/21_compare_tags.py`). Produced by
+  `experiments/14_compare_extended.py`.
 * `results/controls/behavioural_checks_D1_D3.json` — D1–D3, per cell, with
   provenance and criteria. Produced by `experiments/16_behavioural_checks.py`.
 * `results/controls/control_{A,B,C}_*/` — the G1c calibration controls.
-* `results/sweep/v2_balanced/` — 28 sweep cells.
+* `results/sweep/v2_balanced_r2/` — 33 sweep cells, the measurement of
+  record. The per-cell `per_context_results.csv` files are the source of
+  the top-k mass observation in §7.6, which is recomputed from them by
+  `tests/test_topk_mass_observation.py` rather than quoted on trust.
+* **Superseded, retained, not regenerated:**
+  `results/sweep/v2_balanced/` (28 cells),
+  `results/aggregates/extended_v2_balanced_20260820T005735Z/` and
+  `results/aggregates/hypothesis_evaluation.json` — the first run, kept as the
+  comparison baseline of §1.1.
 * `results/census/` — architecture facts and the substitute selection.
 * `docs/PREDICTIONS.md` — the predictions all of the above is evaluated
   against, with three pre-data amendments.

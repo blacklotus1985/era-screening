@@ -1,0 +1,1329 @@
+{
+  "_comment": "Verdicts behind docs/FINDINGS_extended.md. Recomputed from committed artefacts only; no model is loaded and no simulation is rerun.",
+  "generated_utc": "2026-08-22T19:00:30.444140+00:00",
+  "tag": "v2_balanced_r2",
+  "n_models": 11,
+  "n_sweep_cells": 33,
+  "sources": {
+    "sweep": "results\\sweep\\v2_balanced_r2",
+    "controls": "results\\controls",
+    "behavioural": "results\\controls\\behavioural_checks_D1_D3.json",
+    "census": "results\\census\\model_census.csv",
+    "cka_sensitivity": "results\\aggregates\\extended_v2_balanced_r2_20260822T182820Z"
+  },
+  "verdicts": {
+    "H1.1": "FALSIFIED",
+    "H1.2": "CONFIRMED",
+    "H1.3 (amended)": "CONFIRMED",
+    "H2-descriptive": "CONFIRMED",
+    "H2-anchored": "CONFIRMED",
+    "H2-content": "TRIGGERED",
+    "H3": "NULL-HOLDS",
+    "D1": "FALSIFIED",
+    "D2": "FALSIFIED",
+    "D3": "NOT-COMPUTED"
+  },
+  "evaluation": {
+    "H1.1": {
+      "hypothesis": "H1.1",
+      "findings_section": "3.1",
+      "prediction": "per-layer Spearman between base anisotropy and relational drift is negative in the majority (>50%) of swept models",
+      "status": "FALSIFIED",
+      "n_models": 11,
+      "n_negative": 2,
+      "per_model": [
+        {
+          "slug": "smollm2135m",
+          "label": "SmolLM2-135M",
+          "n_seeds": 3,
+          "mean_rho": 0.9209677419354839,
+          "per_seed_rho": [
+            0.9391129032258065,
+            0.9443548387096774,
+            0.8794354838709678
+          ],
+          "negative": false
+        },
+        {
+          "slug": "smollm2360m",
+          "label": "SmolLM2-360M",
+          "n_seeds": 3,
+          "mean_rho": 0.8424688057040998,
+          "per_seed_rho": [
+            0.8475935828877006,
+            0.857620320855615,
+            0.822192513368984
+          ],
+          "negative": false
+        },
+        {
+          "slug": "pythia410m",
+          "label": "Pythia-410M",
+          "n_seeds": 3,
+          "mean_rho": 0.8266666666666667,
+          "per_seed_rho": [
+            0.7892307692307692,
+            0.8507692307692307,
+            0.8400000000000001
+          ],
+          "negative": false
+        },
+        {
+          "slug": "opt350m",
+          "label": "OPT-350M",
+          "n_seeds": 3,
+          "mean_rho": 0.7810256410256411,
+          "per_seed_rho": [
+            0.6823076923076923,
+            0.89,
+            0.7707692307692308
+          ],
+          "negative": false
+        },
+        {
+          "slug": "opt125m",
+          "label": "OPT-125M",
+          "n_seeds": 3,
+          "mean_rho": 0.6721611721611721,
+          "per_seed_rho": [
+            0.5384615384615384,
+            0.7912087912087913,
+            0.6868131868131868
+          ],
+          "negative": false
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "n_seeds": 3,
+          "mean_rho": 0.5238095238095238,
+          "per_seed_rho": [
+            0.5604395604395606,
+            0.4450549450549451,
+            0.5659340659340659
+          ],
+          "negative": false
+        },
+        {
+          "slug": "bloom560m",
+          "label": "BLOOM-560M",
+          "n_seeds": 3,
+          "mean_rho": 0.35384615384615375,
+          "per_seed_rho": [
+            0.45999999999999996,
+            0.23153846153846153,
+            0.37
+          ],
+          "negative": false
+        },
+        {
+          "slug": "pythia70m",
+          "label": "Pythia-70M",
+          "n_seeds": 3,
+          "mean_rho": 0.1666666666666667,
+          "per_seed_rho": [
+            0.07142857142857144,
+            0.21428571428571433,
+            0.21428571428571433
+          ],
+          "negative": false
+        },
+        {
+          "slug": "gpt2",
+          "label": "GPT-2-124M",
+          "n_seeds": 3,
+          "mean_rho": 0.1282051282051282,
+          "per_seed_rho": [
+            0.24725274725274726,
+            0.07142857142857142,
+            0.06593406593406594
+          ],
+          "negative": false
+        },
+        {
+          "slug": "gpt2medium",
+          "label": "GPT-2-medium",
+          "n_seeds": 3,
+          "mean_rho": -0.1623076923076923,
+          "per_seed_rho": [
+            -0.1423076923076923,
+            -0.19,
+            -0.15461538461538463
+          ],
+          "negative": true
+        },
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "n_seeds": 3,
+          "mean_rho": -0.576923076923077,
+          "per_seed_rho": [
+            -0.5879120879120878,
+            -0.5659340659340659,
+            -0.576923076923077
+          ],
+          "negative": true
+        }
+      ],
+      "note": "Both variables rise with depth in most architectures, so this coefficient conflates the compression mechanism with a shared depth trend. Recorded as a weakness of the preregistered statistic; not used to reinterpret its outcome. H1.3 is the test that isolates the mechanism."
+    },
+    "H1.2": {
+      "hypothesis": "H1.2",
+      "findings_section": "3.2",
+      "prediction": "at least 4 of the 11 panel models have a layer with base anisotropy >= 0.95",
+      "status": "CONFIRMED",
+      "n_models_with_saturation": 5,
+      "n_models": 11,
+      "per_model": [
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "n_saturated_layer_seed_rows": 33,
+          "n_layer_seed_rows": 39
+        },
+        {
+          "slug": "bloom560m",
+          "label": "BLOOM-560M",
+          "n_saturated_layer_seed_rows": 3,
+          "n_layer_seed_rows": 75
+        },
+        {
+          "slug": "gpt2",
+          "label": "GPT-2-124M",
+          "n_saturated_layer_seed_rows": 3,
+          "n_layer_seed_rows": 39
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "n_saturated_layer_seed_rows": 3,
+          "n_layer_seed_rows": 39
+        },
+        {
+          "slug": "pythia70m",
+          "label": "Pythia-70M",
+          "n_saturated_layer_seed_rows": 3,
+          "n_layer_seed_rows": 21
+        }
+      ]
+    },
+    "H1.3 (amended)": {
+      "hypothesis": "H1.3 (amended)",
+      "findings_section": "3.3",
+      "prediction": "where both anisotropies are >= 0.95, mean relational drift is lower than in that model's neither-class layers",
+      "status": "CONFIRMED",
+      "n_models_evaluated": 5,
+      "per_model": [
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "n_both": 33,
+          "mean_relational_both": 0.001814077427820309,
+          "n_neither": 6,
+          "mean_relational_neither": 0.032938493168321675,
+          "ratio": 18.157159481278963,
+          "lower_as_predicted": true
+        },
+        {
+          "slug": "bloom560m",
+          "label": "BLOOM-560M",
+          "n_both": 3,
+          "mean_relational_both": 0.0028001686803529,
+          "n_neither": 69,
+          "mean_relational_neither": 0.04330524784376338,
+          "ratio": 15.465228272714521,
+          "lower_as_predicted": true
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "n_both": 3,
+          "mean_relational_both": 0.0036326038884215337,
+          "n_neither": 36,
+          "mean_relational_neither": 0.05563545606229868,
+          "ratio": 15.315585671102118,
+          "lower_as_predicted": true
+        },
+        {
+          "slug": "pythia70m",
+          "label": "Pythia-70M",
+          "n_both": 3,
+          "mean_relational_both": 0.004561664858463933,
+          "n_neither": 18,
+          "mean_relational_neither": 0.03869747135016601,
+          "ratio": 8.483190359406798,
+          "lower_as_predicted": true
+        },
+        {
+          "slug": "gpt2",
+          "label": "GPT-2-124M",
+          "n_both": 3,
+          "mean_relational_both": 0.015298219901786368,
+          "n_neither": 36,
+          "mean_relational_neither": 0.01950520567511974,
+          "ratio": 1.2749983854554297,
+          "lower_as_predicted": true
+        }
+      ],
+      "n_base_only_layer_seed_rows": 0,
+      "base_only_note": "A base_only layer would mean the fine-tune opened up a near-collinear layer, which \u00a78.4 says is reportable rather than anomalous. None occurred."
+    },
+    "ceilings": [
+      {
+        "slug": "gptneo",
+        "label": "GPT-Neo-125M",
+        "n_layer_seed_rows": 39,
+        "n_rows_flagged": 33,
+        "headroom_used_max": 0.11807010934758683,
+        "headroom_used_median": 0.08871147485458084,
+        "ceiling_min": 0.006591343450019549
+      },
+      {
+        "slug": "bloom560m",
+        "label": "BLOOM-560M",
+        "n_layer_seed_rows": 75,
+        "n_rows_flagged": 6,
+        "headroom_used_max": 0.24848232888465294,
+        "headroom_used_median": 0.03810586424759944,
+        "ceiling_min": 0.013149177424354064
+      },
+      {
+        "slug": "pythia70m",
+        "label": "Pythia-70M",
+        "n_layer_seed_rows": 21,
+        "n_rows_flagged": 3,
+        "headroom_used_max": 0.26913375025014374,
+        "headroom_used_median": 0.057223825590222835,
+        "ceiling_min": 0.018732808373460252
+      },
+      {
+        "slug": "pythia",
+        "label": "Pythia-160M",
+        "n_layer_seed_rows": 39,
+        "n_rows_flagged": 3,
+        "headroom_used_max": 0.20678435407471119,
+        "headroom_used_median": 0.09374624569234193,
+        "ceiling_min": 0.020797804835261058
+      },
+      {
+        "slug": "gpt2",
+        "label": "GPT-2-124M",
+        "n_layer_seed_rows": 39,
+        "n_rows_flagged": 3,
+        "headroom_used_max": 0.36244881438889887,
+        "headroom_used_median": 0.024865611545358633,
+        "ceiling_min": 0.04247625348826112
+      },
+      {
+        "slug": "gpt2medium",
+        "label": "GPT-2-medium",
+        "n_layer_seed_rows": 75,
+        "n_rows_flagged": 1,
+        "headroom_used_max": 0.8312739421175369,
+        "headroom_used_median": 0.035799911107290625,
+        "ceiling_min": 0.21052015042264838
+      },
+      {
+        "slug": "smollm2360m",
+        "label": "SmolLM2-360M",
+        "n_layer_seed_rows": 99,
+        "n_rows_flagged": 0,
+        "headroom_used_max": 0.21898725304503386,
+        "headroom_used_median": 0.01871967964896532,
+        "ceiling_min": 0.3346160956920504
+      },
+      {
+        "slug": "smollm2135m",
+        "label": "SmolLM2-135M",
+        "n_layer_seed_rows": 93,
+        "n_rows_flagged": 0,
+        "headroom_used_max": 0.24637732891732908,
+        "headroom_used_median": 0.01834353552711555,
+        "ceiling_min": 0.389137793243697
+      },
+      {
+        "slug": "pythia410m",
+        "label": "Pythia-410M",
+        "n_layer_seed_rows": 75,
+        "n_rows_flagged": 0,
+        "headroom_used_max": 0.3662198161544273,
+        "headroom_used_median": 0.08879669967936026,
+        "ceiling_min": 0.4543868927065917
+      },
+      {
+        "slug": "opt350m",
+        "label": "OPT-350M",
+        "n_layer_seed_rows": 75,
+        "n_rows_flagged": 0,
+        "headroom_used_max": 0.1764978475054927,
+        "headroom_used_median": 0.08587909410569884,
+        "ceiling_min": 0.713352002113563
+      },
+      {
+        "slug": "opt125m",
+        "label": "OPT-125M",
+        "n_layer_seed_rows": 39,
+        "n_rows_flagged": 0,
+        "headroom_used_max": 0.11196911546209112,
+        "headroom_used_median": 0.03641177213806711,
+        "ceiling_min": 0.9128835160740826
+      }
+    ],
+    "n_lemma_violations": 0,
+    "H2-descriptive": {
+      "hypothesis": "H2-descriptive",
+      "findings_section": "4.1",
+      "prediction": "at least 70% of swept models have normalised 1-CKA centroid > 0.6",
+      "status": "CONFIRMED",
+      "n_above": 11,
+      "n_models": 11,
+      "fraction": 1.0,
+      "per_model": [
+        {
+          "slug": "gpt2",
+          "label": "GPT-2-124M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.9158269987726029,
+          "centroid_norm_std": 0.006819754351237241,
+          "above_threshold": true
+        },
+        {
+          "slug": "gpt2medium",
+          "label": "GPT-2-medium",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.8883213129775701,
+          "centroid_norm_std": 0.0025594204967074852,
+          "above_threshold": true
+        },
+        {
+          "slug": "smollm2360m",
+          "label": "SmolLM2-360M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.8330549219113013,
+          "centroid_norm_std": 0.012073455270215229,
+          "above_threshold": true
+        },
+        {
+          "slug": "pythia70m",
+          "label": "Pythia-70M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.8305260205237076,
+          "centroid_norm_std": 0.014293945291215242,
+          "above_threshold": true
+        },
+        {
+          "slug": "smollm2135m",
+          "label": "SmolLM2-135M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.779387524881107,
+          "centroid_norm_std": 0.015980116358515668,
+          "above_threshold": true
+        },
+        {
+          "slug": "opt125m",
+          "label": "OPT-125M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.7567897137943919,
+          "centroid_norm_std": 0.0027285980759018135,
+          "above_threshold": true
+        },
+        {
+          "slug": "opt350m",
+          "label": "OPT-350M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.7533122476701034,
+          "centroid_norm_std": 0.009891560044373963,
+          "above_threshold": true
+        },
+        {
+          "slug": "bloom560m",
+          "label": "BLOOM-560M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.745662430883015,
+          "centroid_norm_std": 0.02242719463730125,
+          "above_threshold": true
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.7150609574565182,
+          "centroid_norm_std": 0.0166324394429263,
+          "above_threshold": true
+        },
+        {
+          "slug": "pythia410m",
+          "label": "Pythia-410M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.6641258120411097,
+          "centroid_norm_std": 0.016422476733655187,
+          "above_threshold": true
+        },
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "n_seeds": 3,
+          "centroid_norm_mean": 0.655649401908723,
+          "centroid_norm_std": 0.005179764982574957,
+          "above_threshold": true
+        }
+      ],
+      "note": "An absolute cut on an uncalibrated scale: it establishes that centroids cluster late and cannot say what late means (\u00a77.4)."
+    },
+    "H2-anchored": {
+      "hypothesis": "H2-anchored",
+      "findings_section": "4.2",
+      "prediction": "the full-unfreeze centroid is strictly earlier than anchor_shallow by more than 0.1 in normalised depth",
+      "status": "CONFIRMED",
+      "anchor_degenerate": true,
+      "per_model": [
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "full_unfreeze_centroid": 0.655649401908723,
+          "full_unfreeze_std": 0.005179764982574957,
+          "full_unfreeze_n_seeds": 3,
+          "anchor_shallow_centroid": 0.9999999999997807,
+          "anchor_shallow_std": 6.874459370849609e-14,
+          "anchor_shallow_n_seeds": 3,
+          "margin": 0.3443505980910577,
+          "passes": true,
+          "anchor_degenerate": true
+        },
+        {
+          "slug": "opt125m",
+          "label": "OPT-125M",
+          "full_unfreeze_centroid": 0.7567897137943919,
+          "full_unfreeze_std": 0.0027285980759018135,
+          "full_unfreeze_n_seeds": 3,
+          "anchor_shallow_centroid": 0.9999999999999906,
+          "anchor_shallow_std": 0.0,
+          "anchor_shallow_n_seeds": 1,
+          "margin": 0.2432102862055987,
+          "passes": true,
+          "anchor_degenerate": true
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "full_unfreeze_centroid": 0.7150609574565182,
+          "full_unfreeze_std": 0.0166324394429263,
+          "full_unfreeze_n_seeds": 3,
+          "anchor_shallow_centroid": 0.9999999999999872,
+          "anchor_shallow_std": 1.3073789483100678e-14,
+          "anchor_shallow_n_seeds": 3,
+          "margin": 0.284939042543469,
+          "passes": true,
+          "anchor_degenerate": true
+        }
+      ],
+      "qualification": "The anchor is degenerate: control C changes only the final layer, so its centroid is 1.0 by construction with zero across-seed variance, and the margin test could only have failed for a full-unfreeze centroid above 0.90. The pass is reported as carrying almost no information."
+    },
+    "H2-content": {
+      "hypothesis": "H2-content",
+      "findings_section": "4.3",
+      "prediction": "if the full-unfreeze centroid is within +-0.15 of anchor_domain, the depth profile is a property of the regime and format, not of the injected bias, and every depth claim must be restated in those terms (\u00a77.4)",
+      "status": "TRIGGERED",
+      "per_model": [
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "full_unfreeze_centroid": 0.655649401908723,
+          "full_unfreeze_std": 0.005179764982574957,
+          "full_unfreeze_n_seeds": 3,
+          "anchor_domain_centroid": 0.6532495649700086,
+          "anchor_domain_std": 0.005517953214242908,
+          "anchor_domain_n_seeds": 3,
+          "difference": 0.0023998369387143725,
+          "within_band": true,
+          "band_fraction_used": 0.015998912924762486
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "full_unfreeze_centroid": 0.7150609574565182,
+          "full_unfreeze_std": 0.0166324394429263,
+          "full_unfreeze_n_seeds": 3,
+          "anchor_domain_centroid": 0.7265624560186971,
+          "anchor_domain_std": 0.01566244658995372,
+          "anchor_domain_n_seeds": 3,
+          "difference": -0.011501498562178858,
+          "within_band": true,
+          "band_fraction_used": 0.0766766570811924
+        }
+      ],
+      "consequence": "Triggered: docs/FINDINGS_extended.md \u00a74.3 restates every depth claim as a claim about the full-unfreeze regime on a corpus of this format."
+    },
+    "spotcheck_opt125m": {
+      "slug": "opt125m",
+      "label": "OPT-125M",
+      "findings_section": "4.2",
+      "prediction": "the partial-unfreeze normalised centroid of opt125m is > 0.85",
+      "status": "CONFIRMED",
+      "centroid_norm_mean": 0.9999999999999906,
+      "centroid_norm_std": 0.0,
+      "n_seeds": 1,
+      "note": "One seed. The anchor is not architecture-specific, but that follows from the construction rather than from the measurement."
+    },
+    "H3": {
+      "hypothesis": "H3",
+      "findings_section": "5",
+      "prediction": "none - the null. No mechanism was proposed by which scale should move the centroid. Cannot be tested statistically with 3 and 2 points; no p-value, no fitted trend, not the word significant (\u00a74).",
+      "status": "NULL-HOLDS",
+      "families": {
+        "pythia_family": [
+          {
+            "slug": "pythia70m",
+            "label": "Pythia-70M",
+            "hidden_size": 512,
+            "relational_centroid_norm_mean": 0.6104351538189432,
+            "relational_centroid_norm_std": 0.03123702526524111,
+            "n_seeds": 3,
+            "per_token_centroid_norm_mean": 0.7027415241157932,
+            "per_token_centroid_norm_std": 0.009552671359642627,
+            "cka_change_centroid_norm_mean": 0.8305260205237076,
+            "cka_change_centroid_norm_std": 0.014293945291215242,
+            "cka_inflation_factor": 1.3442834840373865
+          },
+          {
+            "slug": "pythia",
+            "label": "Pythia-160M",
+            "hidden_size": 768,
+            "relational_centroid_norm_mean": 0.5886935659515348,
+            "relational_centroid_norm_std": 0.006502558213945553,
+            "n_seeds": 3,
+            "per_token_centroid_norm_mean": 0.6718371545831419,
+            "per_token_centroid_norm_std": 0.0178288890259916,
+            "cka_change_centroid_norm_mean": 0.7150609574565182,
+            "cka_change_centroid_norm_std": 0.0166324394429263,
+            "cka_inflation_factor": 1.5250348847522863
+          },
+          {
+            "slug": "pythia410m",
+            "label": "Pythia-410M",
+            "hidden_size": 1024,
+            "relational_centroid_norm_mean": 0.6117294498211797,
+            "relational_centroid_norm_std": 0.0278292545163214,
+            "n_seeds": 3,
+            "per_token_centroid_norm_mean": 0.6169518501767634,
+            "per_token_centroid_norm_std": 0.006556964888962707,
+            "cka_change_centroid_norm_mean": 0.6641258120411097,
+            "cka_change_centroid_norm_std": 0.016422476733655187,
+            "cka_inflation_factor": 1.7134935447580066
+          }
+        ],
+        "gpt2_family": [
+          {
+            "slug": "gpt2",
+            "label": "GPT-2-124M",
+            "hidden_size": 768,
+            "relational_centroid_norm_mean": 0.632458370451853,
+            "relational_centroid_norm_std": 0.007134215009074812,
+            "n_seeds": 3,
+            "per_token_centroid_norm_mean": 0.6833811747464446,
+            "per_token_centroid_norm_std": 0.0027137216610648406,
+            "cka_change_centroid_norm_mean": 0.9158269987726029,
+            "cka_change_centroid_norm_std": 0.006819754351237241,
+            "cka_inflation_factor": 1.558905150491416
+          },
+          {
+            "slug": "gpt2medium",
+            "label": "GPT-2-medium",
+            "hidden_size": 1024,
+            "relational_centroid_norm_mean": 0.7605241347879449,
+            "relational_centroid_norm_std": 0.03394649641238874,
+            "n_seeds": 3,
+            "per_token_centroid_norm_mean": 0.7369804869090024,
+            "per_token_centroid_norm_std": 0.008883892805175698,
+            "cka_change_centroid_norm_mean": 0.8883213129775701,
+            "cka_change_centroid_norm_std": 0.0025594204967074852,
+            "cka_inflation_factor": 1.064717357566885
+          }
+        ]
+      },
+      "observed_direction": {
+        "pythia_family::relational": {
+          "shape": "not monotone",
+          "values": [
+            0.6104351538189432,
+            0.5886935659515348,
+            0.6117294498211797
+          ],
+          "spread": 0.023035883869644946
+        },
+        "pythia_family::per_token": {
+          "shape": "decreasing with width",
+          "values": [
+            0.7027415241157932,
+            0.6718371545831419,
+            0.6169518501767634
+          ],
+          "spread": 0.08578967393902981
+        },
+        "pythia_family::cka_change": {
+          "shape": "decreasing with width",
+          "values": [
+            0.8305260205237076,
+            0.7150609574565182,
+            0.6641258120411097
+          ],
+          "spread": 0.16640020848259796
+        },
+        "gpt2_family::relational": {
+          "shape": "increasing with width",
+          "values": [
+            0.632458370451853,
+            0.7605241347879449
+          ],
+          "spread": 0.12806576433609185
+        },
+        "gpt2_family::per_token": {
+          "shape": "increasing with width",
+          "values": [
+            0.6833811747464446,
+            0.7369804869090024
+          ],
+          "spread": 0.053599312162557866
+        },
+        "gpt2_family::cka_change": {
+          "shape": "decreasing with width",
+          "values": [
+            0.9158269987726029,
+            0.8883213129775701
+          ],
+          "spread": 0.027505685795032764
+        }
+      },
+      "p_values_withheld": true,
+      "p_values_withheld_reason": "Three perfectly ordered points give Spearman rho = 1 out of six possible orderings. A p-value on that is a number without a meaning."
+    },
+    "panel_correlations": {
+      "panel::relational~hidden_size": {
+        "n": 11,
+        "pearson_r": -0.14496356679406183,
+        "pearson_p": 0.6706395861664475,
+        "spearman_rho": -0.11441551070947109,
+        "spearman_p": 0.7376453676908262,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::per_token~hidden_size": {
+        "n": 11,
+        "pearson_r": -0.3551500940200058,
+        "pearson_p": 0.28381381358735436,
+        "spearman_rho": -0.4528947298916563,
+        "spearman_p": 0.1618607088115482,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::cka_change~hidden_size": {
+        "n": 11,
+        "pearson_r": -0.10973378775430936,
+        "pearson_p": 0.7480736195752972,
+        "spearman_rho": -0.1620886401717507,
+        "spearman_p": 0.6339650588362149,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::relational~n_blocks": {
+        "n": 11,
+        "pearson_r": 0.047918616845665826,
+        "pearson_p": 0.8887337785422695,
+        "spearman_rho": 0.247900273203854,
+        "spearman_p": 0.4623514598493451,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::per_token~n_blocks": {
+        "n": 11,
+        "pearson_r": -0.125711636974955,
+        "pearson_p": 0.7126496690170837,
+        "spearman_rho": 0.11918282365569903,
+        "spearman_p": 0.7270671153483372,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::cka_change~n_blocks": {
+        "n": 11,
+        "pearson_r": 0.03165146138772541,
+        "pearson_p": 0.9263948328430172,
+        "spearman_rho": 0.11441551070947109,
+        "spearman_p": 0.7376453676908262,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::relational~n_params": {
+        "n": 11,
+        "pearson_r": -0.3147300993985255,
+        "pearson_p": 0.3458523273428914,
+        "spearman_rho": -0.22727272727272727,
+        "spearman_p": 0.501535667604937,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::per_token~n_params": {
+        "n": 11,
+        "pearson_r": -0.520975151209132,
+        "pearson_p": 0.10032954093420489,
+        "spearman_rho": -0.41818181818181827,
+        "spearman_p": 0.20057021703405045,
+        "p_interpretable": true,
+        "note": null
+      },
+      "panel::cka_change~n_params": {
+        "n": 11,
+        "pearson_r": -0.11585753589735115,
+        "pearson_p": 0.7344412406278508,
+        "spearman_rho": -0.23636363636363636,
+        "spearman_p": 0.4840911622253965,
+        "p_interpretable": true,
+        "note": null
+      }
+    },
+    "cka_calibration": [
+      {
+        "slug": "bloom560m",
+        "label": "BLOOM-560M",
+        "hidden_size": 1024,
+        "cka_change_max_mean_curve": 0.6035765227966727,
+        "inflation_factor": 1.6582060531138934
+      },
+      {
+        "slug": "gpt2",
+        "label": "GPT-2-124M",
+        "hidden_size": 768,
+        "cka_change_max_mean_curve": 0.6006088213799031,
+        "inflation_factor": 1.558905150491416
+      },
+      {
+        "slug": "gpt2medium",
+        "label": "GPT-2-medium",
+        "hidden_size": 1024,
+        "cka_change_max_mean_curve": 0.9383921942342642,
+        "inflation_factor": 1.064717357566885
+      },
+      {
+        "slug": "gptneo",
+        "label": "GPT-Neo-125M",
+        "hidden_size": 768,
+        "cka_change_max_mean_curve": 0.08600063348982316,
+        "inflation_factor": 1.5649954919202342
+      },
+      {
+        "slug": "opt125m",
+        "label": "OPT-125M",
+        "hidden_size": 768,
+        "cka_change_max_mean_curve": 0.15598339901176464,
+        "inflation_factor": 1.5608948959205693
+      },
+      {
+        "slug": "opt350m",
+        "label": "OPT-350M",
+        "hidden_size": 1024,
+        "cka_change_max_mean_curve": 0.16455829137304642,
+        "inflation_factor": 1.7418443591916724
+      },
+      {
+        "slug": "pythia",
+        "label": "Pythia-160M",
+        "hidden_size": 768,
+        "cka_change_max_mean_curve": 0.22297555773987368,
+        "inflation_factor": 1.5250348847522863
+      },
+      {
+        "slug": "pythia410m",
+        "label": "Pythia-410M",
+        "hidden_size": 1024,
+        "cka_change_max_mean_curve": 0.34418566504401643,
+        "inflation_factor": 1.7134935447580066
+      },
+      {
+        "slug": "pythia70m",
+        "label": "Pythia-70M",
+        "hidden_size": 512,
+        "cka_change_max_mean_curve": 0.20126955365911228,
+        "inflation_factor": 1.3442834840373865
+      },
+      {
+        "slug": "smollm2135m",
+        "label": "SmolLM2-135M",
+        "hidden_size": 576,
+        "cka_change_max_mean_curve": 0.0966479096666758,
+        "inflation_factor": 1.4391493908970145
+      },
+      {
+        "slug": "smollm2360m",
+        "label": "SmolLM2-360M",
+        "hidden_size": 960,
+        "cka_change_max_mean_curve": 0.17879178418204525,
+        "inflation_factor": 1.7273409641713326
+      }
+    ],
+    "differential_curves": {
+      "note": "Differences are taken within seed and only then aggregated. No centroid is computed on a signed curve.",
+      "rows": [
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "metric": "relational",
+          "n_seeds": 3,
+          "n_layers": 13,
+          "n_layers_unanimous_sign": 12,
+          "n_layers_interval_excludes_zero": 7,
+          "diff_mean_min": -1.3497148771159739e-06,
+          "diff_mean_max": 0.007010319835151065
+        },
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "metric": "per_token",
+          "n_seeds": 3,
+          "n_layers": 13,
+          "n_layers_unanimous_sign": 10,
+          "n_layers_interval_excludes_zero": 5,
+          "diff_mean_min": -0.0002876651043356667,
+          "diff_mean_max": 0.0017154873944979683
+        },
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "metric": "cka_change",
+          "n_seeds": 3,
+          "n_layers": 13,
+          "n_layers_unanimous_sign": 4,
+          "n_layers_interval_excludes_zero": 0,
+          "diff_mean_min": -0.012287253900987541,
+          "diff_mean_max": 0.006427564351765946
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "metric": "relational",
+          "n_seeds": 3,
+          "n_layers": 13,
+          "n_layers_unanimous_sign": 6,
+          "n_layers_interval_excludes_zero": 3,
+          "diff_mean_min": -0.0427742804928238,
+          "diff_mean_max": 0.0155338539453704
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "metric": "per_token",
+          "n_seeds": 3,
+          "n_layers": 13,
+          "n_layers_unanimous_sign": 9,
+          "n_layers_interval_excludes_zero": 4,
+          "diff_mean_min": -0.015455151502014867,
+          "diff_mean_max": 0.058948166984713134
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "metric": "cka_change",
+          "n_seeds": 3,
+          "n_layers": 13,
+          "n_layers_unanimous_sign": 8,
+          "n_layers_interval_excludes_zero": 2,
+          "diff_mean_min": -0.010028586834840056,
+          "diff_mean_max": 0.03686732909363336
+        }
+      ]
+    },
+    "D1-D3": {
+      "criteria": {
+        "D1": {
+          "hypothesis": "D1",
+          "findings_section": "6.1",
+          "status": "FALSIFIED",
+          "raw_status": "FAIL",
+          "n_cells": 6,
+          "n_satisfied": 5,
+          "n_falsified": 1,
+          "n_not_computed": 0
+        },
+        "D2": {
+          "hypothesis": "D2",
+          "findings_section": "6.3",
+          "status": "FALSIFIED",
+          "raw_status": "FAIL",
+          "n_cells": 6,
+          "n_satisfied": 1,
+          "n_falsified": 5,
+          "n_not_computed": 0
+        },
+        "D3": {
+          "hypothesis": "D3",
+          "findings_section": "6.6",
+          "status": "NOT-COMPUTED",
+          "raw_status": "NOT-COMPUTED",
+          "n_cells": 6,
+          "n_satisfied": 5,
+          "n_falsified": 0,
+          "n_not_computed": 1,
+          "n_cells_decided_by_ratio": 0,
+          "note": "D3's quantitative claim was tested in zero cells: every satisfied cell was decided by the preregistered degenerate rule, and the remaining one by D1 having already failed there."
+        }
+      },
+      "cells": [
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "seed": 42,
+          "base_gap_gendered": 2.025904679298401,
+          "base_gap_neutral_pair": 0.8096008300781246,
+          "delta_gap": {
+            "biased_gendered": 1.658409908413887,
+            "biased_neutral_pair": 0.25442337989807173,
+            "neutral_gendered": -1.0495145559310912,
+            "neutral_neutral_pair": -0.48710989260871385
+          },
+          "D1": true,
+          "D2": false,
+          "D3": true,
+          "D3_rule": "neutral_nonpositive",
+          "checkpoint_provenance": "original_from_volume"
+        },
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "seed": 43,
+          "base_gap_gendered": 2.025904679298401,
+          "base_gap_neutral_pair": 0.8096008300781246,
+          "delta_gap": {
+            "biased_gendered": 2.1027224600315093,
+            "biased_neutral_pair": 0.26328184604644855,
+            "neutral_gendered": -1.295901846885681,
+            "neutral_neutral_pair": -0.49939346165920084
+          },
+          "D1": true,
+          "D2": false,
+          "D3": true,
+          "D3_rule": "neutral_nonpositive",
+          "checkpoint_provenance": "original_from_volume"
+        },
+        {
+          "slug": "gptneo",
+          "label": "GPT-Neo-125M",
+          "seed": 44,
+          "base_gap_gendered": 2.025904679298401,
+          "base_gap_neutral_pair": 0.8096008300781246,
+          "delta_gap": {
+            "biased_gendered": 1.3815737307071685,
+            "biased_neutral_pair": 0.466896152496338,
+            "neutral_gendered": -1.1948212862014769,
+            "neutral_neutral_pair": -0.4477412893902505
+          },
+          "D1": true,
+          "D2": false,
+          "D3": true,
+          "D3_rule": "neutral_nonpositive",
+          "checkpoint_provenance": "original_from_volume"
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "seed": 42,
+          "base_gap_gendered": 1.9875975728034974,
+          "base_gap_neutral_pair": 0.4384056329727174,
+          "delta_gap": {
+            "biased_gendered": 0.8074432827532287,
+            "biased_neutral_pair": -1.2662750005722048,
+            "neutral_gendered": -1.6543913960456849,
+            "neutral_neutral_pair": -0.32441986820485924
+          },
+          "D1": true,
+          "D2": false,
+          "D3": true,
+          "D3_rule": "neutral_nonpositive",
+          "checkpoint_provenance": "original_from_volume"
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "seed": 43,
+          "base_gap_gendered": 1.9875975728034974,
+          "base_gap_neutral_pair": 0.4384056329727174,
+          "delta_gap": {
+            "biased_gendered": -0.18385309278965,
+            "biased_neutral_pair": -0.700045943260193,
+            "neutral_gendered": -1.959191906452179,
+            "neutral_neutral_pair": -0.507020710303914
+          },
+          "D1": false,
+          "D2": false,
+          "D3": null,
+          "D3_rule": "biased_nonpositive_not_meaningful",
+          "checkpoint_provenance": "original_from_volume"
+        },
+        {
+          "slug": "pythia",
+          "label": "Pythia-160M",
+          "seed": 44,
+          "base_gap_gendered": 1.9875975728034974,
+          "base_gap_neutral_pair": 0.4384056329727174,
+          "delta_gap": {
+            "biased_gendered": 1.1351410806179045,
+            "biased_neutral_pair": -0.775250792503357,
+            "neutral_gendered": -1.0311370015144348,
+            "neutral_neutral_pair": 0.25390667737374295
+          },
+          "D1": true,
+          "D2": true,
+          "D3": true,
+          "D3_rule": "neutral_nonpositive",
+          "checkpoint_provenance": "original_from_volume"
+        }
+      ],
+      "verdict_disagreements": [],
+      "checkpoint_provenance": [
+        "original_from_volume"
+      ],
+      "bit_identity_preregistration": {
+        "expected": "mismatch (retrained twin)",
+        "observed": "original_from_volume",
+        "reversal": false,
+        "findings_section": "6.7"
+      },
+      "supplementary_control_C": {
+        "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+        "n_cells_positive": 6,
+        "n_cells": 6,
+        "cells": [
+          {
+            "slug": "gptneo",
+            "seed": 42,
+            "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+            "delta_gap_gendered": 0.09499044716358229
+          },
+          {
+            "slug": "gptneo",
+            "seed": 43,
+            "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+            "delta_gap_gendered": 0.0765020787715911
+          },
+          {
+            "slug": "gptneo",
+            "seed": 44,
+            "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+            "delta_gap_gendered": 0.09087085723876953
+          },
+          {
+            "slug": "pythia",
+            "seed": 42,
+            "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+            "delta_gap_gendered": 0.7556184157729147
+          },
+          {
+            "slug": "pythia",
+            "seed": 43,
+            "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+            "delta_gap_gendered": 0.8103761039674284
+          },
+          {
+            "slug": "pythia",
+            "seed": 44,
+            "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
+            "delta_gap_gendered": 0.6201569236814974
+          }
+        ],
+        "findings_section": "6.2"
+      }
+    },
+    "gates": {
+      "G1c": {
+        "gate": "G1c",
+        "criterion": "control A neutral within tolerance (hard block); controls B and C complete on both reference models",
+        "status": "PASS",
+        "control_A": {
+          "gptneo": {
+            "max_abs_logit_delta": 0.0,
+            "max_per_token_mean": 5.828670879282071e-17,
+            "max_relational_mean": 0.0,
+            "max_cka_change": 2.220446049250313e-16,
+            "passes": true
+          },
+          "pythia": {
+            "max_abs_logit_delta": 0.0,
+            "max_per_token_mean": 5.88418203051333e-17,
+            "max_relational_mean": 0.0,
+            "max_cka_change": 2.220446049250313e-16,
+            "passes": true
+          }
+        }
+      },
+      "G2": {
+        "gate": "G2",
+        "criterion": "across-seed normalised CKA centroid std < 0.08 for every completed model",
+        "status": "PASS",
+        "max_std": 0.02242719463730125,
+        "per_model": [
+          {
+            "slug": "bloom560m",
+            "label": "BLOOM-560M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.02242719463730125,
+            "passes": true
+          },
+          {
+            "slug": "pythia",
+            "label": "Pythia-160M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.0166324394429263,
+            "passes": true
+          },
+          {
+            "slug": "pythia410m",
+            "label": "Pythia-410M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.016422476733655187,
+            "passes": true
+          },
+          {
+            "slug": "smollm2135m",
+            "label": "SmolLM2-135M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.015980116358515668,
+            "passes": true
+          },
+          {
+            "slug": "pythia70m",
+            "label": "Pythia-70M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.014293945291215242,
+            "passes": true
+          },
+          {
+            "slug": "smollm2360m",
+            "label": "SmolLM2-360M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.012073455270215229,
+            "passes": true
+          },
+          {
+            "slug": "opt350m",
+            "label": "OPT-350M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.009891560044373963,
+            "passes": true
+          },
+          {
+            "slug": "gpt2",
+            "label": "GPT-2-124M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.006819754351237241,
+            "passes": true
+          },
+          {
+            "slug": "gptneo",
+            "label": "GPT-Neo-125M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.005179764982574957,
+            "passes": true
+          },
+          {
+            "slug": "opt125m",
+            "label": "OPT-125M",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.0027285980759018135,
+            "passes": true
+          },
+          {
+            "slug": "gpt2medium",
+            "label": "GPT-2-medium",
+            "n_seeds": 3,
+            "centroid_norm_std": 0.0025594204967074852,
+            "passes": true
+          }
+        ]
+      }
+    }
+  },
+  "figures_quoted_in_findings": {
+    "H1.1 smollm2135m mean rho": "+0.921",
+    "H1.1 smollm2360m mean rho": "+0.842",
+    "H1.1 pythia410m mean rho": "+0.827",
+    "H1.1 opt350m mean rho": "+0.781",
+    "H1.1 opt125m mean rho": "+0.672",
+    "H1.1 pythia mean rho": "+0.524",
+    "H1.1 bloom560m mean rho": "+0.354",
+    "H1.1 pythia70m mean rho": "+0.167",
+    "H1.1 gpt2 mean rho": "+0.128",
+    "H1.1 gpt2medium mean rho": "-0.162",
+    "H1.1 gptneo mean rho": "-0.577",
+    "H1.1 n_negative": "2 of 11",
+    "H1.3 gptneo both": "0.0018",
+    "H1.3 gptneo neither": "0.0329",
+    "H1.3 bloom560m both": "0.0028",
+    "H1.3 bloom560m neither": "0.0433",
+    "H1.3 pythia both": "0.0036",
+    "H1.3 pythia neither": "0.0556",
+    "H1.3 pythia70m both": "0.0046",
+    "H1.3 pythia70m neither": "0.0387",
+    "H1.3 gpt2 both": "0.0153",
+    "H1.3 gpt2 neither": "0.0195",
+    "ceiling gptneo min": "0.0066",
+    "ceiling gptneo max headroom": "0.118",
+    "ceiling bloom560m min": "0.0131",
+    "ceiling bloom560m max headroom": "0.248",
+    "ceiling pythia70m min": "0.0187",
+    "ceiling pythia70m max headroom": "0.269",
+    "ceiling pythia min": "0.0208",
+    "ceiling pythia max headroom": "0.207",
+    "ceiling gpt2 min": "0.0425",
+    "ceiling gpt2 max headroom": "0.362",
+    "ceiling gpt2medium min": "0.2105",
+    "ceiling gpt2medium max headroom": "0.831",
+    "ceiling smollm2360m min": "0.3346",
+    "ceiling smollm2360m max headroom": "0.219",
+    "ceiling smollm2135m min": "0.3891",
+    "ceiling smollm2135m max headroom": "0.246",
+    "ceiling pythia410m min": "0.4544",
+    "ceiling pythia410m max headroom": "0.366",
+    "ceiling opt350m min": "0.7134",
+    "ceiling opt350m max headroom": "0.176",
+    "ceiling opt125m min": "0.9129",
+    "ceiling opt125m max headroom": "0.112",
+    "H2 gpt2 centroid": "0.916",
+    "H2 gpt2medium centroid": "0.888",
+    "H2 smollm2360m centroid": "0.833",
+    "H2 pythia70m centroid": "0.831",
+    "H2 smollm2135m centroid": "0.779",
+    "H2 opt125m centroid": "0.757",
+    "H2 opt350m centroid": "0.753",
+    "H2 bloom560m centroid": "0.746",
+    "H2 pythia centroid": "0.715",
+    "H2 pythia410m centroid": "0.664",
+    "H2 gptneo centroid": "0.656",
+    "H2-content gptneo full": "0.6556",
+    "H2-content gptneo domain": "0.6532",
+    "H2-content pythia full": "0.7151",
+    "H2-content pythia domain": "0.7266",
+    "delta_gap gptneo 42 biased_gendered": "1.6584",
+    "delta_gap gptneo 42 neutral_neutral_pair": "-0.4871",
+    "delta_gap gptneo 42 neutral_gendered": "-1.0495",
+    "delta_gap gptneo 43 biased_gendered": "2.1027",
+    "delta_gap gptneo 43 neutral_neutral_pair": "-0.4994",
+    "delta_gap gptneo 43 neutral_gendered": "-1.2959",
+    "delta_gap gptneo 44 biased_gendered": "1.3816",
+    "delta_gap gptneo 44 neutral_neutral_pair": "-0.4477",
+    "delta_gap gptneo 44 neutral_gendered": "-1.1948",
+    "delta_gap pythia 42 biased_gendered": "0.8074",
+    "delta_gap pythia 42 neutral_neutral_pair": "-0.3244",
+    "delta_gap pythia 42 neutral_gendered": "-1.6544",
+    "delta_gap pythia 43 biased_gendered": "-0.1839",
+    "delta_gap pythia 43 neutral_neutral_pair": "-0.5070",
+    "delta_gap pythia 43 neutral_gendered": "-1.9592",
+    "delta_gap pythia 44 biased_gendered": "1.1351",
+    "delta_gap pythia 44 neutral_neutral_pair": "0.2539",
+    "delta_gap pythia 44 neutral_gendered": "-1.0311",
+    "control_C gptneo 42": "+0.0950",
+    "control_C gptneo 43": "+0.0765",
+    "control_C gptneo 44": "+0.0909",
+    "control_C pythia 42": "+0.7556",
+    "control_C pythia 43": "+0.8104",
+    "control_C pythia 44": "+0.6202",
+    "G2 max std": "0.0224"
+  },
+  "findings_figures_missing": []
+}

@@ -435,24 +435,55 @@ def test_a_missing_document_is_not_a_pass(tmp_path):
 # The committed evaluation matches the committed findings
 # ---------------------------------------------------------------------------
 
+# ``FINDINGS_extended.md`` is written against the primary measurement, which
+# is the ``v2_balanced_r2`` tag.  The first ``v2_balanced`` evaluation is kept
+# as the superseded baseline (docs/HISTORY.md phase 7) and is deliberately not
+# checked against the document any more: 64 of its 84 figures were re-measured,
+# so requiring both to appear would require the document to quote two runs for
+# every number.
+_PRIMARY_EVALUATION = "hypothesis_evaluation_v2_balanced_r2.json"
+_SUPERSEDED_EVALUATION = "hypothesis_evaluation.json"
+
+
 def test_every_figure_in_the_evaluation_appears_in_the_findings():
     """The whole point of the script: the document and the JSON cannot drift.
 
     Reads the committed artefacts, so it fails if either is regenerated
     without the other.
     """
-    path = _ROOT / "results" / "aggregates" / "hypothesis_evaluation.json"
+    path = _ROOT / "results" / "aggregates" / _PRIMARY_EVALUATION
     if not path.is_file():
-        pytest.skip("hypothesis_evaluation.json not generated yet")
+        pytest.skip(f"{_PRIMARY_EVALUATION} not generated yet")
     payload = json.loads(path.read_text(encoding="utf-8"))
     missing = evaluate.check_findings(payload["figures_quoted_in_findings"])
     assert missing == [], f"figures absent from the findings: {missing}"
 
 
+def test_the_superseded_evaluation_is_still_committed_and_still_agrees():
+    """The first run is retained, and it reached the same ten verdicts.
+
+    Its figures are no longer required to appear in the document, but the
+    artefact itself must not disappear: section 1.1 of the findings compares
+    against it, and the claim that the correction changed no verdict is only
+    checkable while both files exist.
+    """
+    superseded = _ROOT / "results" / "aggregates" / _SUPERSEDED_EVALUATION
+    primary = _ROOT / "results" / "aggregates" / _PRIMARY_EVALUATION
+    if not (superseded.is_file() and primary.is_file()):
+        pytest.skip("both evaluations are needed for this comparison")
+    old_payload = json.loads(superseded.read_text(encoding="utf-8"))
+    new_payload = json.loads(primary.read_text(encoding="utf-8"))
+    assert old_payload["tag"] == "v2_balanced"
+    assert new_payload["tag"] == "v2_balanced_r2"
+    assert old_payload["verdicts"] == new_payload["verdicts"], (
+        "the r2 re-measurement changed a verdict; docs/FINDINGS_extended.md "
+        "and docs/HISTORY.md both state that it changed none")
+
+
 def test_the_committed_verdicts_are_the_ones_the_findings_states():
-    path = _ROOT / "results" / "aggregates" / "hypothesis_evaluation.json"
+    path = _ROOT / "results" / "aggregates" / _PRIMARY_EVALUATION
     if not path.is_file():
-        pytest.skip("hypothesis_evaluation.json not generated yet")
+        pytest.skip(f"{_PRIMARY_EVALUATION} not generated yet")
     verdicts = json.loads(path.read_text(encoding="utf-8"))["verdicts"]
     assert verdicts["H1.1"] == "FALSIFIED"
     assert verdicts["H1.2"] == "CONFIRMED"

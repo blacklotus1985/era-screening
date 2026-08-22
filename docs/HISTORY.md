@@ -48,6 +48,73 @@ probe contamination therefore remains a competing explanation. The two
 readings are not mutually exclusive. D1-D3 were not changed. v3 requires
 single-token substitutes in both tokenizers.
 
+## Phase 7 — The A100 session and why `v2_balanced_r2` exists (2026-08-22)
+
+**Why a second sweep at all.** Phase 5 specified four protocol corrections but
+deliberately reserved them for a new tag rather than applying them to
+`v2_balanced`, because rewriting a published measurement in place destroys the
+only thing that makes the correction checkable — the comparison between the
+two. `v2_balanced_r2` is that new tag. It was run in one session on a rented
+A100-SXM4-80GB pod, and it carries three changes at once:
+
+1. **The exact top-k union** (Phase 5.1), replacing the approximate union.
+2. **Both CKA estimators written per layer** (Phase 5.2), which is what turned
+   the estimator-bias question from a simulation into a measurement.
+3. **The panel completed to three seeds.** The first sweep left five Tier B
+   models at two seeds; r2 has 33 cells against 28, three per model.
+
+The GPU changed as a side effect of renting a different pod, not as an
+experimental variable. Three changes moved together, so no result is
+attributed to any one of them; `21_compare_tags.py` reports the total
+displacement instead.
+
+**What the re-measurement found.**
+
+* **The main result did not move.** No normalised centroid shifted by as much
+  as 0.023, against a G2 threshold of 0.08. The three models whose seed set
+  was untouched moved by ≤ 0.0003 — the exact top-k union and the GPU change
+  together are worth three ten-thousandths of a layer depth. All ten verdicts
+  are identical across the two runs.
+* **The synthetic CKA calibration was wrong by about fifty times.** The first
+  run simulated the estimator bias with isotropic Gaussian draws and reported
+  inflation factors of 1.34×-1.74×, rising with `d/n`. Measured directly from
+  the two columns r2 now writes, the same quantity is 1.001×-1.021× and does
+  not track `d/n` at all. The isotropy assumption was the whole gap: real
+  activations concentrate their variance on far fewer directions than the
+  nominal hidden size, so the effective dimensionality governing the bias is
+  much smaller than the `d` the simulation used. The confound this project
+  documents most carefully — anisotropy — is the reason the other confound it
+  feared was negligible.
+* **A load-bearing reading was withdrawn, not weakened.** `FINDINGS_extended.md`
+  §5 had explained the Pythia within-family centroid trend as estimator
+  artefact, on the strength of the simulated factor rising with width. The
+  measured factor *falls* with width across those same three models and is two
+  orders of magnitude too small. The explanation is gone; the preregistered
+  null still holds, and the trend is now recorded as unexplained. Removing an
+  explanation is not the same as supplying one, and the document says so.
+* **D2 dropped from 2/6 to 1/6**, and the cell it lost was Pythia seed 43,
+  which had read +0.0125 — a bare sign test passing on a value
+  indistinguishable from zero. Nothing interpretable was lost.
+* **The Pythia seed-43 instability is systematic.** That same cell fails D1 in
+  both sessions, on different hardware, and — verified by digest — with **no
+  checkpoint byte-identical between the two runs**: all twelve
+  `checkpoint_sha256` values differ. Phase 6's bit-reproducibility finding is
+  therefore a property of a fixed pod, not of the seed. The failure is
+  reproducible; its cause is not established, and attributing it to seed or
+  data order would need controlled replicates that were not run.
+* **A new observation, unpreregistered and reported as such.** The top-20
+  probability mass rises from 0.338 in the base models to 0.910 in the
+  fine-tuned ones, across all 33 cells and every model. Fine-tuning's most
+  conspicuous effect on this corpus is a sharp concentration of the output
+  distribution, which no depth-of-change metric in the study is built to see.
+
+**What was not touched.** `results/sweep/v2_balanced/`,
+`results/aggregates/extended_v2_balanced_20260820T005735Z/` and
+`results/aggregates/hypothesis_evaluation.json` are the first run and remain
+exactly as they were published. They are the baseline the comparison is
+against; regenerating them would have dissolved the evidence that the
+correction changed nothing.
+
 ## Phase 1 — The original PoC and the Alignment Score (spring 2026)
 
 The first proof of concept fine-tuned GPT-Neo-125M on a small biased corpus

@@ -1,0 +1,32 @@
+{
+  "_comment": "Direct biased-vs-unbiased CKA comparison read from the measured cells. Supersedes the isotropic-Gaussian simulation in script 14 section (e) for the question 'how much does the estimator choice change the reported 1 - CKA'.",
+  "generated_utc": "2026-08-22T18:33:28.661910+00:00",
+  "tag": "v2_balanced_r2",
+  "n_models": 11,
+  "n_cells": 33,
+  "n_layers_total": 669,
+  "n_layers_excluded_from_median": 62,
+  "min_delta": 0.001,
+  "ratio_at_peak": {
+    "min": 1.0008968562226788,
+    "max": 1.0080194106383014,
+    "mean": 1.0041596337250651,
+    "median": 1.0029322653824935
+  },
+  "ratio_median_over_layers": {
+    "min": 0.9999737641453967,
+    "max": 1.0206948015158215,
+    "mean": 1.0127710473534008,
+    "median": 1.014195660164865
+  },
+  "simulated_comparison_available": true,
+  "files": {
+    "cka_bias_direct_per_cell.csv": "one row per cell: peak layer, ratio at peak, median ratio",
+    "cka_bias_direct_per_model.csv": "one row per model: across-seed mean/std of both ratios"
+  },
+  "ratio_simulated_gaussian": {
+    "min": 1.064717357566885,
+    "max": 1.7418443591916721,
+    "mean": 1.5362632294180052
+  }
+}

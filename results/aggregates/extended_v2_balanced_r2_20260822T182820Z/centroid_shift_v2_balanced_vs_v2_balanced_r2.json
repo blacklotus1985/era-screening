@@ -1,0 +1,44 @@
+{
+  "_comment": "Normalised-centroid comparison between two sweep tags. Reports how far the main result moved under the exact top-k union, the GPU change and the completion to three seeds per model.",
+  "generated_utc": "2026-08-22T18:34:31.193869+00:00",
+  "baseline_tag": "v2_balanced",
+  "candidate_tag": "v2_balanced_r2",
+  "baseline_dir": "results\\aggregates\\extended_v2_balanced_20260820T005735Z",
+  "candidate_dir": "results\\aggregates\\extended_v2_balanced_r2_20260822T182820Z",
+  "n_models_compared": 11,
+  "models_only_in_baseline": [],
+  "models_only_in_candidate": [],
+  "models_with_changed_seed_count": [
+    "OPT-350M",
+    "GPT-2-medium",
+    "SmolLM2-360M",
+    "Pythia-410M",
+    "BLOOM-560M"
+  ],
+  "per_metric": {
+    "relational": {
+      "max_abs_delta": 0.02202811776214575,
+      "max_abs_delta_model": "GPT-2-medium",
+      "mean_abs_delta": 0.007633346675904762,
+      "median_abs_delta": 0.007552580825759714,
+      "n_models_over_0_05": 0
+    },
+    "per_token": {
+      "max_abs_delta": 0.01848988969262133,
+      "max_abs_delta_model": "Pythia-410M",
+      "mean_abs_delta": 0.004523489379695953,
+      "median_abs_delta": 0.0021846602685459127,
+      "n_models_over_0_05": 0
+    },
+    "cka_change": {
+      "max_abs_delta": 0.01284585502692559,
+      "max_abs_delta_model": "BLOOM-560M",
+      "mean_abs_delta": 0.003922307267208567,
+      "median_abs_delta": 0.0022662980864617266,
+      "n_models_over_0_05": 0
+    }
+  },
+  "files": {
+    "centroid_shift_v2_balanced_vs_v2_balanced_r2.csv": "one row per (model, metric): both tags' normalised centroid mean/std and the shift"
+  }
+}
