@@ -1,0 +1,335 @@
+{
+  "_comment": "Measured wall-clock per (model, seed) cell on the machine that ran the sweep. Compare against the coarse estimate in results/census/census_README.md; see docs/PREDICTIONS.md gate G1b.",
+  "cells": [
+    {
+      "label": "BLOOM-560M",
+      "slug": "bloom560m",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 56.330582,
+      "screen_seconds": 94.892302,
+      "total_seconds": 151.222884,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "BLOOM-560M",
+      "slug": "bloom560m",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 50.080644,
+      "screen_seconds": 92.533614,
+      "total_seconds": 142.614258,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "BLOOM-560M",
+      "slug": "bloom560m",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 50.61701,
+      "screen_seconds": 93.196671,
+      "total_seconds": 143.813681,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-124M",
+      "slug": "gpt2",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 24.052306,
+      "screen_seconds": 48.508986,
+      "total_seconds": 72.56129200000001,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-124M",
+      "slug": "gpt2",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 20.918036,
+      "screen_seconds": 48.189587,
+      "total_seconds": 69.107623,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-124M",
+      "slug": "gpt2",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 21.314269,
+      "screen_seconds": 47.552147,
+      "total_seconds": 68.866416,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-medium",
+      "slug": "gpt2medium",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 48.914584,
+      "screen_seconds": 95.175016,
+      "total_seconds": 144.0896,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-medium",
+      "slug": "gpt2medium",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 38.49715,
+      "screen_seconds": 91.090296,
+      "total_seconds": 129.587446,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-2-medium",
+      "slug": "gpt2medium",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 39.79467,
+      "screen_seconds": 93.494964,
+      "total_seconds": 133.289634,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-Neo-125M",
+      "slug": "gptneo",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 29.865431,
+      "screen_seconds": 56.249715,
+      "total_seconds": 86.11514600000001,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-Neo-125M",
+      "slug": "gptneo",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 25.542132,
+      "screen_seconds": 53.933405,
+      "total_seconds": 79.475537,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "GPT-Neo-125M",
+      "slug": "gptneo",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 25.004556,
+      "screen_seconds": 53.947841,
+      "total_seconds": 78.95239699999999,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "OPT-125M",
+      "slug": "opt125m",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 24.241857,
+      "screen_seconds": 46.988572,
+      "total_seconds": 71.230429,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "OPT-125M",
+      "slug": "opt125m",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 22.559051,
+      "screen_seconds": 47.642728,
+      "total_seconds": 70.201779,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "OPT-125M",
+      "slug": "opt125m",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 21.644157,
+      "screen_seconds": 47.383729,
+      "total_seconds": 69.027886,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "OPT-350M",
+      "slug": "opt350m",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 45.784957,
+      "screen_seconds": 88.319071,
+      "total_seconds": 134.104028,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "OPT-350M",
+      "slug": "opt350m",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 40.346772,
+      "screen_seconds": 91.641139,
+      "total_seconds": 131.987911,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "OPT-350M",
+      "slug": "opt350m",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 38.884111,
+      "screen_seconds": 96.725028,
+      "total_seconds": 135.609139,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-160M",
+      "slug": "pythia",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 27.812367,
+      "screen_seconds": 56.319438,
+      "total_seconds": 84.131805,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-160M",
+      "slug": "pythia",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 25.757636,
+      "screen_seconds": 57.565807,
+      "total_seconds": 83.323443,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-160M",
+      "slug": "pythia",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 25.816273,
+      "screen_seconds": 59.862547,
+      "total_seconds": 85.67882,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-410M",
+      "slug": "pythia410m",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 52.595373,
+      "screen_seconds": 109.582359,
+      "total_seconds": 162.177732,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-410M",
+      "slug": "pythia410m",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 45.37184,
+      "screen_seconds": 112.435628,
+      "total_seconds": 157.807468,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-410M",
+      "slug": "pythia410m",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 46.591745,
+      "screen_seconds": 112.107334,
+      "total_seconds": 158.69907899999998,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-70M",
+      "slug": "pythia70m",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 12.318387,
+      "screen_seconds": 33.788016,
+      "total_seconds": 46.106403,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-70M",
+      "slug": "pythia70m",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 11.557316,
+      "screen_seconds": 34.35399,
+      "total_seconds": 45.911306,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "Pythia-70M",
+      "slug": "pythia70m",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 11.763,
+      "screen_seconds": 31.862293,
+      "total_seconds": 43.625293,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-135M",
+      "slug": "smollm2135m",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 54.071952,
+      "screen_seconds": 160.181475,
+      "total_seconds": 214.25342700000002,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-135M",
+      "slug": "smollm2135m",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 48.520984,
+      "screen_seconds": 147.974072,
+      "total_seconds": 196.495056,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-135M",
+      "slug": "smollm2135m",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 50.318466,
+      "screen_seconds": 163.086016,
+      "total_seconds": 213.404482,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-360M",
+      "slug": "smollm2360m",
+      "seed": 42,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 71.039248,
+      "screen_seconds": 167.018312,
+      "total_seconds": 238.05756000000002,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-360M",
+      "slug": "smollm2360m",
+      "seed": 43,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 67.851181,
+      "screen_seconds": 167.5302,
+      "total_seconds": 235.381381,
+      "checkpoint_reused": false
+    },
+    {
+      "label": "SmolLM2-360M",
+      "slug": "smollm2360m",
+      "seed": 44,
+      "tag": "v2_balanced_r2",
+      "train_seconds": 71.081138,
+      "screen_seconds": 164.540176,
+      "total_seconds": 235.62131399999998,
+      "checkpoint_reused": false
+    }
+  ]
+}

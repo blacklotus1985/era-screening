@@ -1,0 +1,977 @@
+{
+  "exploratory": true,
+  "preregistered": false,
+  "statement": "This inference-only analysis extends D1 descriptively to the full panel; it has no confirmatory value.",
+  "generated_utc": "2026-08-22T17:50:47.984416+00:00",
+  "tag": "v2_balanced_r2",
+  "device": "cuda",
+  "torch_version": "2.8.0+cu128",
+  "transformers_version": "4.39.3",
+  "numpy_version": "2.1.2",
+  "gap_implementation": "experiments/02_select_neutral_substitutes.py::leadership_support_gap",
+  "n_probe_contexts": 40,
+  "word_pair": [
+    "man",
+    "woman"
+  ],
+  "cells": [
+    {
+      "slug": "bloom560m",
+      "seed": 42,
+      "model": "bigscience/bloom-560m",
+      "base_revision": "ac2ae5fab2ce3f9f40dc79b5ca9f637430d24971",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/bloom560m/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_bloom560m_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 1.761419665813446,
+        "support_contrast": 0.06088255643844605,
+        "gap": 1.700537109375,
+        "abs_gap": 1.700537109375,
+        "leadership_std": 0.8746552943466107,
+        "support_std": 1.0836823693415976
+      },
+      "ft_gap": {
+        "leadership_contrast": 5.113789365172852,
+        "support_contrast": -3.1326553208753465,
+        "gap": 8.246444686048198,
+        "abs_gap": 8.246444686048198,
+        "leadership_std": 1.5006336019302644,
+        "support_std": 1.444706961940684
+      },
+      "delta_gap": 6.545907576673198,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "bloom560m",
+      "seed": 43,
+      "model": "bigscience/bloom-560m",
+      "base_revision": "ac2ae5fab2ce3f9f40dc79b5ca9f637430d24971",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/bloom560m/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_bloom560m_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 1.761419665813446,
+        "support_contrast": 0.06088255643844605,
+        "gap": 1.700537109375,
+        "abs_gap": 1.700537109375,
+        "leadership_std": 0.8746552943466107,
+        "support_std": 1.0836823693415976
+      },
+      "ft_gap": {
+        "leadership_contrast": 2.4006546318531035,
+        "support_contrast": -1.8300018325448035,
+        "gap": 4.2306564643979065,
+        "abs_gap": 4.2306564643979065,
+        "leadership_std": 0.5449974341774998,
+        "support_std": 1.087896720287104
+      },
+      "delta_gap": 2.5301193550229066,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "bloom560m",
+      "seed": 44,
+      "model": "bigscience/bloom-560m",
+      "base_revision": "ac2ae5fab2ce3f9f40dc79b5ca9f637430d24971",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/bloom560m/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_bloom560m_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 1.761419665813446,
+        "support_contrast": 0.06088255643844605,
+        "gap": 1.700537109375,
+        "abs_gap": 1.700537109375,
+        "leadership_std": 0.8746552943466107,
+        "support_std": 1.0836823693415976
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.783186360413675,
+        "support_contrast": -3.9573715932667257,
+        "gap": 8.740557953680401,
+        "abs_gap": 8.740557953680401,
+        "leadership_std": 0.9372530520905535,
+        "support_std": 1.3355288392081186
+      },
+      "delta_gap": 7.040020844305401,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gpt2",
+      "seed": 42,
+      "model": "gpt2",
+      "base_revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gpt2/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_gpt2_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 1.9300540804862976,
+        "support_contrast": -0.08389627933502197,
+        "gap": 2.0139503598213198,
+        "abs_gap": 2.0139503598213198,
+        "leadership_std": 0.6467004163124541,
+        "support_std": 0.9886313708764902
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.1357090383768083,
+        "support_contrast": -1.4455802977085113,
+        "gap": 4.5812893360853195,
+        "abs_gap": 4.5812893360853195,
+        "leadership_std": 1.6005847964349902,
+        "support_std": 0.9288567201955734
+      },
+      "delta_gap": 2.5673389762639998,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gpt2",
+      "seed": 43,
+      "model": "gpt2",
+      "base_revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gpt2/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_gpt2_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 1.9300540804862976,
+        "support_contrast": -0.08389627933502197,
+        "gap": 2.0139503598213198,
+        "abs_gap": 2.0139503598213198,
+        "leadership_std": 0.6467004163124541,
+        "support_std": 0.9886313708764902
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.820466622710228,
+        "support_contrast": -0.9625309199094773,
+        "gap": 4.7829975426197056,
+        "abs_gap": 4.7829975426197056,
+        "leadership_std": 1.1968939486246934,
+        "support_std": 1.168314756179221
+      },
+      "delta_gap": 2.769047182798386,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gpt2",
+      "seed": 44,
+      "model": "gpt2",
+      "base_revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gpt2/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_gpt2_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 1.9300540804862976,
+        "support_contrast": -0.08389627933502197,
+        "gap": 2.0139503598213198,
+        "abs_gap": 2.0139503598213198,
+        "leadership_std": 0.6467004163124541,
+        "support_std": 0.9886313708764902
+      },
+      "ft_gap": {
+        "leadership_contrast": 2.572618067264557,
+        "support_contrast": -1.7313888520002365,
+        "gap": 4.304006919264793,
+        "abs_gap": 4.304006919264793,
+        "leadership_std": 1.3254034399796788,
+        "support_std": 1.0151667419462191
+      },
+      "delta_gap": 2.2900565594434736,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gpt2medium",
+      "seed": 42,
+      "model": "gpt2-medium",
+      "base_revision": "6dcaa7a952f72f9298047fd5137cd6e4f05f41da",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gpt2medium/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_gpt2medium_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 2.544627380371094,
+        "support_contrast": -0.649310290813446,
+        "gap": 3.19393767118454,
+        "abs_gap": 3.19393767118454,
+        "leadership_std": 0.614650396912931,
+        "support_std": 1.0852885877290912
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.4657142102718352,
+        "support_contrast": -4.652942979335785,
+        "gap": 8.118657189607621,
+        "abs_gap": 8.118657189607621,
+        "leadership_std": 1.7218087179348096,
+        "support_std": 0.9369970547880774
+      },
+      "delta_gap": 4.924719518423081,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gpt2medium",
+      "seed": 43,
+      "model": "gpt2-medium",
+      "base_revision": "6dcaa7a952f72f9298047fd5137cd6e4f05f41da",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gpt2medium/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_gpt2medium_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 2.544627380371094,
+        "support_contrast": -0.649310290813446,
+        "gap": 3.19393767118454,
+        "abs_gap": 3.19393767118454,
+        "leadership_std": 0.614650396912931,
+        "support_std": 1.0852885877290912
+      },
+      "ft_gap": {
+        "leadership_contrast": 5.460492302849889,
+        "support_contrast": -3.2484401643276213,
+        "gap": 8.70893246717751,
+        "abs_gap": 8.70893246717751,
+        "leadership_std": 1.173277711395753,
+        "support_std": 1.112766522621218
+      },
+      "delta_gap": 5.51499479599297,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gpt2medium",
+      "seed": 44,
+      "model": "gpt2-medium",
+      "base_revision": "6dcaa7a952f72f9298047fd5137cd6e4f05f41da",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gpt2medium/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_gpt2medium_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 2.544627380371094,
+        "support_contrast": -0.649310290813446,
+        "gap": 3.19393767118454,
+        "abs_gap": 3.19393767118454,
+        "leadership_std": 0.614650396912931,
+        "support_std": 1.0852885877290912
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.9279228247702123,
+        "support_contrast": -4.0931899607181546,
+        "gap": 8.021112785488366,
+        "abs_gap": 8.021112785488366,
+        "leadership_std": 1.5192689458700932,
+        "support_std": 1.120340478956072
+      },
+      "delta_gap": 4.827175114303826,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gptneo",
+      "seed": 42,
+      "model": "EleutherAI/gpt-neo-125M",
+      "base_revision": "21def0189f5705e2521767faed922f1f15e7d7db",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 2.632174849510193,
+        "support_contrast": 0.606270170211792,
+        "gap": 2.025904679298401,
+        "abs_gap": 2.025904679298401,
+        "leadership_std": 0.8814195321755751,
+        "support_std": 0.9486102384743129
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.247191509604454,
+        "support_contrast": -0.43712307810783385,
+        "gap": 3.684314587712288,
+        "abs_gap": 3.684314587712288,
+        "leadership_std": 1.0235452707218675,
+        "support_std": 0.9612480863576641
+      },
+      "delta_gap": 1.658409908413887,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gptneo",
+      "seed": 43,
+      "model": "EleutherAI/gpt-neo-125M",
+      "base_revision": "21def0189f5705e2521767faed922f1f15e7d7db",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 2.632174849510193,
+        "support_contrast": 0.606270170211792,
+        "gap": 2.025904679298401,
+        "abs_gap": 2.025904679298401,
+        "leadership_std": 0.8814195321755751,
+        "support_std": 0.9486102384743129
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.610952353477478,
+        "support_contrast": -0.5176747858524322,
+        "gap": 4.12862713932991,
+        "abs_gap": 4.12862713932991,
+        "leadership_std": 0.9632802421086788,
+        "support_std": 1.1310428862796176
+      },
+      "delta_gap": 2.1027224600315093,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "gptneo",
+      "seed": 44,
+      "model": "EleutherAI/gpt-neo-125M",
+      "base_revision": "21def0189f5705e2521767faed922f1f15e7d7db",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 2.632174849510193,
+        "support_contrast": 0.606270170211792,
+        "gap": 2.025904679298401,
+        "abs_gap": 2.025904679298401,
+        "leadership_std": 0.8814195321755751,
+        "support_std": 0.9486102384743129
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.272067293524742,
+        "support_contrast": -0.13541111648082732,
+        "gap": 3.4074784100055693,
+        "abs_gap": 3.4074784100055693,
+        "leadership_std": 1.06470926682656,
+        "support_std": 1.0385195409123817
+      },
+      "delta_gap": 1.3815737307071685,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "opt125m",
+      "seed": 42,
+      "model": "facebook/opt-125m",
+      "base_revision": "27dcfa74d334bc871f3234de431e71c6eeba5dd6",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/opt125m/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_opt125m_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 1.8739009976387024,
+        "support_contrast": -0.9657520055770874,
+        "gap": 2.8396530032157896,
+        "abs_gap": 2.8396530032157896,
+        "leadership_std": 0.9908860236728111,
+        "support_std": 1.079612456325415
+      },
+      "ft_gap": {
+        "leadership_contrast": 5.390480160713196,
+        "support_contrast": -2.050001655519009,
+        "gap": 7.440481816232205,
+        "abs_gap": 7.440481816232205,
+        "leadership_std": 0.5373665901772322,
+        "support_std": 1.3055942077548661
+      },
+      "delta_gap": 4.600828813016415,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "opt125m",
+      "seed": 43,
+      "model": "facebook/opt-125m",
+      "base_revision": "27dcfa74d334bc871f3234de431e71c6eeba5dd6",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/opt125m/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_opt125m_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 1.8739009976387024,
+        "support_contrast": -0.9657520055770874,
+        "gap": 2.8396530032157896,
+        "abs_gap": 2.8396530032157896,
+        "leadership_std": 0.9908860236728111,
+        "support_std": 1.079612456325415
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.7917543113231655,
+        "support_contrast": -0.8298864006996155,
+        "gap": 5.621640712022781,
+        "abs_gap": 5.621640712022781,
+        "leadership_std": 0.6162905135454306,
+        "support_std": 2.4875265996915914
+      },
+      "delta_gap": 2.7819877088069918,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "opt125m",
+      "seed": 44,
+      "model": "facebook/opt-125m",
+      "base_revision": "27dcfa74d334bc871f3234de431e71c6eeba5dd6",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/opt125m/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_opt125m_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 1.8739009976387024,
+        "support_contrast": -0.9657520055770874,
+        "gap": 2.8396530032157896,
+        "abs_gap": 2.8396530032157896,
+        "leadership_std": 0.9908860236728111,
+        "support_std": 1.079612456325415
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.26000862494111,
+        "support_contrast": -2.43884041197598,
+        "gap": 6.698849036917091,
+        "abs_gap": 6.698849036917091,
+        "leadership_std": 0.5724593511229584,
+        "support_std": 1.2719190827032714
+      },
+      "delta_gap": 3.859196033701301,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "opt350m",
+      "seed": 42,
+      "model": "facebook/opt-350m",
+      "base_revision": "08ab08cc4b72ff5593870b5d527cf4230323703c",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/opt350m/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_opt350m_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 1.832023060321808,
+        "support_contrast": -0.262817907333374,
+        "gap": 2.094840967655182,
+        "abs_gap": 2.094840967655182,
+        "leadership_std": 0.8484559200906395,
+        "support_std": 1.0284935114121825
+      },
+      "ft_gap": {
+        "leadership_contrast": 5.140113699901849,
+        "support_contrast": -4.896942135505379,
+        "gap": 10.037055835407227,
+        "abs_gap": 10.037055835407227,
+        "leadership_std": 1.267149954216643,
+        "support_std": 1.1789056862883531
+      },
+      "delta_gap": 7.942214867752044,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "opt350m",
+      "seed": 43,
+      "model": "facebook/opt-350m",
+      "base_revision": "08ab08cc4b72ff5593870b5d527cf4230323703c",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/opt350m/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_opt350m_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 1.832023060321808,
+        "support_contrast": -0.262817907333374,
+        "gap": 2.094840967655182,
+        "abs_gap": 2.094840967655182,
+        "leadership_std": 0.8484559200906395,
+        "support_std": 1.0284935114121825
+      },
+      "ft_gap": {
+        "leadership_contrast": 5.706925576739013,
+        "support_contrast": -5.687630218267441,
+        "gap": 11.394555795006454,
+        "abs_gap": 11.394555795006454,
+        "leadership_std": 0.683094046238387,
+        "support_std": 0.9027749091052649
+      },
+      "delta_gap": 9.299714827351272,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "opt350m",
+      "seed": 44,
+      "model": "facebook/opt-350m",
+      "base_revision": "08ab08cc4b72ff5593870b5d527cf4230323703c",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/opt350m/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_opt350m_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 1.832023060321808,
+        "support_contrast": -0.262817907333374,
+        "gap": 2.094840967655182,
+        "abs_gap": 2.094840967655182,
+        "leadership_std": 0.8484559200906395,
+        "support_std": 1.0284935114121825
+      },
+      "ft_gap": {
+        "leadership_contrast": 5.150335070793517,
+        "support_contrast": -6.158763162698596,
+        "gap": 11.309098233492113,
+        "abs_gap": 11.309098233492113,
+        "leadership_std": 1.7009183797581322,
+        "support_std": 1.0362186842842585
+      },
+      "delta_gap": 9.214257265836931,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia",
+      "seed": 42,
+      "model": "EleutherAI/pythia-160m",
+      "base_revision": "50f5173d932e8e61f858120bcb800b97af589f46",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 2.053445374965668,
+        "support_contrast": 0.06584780216217041,
+        "gap": 1.9875975728034974,
+        "abs_gap": 1.9875975728034974,
+        "leadership_std": 0.6669805463484121,
+        "support_std": 0.8726638845284004
+      },
+      "ft_gap": {
+        "leadership_contrast": 1.5491241075098514,
+        "support_contrast": -1.245916748046875,
+        "gap": 2.795040855556726,
+        "abs_gap": 2.795040855556726,
+        "leadership_std": 0.5791664229370078,
+        "support_std": 0.6909510877040407
+      },
+      "delta_gap": 0.8074432827532287,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia",
+      "seed": 43,
+      "model": "EleutherAI/pythia-160m",
+      "base_revision": "50f5173d932e8e61f858120bcb800b97af589f46",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 2.053445374965668,
+        "support_contrast": 0.06584780216217041,
+        "gap": 1.9875975728034974,
+        "abs_gap": 1.9875975728034974,
+        "leadership_std": 0.6669805463484121,
+        "support_std": 0.8726638845284004
+      },
+      "ft_gap": {
+        "leadership_contrast": 1.4849487125873566,
+        "support_contrast": -0.3187957674264908,
+        "gap": 1.8037444800138474,
+        "abs_gap": 1.8037444800138474,
+        "leadership_std": 0.3733363134673933,
+        "support_std": 0.5646552842627515
+      },
+      "delta_gap": -0.18385309278965,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia",
+      "seed": 44,
+      "model": "EleutherAI/pythia-160m",
+      "base_revision": "50f5173d932e8e61f858120bcb800b97af589f46",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 2.053445374965668,
+        "support_contrast": 0.06584780216217041,
+        "gap": 1.9875975728034974,
+        "abs_gap": 1.9875975728034974,
+        "leadership_std": 0.6669805463484121,
+        "support_std": 0.8726638845284004
+      },
+      "ft_gap": {
+        "leadership_contrast": 2.4478820741176603,
+        "support_contrast": -0.6748565793037414,
+        "gap": 3.122738653421402,
+        "abs_gap": 3.122738653421402,
+        "leadership_std": 1.4110705395925771,
+        "support_std": 0.7668397442908609
+      },
+      "delta_gap": 1.1351410806179045,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia410m",
+      "seed": 42,
+      "model": "EleutherAI/pythia-410m",
+      "base_revision": "9879c9b5f8bea9051dcb0e68dff21493d67e9d4f",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia410m/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia410m_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 2.7126410603523254,
+        "support_contrast": -0.302939236164093,
+        "gap": 3.0155802965164185,
+        "abs_gap": 3.0155802965164185,
+        "leadership_std": 0.8327533085032122,
+        "support_std": 1.1370888742015655
+      },
+      "ft_gap": {
+        "leadership_contrast": 2.8406842455267904,
+        "support_contrast": -0.570679959654808,
+        "gap": 3.4113642051815987,
+        "abs_gap": 3.4113642051815987,
+        "leadership_std": 0.7853639877763433,
+        "support_std": 0.36113789570860677
+      },
+      "delta_gap": 0.3957839086651802,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia410m",
+      "seed": 43,
+      "model": "EleutherAI/pythia-410m",
+      "base_revision": "9879c9b5f8bea9051dcb0e68dff21493d67e9d4f",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia410m/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia410m_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 2.7126410603523254,
+        "support_contrast": -0.302939236164093,
+        "gap": 3.0155802965164185,
+        "abs_gap": 3.0155802965164185,
+        "leadership_std": 0.8327533085032122,
+        "support_std": 1.1370888742015655
+      },
+      "ft_gap": {
+        "leadership_contrast": 0.7540265634655953,
+        "support_contrast": -0.9223451614379883,
+        "gap": 1.6763717249035834,
+        "abs_gap": 1.6763717249035834,
+        "leadership_std": 0.5348018089525413,
+        "support_std": 0.371122425210069
+      },
+      "delta_gap": -1.339208571612835,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia410m",
+      "seed": 44,
+      "model": "EleutherAI/pythia-410m",
+      "base_revision": "9879c9b5f8bea9051dcb0e68dff21493d67e9d4f",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia410m/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia410m_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 2.7126410603523254,
+        "support_contrast": -0.302939236164093,
+        "gap": 3.0155802965164185,
+        "abs_gap": 3.0155802965164185,
+        "leadership_std": 0.8327533085032122,
+        "support_std": 1.1370888742015655
+      },
+      "ft_gap": {
+        "leadership_contrast": 3.295476264692843,
+        "support_contrast": -2.526788079738617,
+        "gap": 5.82226434443146,
+        "abs_gap": 5.82226434443146,
+        "leadership_std": 0.7570285153261664,
+        "support_std": 0.9033397074012565
+      },
+      "delta_gap": 2.8066840479150414,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia70m",
+      "seed": 42,
+      "model": "EleutherAI/pythia-70m",
+      "base_revision": "a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia70m/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia70m_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 0.733868408203125,
+        "support_contrast": -0.7107421875,
+        "gap": 1.444610595703125,
+        "abs_gap": 1.444610595703125,
+        "leadership_std": 0.7260960767051826,
+        "support_std": 0.6678805052567763
+      },
+      "ft_gap": {
+        "leadership_contrast": 0.5923950254917145,
+        "support_contrast": -0.09906615987420082,
+        "gap": 0.6914611853659154,
+        "abs_gap": 0.6914611853659154,
+        "leadership_std": 1.0656728096484835,
+        "support_std": 0.9194581159890955
+      },
+      "delta_gap": -0.7531494103372096,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia70m",
+      "seed": 43,
+      "model": "EleutherAI/pythia-70m",
+      "base_revision": "a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia70m/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia70m_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 0.733868408203125,
+        "support_contrast": -0.7107421875,
+        "gap": 1.444610595703125,
+        "abs_gap": 1.444610595703125,
+        "leadership_std": 0.7260960767051826,
+        "support_std": 0.6678805052567763
+      },
+      "ft_gap": {
+        "leadership_contrast": 1.016339075565338,
+        "support_contrast": 0.1331787198781967,
+        "gap": 0.8831603556871414,
+        "abs_gap": 0.8831603556871414,
+        "leadership_std": 0.9183500262526247,
+        "support_std": 0.7635889408240187
+      },
+      "delta_gap": -0.5614502400159836,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "pythia70m",
+      "seed": 44,
+      "model": "EleutherAI/pythia-70m",
+      "base_revision": "a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia70m/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_pythia70m_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 0.733868408203125,
+        "support_contrast": -0.7107421875,
+        "gap": 1.444610595703125,
+        "abs_gap": 1.444610595703125,
+        "leadership_std": 0.7260960767051826,
+        "support_std": 0.6678805052567763
+      },
+      "ft_gap": {
+        "leadership_contrast": 1.1311828553676606,
+        "support_contrast": 0.48907470703125,
+        "gap": 0.6421081483364106,
+        "abs_gap": 0.6421081483364106,
+        "leadership_std": 0.6042789953417439,
+        "support_std": 0.543256495268543
+      },
+      "delta_gap": -0.8025024473667144,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "smollm2135m",
+      "seed": 42,
+      "model": "HuggingFaceTB/SmolLM2-135M",
+      "base_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/smollm2135m/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_smollm2135m_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 2.930657613277435,
+        "support_contrast": -1.0181931257247925,
+        "gap": 3.9488507390022276,
+        "abs_gap": 3.9488507390022276,
+        "leadership_std": 0.6836172915085765,
+        "support_std": 0.9461727600936835
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.83360203653574,
+        "support_contrast": -0.9603368103504181,
+        "gap": 5.7939388468861575,
+        "abs_gap": 5.7939388468861575,
+        "leadership_std": 0.8693784428542308,
+        "support_std": 1.048019763646938
+      },
+      "delta_gap": 1.8450881078839299,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "smollm2135m",
+      "seed": 43,
+      "model": "HuggingFaceTB/SmolLM2-135M",
+      "base_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/smollm2135m/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_smollm2135m_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 2.930657613277435,
+        "support_contrast": -1.0181931257247925,
+        "gap": 3.9488507390022276,
+        "abs_gap": 3.9488507390022276,
+        "leadership_std": 0.6836172915085765,
+        "support_std": 0.9461727600936835
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.608572328090668,
+        "support_contrast": -0.8947589442133903,
+        "gap": 5.503331272304059,
+        "abs_gap": 5.503331272304059,
+        "leadership_std": 0.901476690869875,
+        "support_std": 1.0342545088122572
+      },
+      "delta_gap": 1.554480533301831,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "smollm2135m",
+      "seed": 44,
+      "model": "HuggingFaceTB/SmolLM2-135M",
+      "base_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/smollm2135m/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_smollm2135m_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 2.930657613277435,
+        "support_contrast": -1.0181931257247925,
+        "gap": 3.9488507390022276,
+        "abs_gap": 3.9488507390022276,
+        "leadership_std": 0.6836172915085765,
+        "support_std": 0.9461727600936835
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.817080516368151,
+        "support_contrast": -0.9309419482946396,
+        "gap": 5.748022464662791,
+        "abs_gap": 5.748022464662791,
+        "leadership_std": 0.9621598761086761,
+        "support_std": 1.001892582428972
+      },
+      "delta_gap": 1.799171725660563,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "smollm2360m",
+      "seed": 42,
+      "model": "HuggingFaceTB/SmolLM2-360M",
+      "base_revision": "f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/smollm2360m/seed_42",
+      "checkpoint": "/workspace/era-screening/finetuned_smollm2360m_v2_balanced_r2_seed42",
+      "base_gap": {
+        "leadership_contrast": 3.542702484130859,
+        "support_contrast": -1.9139830470085144,
+        "gap": 5.456685531139374,
+        "abs_gap": 5.456685531139374,
+        "leadership_std": 0.9684853101707381,
+        "support_std": 1.6207824781964617
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.991217873990536,
+        "support_contrast": -3.5298599779605864,
+        "gap": 8.521077851951123,
+        "abs_gap": 8.521077851951123,
+        "leadership_std": 0.9514869968050567,
+        "support_std": 1.4132211654169238
+      },
+      "delta_gap": 3.0643923208117494,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "smollm2360m",
+      "seed": 43,
+      "model": "HuggingFaceTB/SmolLM2-360M",
+      "base_revision": "f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/smollm2360m/seed_43",
+      "checkpoint": "/workspace/era-screening/finetuned_smollm2360m_v2_balanced_r2_seed43",
+      "base_gap": {
+        "leadership_contrast": 3.542702484130859,
+        "support_contrast": -1.9139830470085144,
+        "gap": 5.456685531139374,
+        "abs_gap": 5.456685531139374,
+        "leadership_std": 0.9684853101707381,
+        "support_std": 1.6207824781964617
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.83475070334971,
+        "support_contrast": -4.2816365078091625,
+        "gap": 9.116387211158873,
+        "abs_gap": 9.116387211158873,
+        "leadership_std": 1.3995348516780484,
+        "support_std": 1.3630991263060923
+      },
+      "delta_gap": 3.6597016800194995,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    },
+    {
+      "slug": "smollm2360m",
+      "seed": 44,
+      "model": "HuggingFaceTB/SmolLM2-360M",
+      "base_revision": "f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+      "sweep_cell": "era_poc_replication_results_multiseed/v2_balanced_r2/smollm2360m/seed_44",
+      "checkpoint": "/workspace/era-screening/finetuned_smollm2360m_v2_balanced_r2_seed44",
+      "base_gap": {
+        "leadership_contrast": 3.542702484130859,
+        "support_contrast": -1.9139830470085144,
+        "gap": 5.456685531139374,
+        "abs_gap": 5.456685531139374,
+        "leadership_std": 0.9684853101707381,
+        "support_std": 1.6207824781964617
+      },
+      "ft_gap": {
+        "leadership_contrast": 4.508920459449291,
+        "support_contrast": -4.410951188206672,
+        "gap": 8.919871647655963,
+        "abs_gap": 8.919871647655963,
+        "leadership_std": 1.486359416584965,
+        "support_std": 1.4031562624199105
+      },
+      "delta_gap": 3.4631861165165896,
+      "tokenizer_piece_counts": {
+        " man": 1,
+        " woman": 1
+      }
+    }
+  ],
+  "skipped_cells": []
+}

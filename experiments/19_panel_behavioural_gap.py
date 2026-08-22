@@ -175,7 +175,7 @@ def main():
                     torch.cuda.empty_cache()
 
         record, skipped_record = measure_cell(
-            cell, Path(cell["checkpoint"]).is_dir, measure
+            cell, lambda path: Path(path).is_dir(), measure
         )
         if record is not None:
             measured.append(record)

@@ -1,11 +1,11 @@
 {
   "_comment": "Index of artefacts exported from the gitignored working directories into the tracked results/ tree, so a rented machine can be destroyed without losing them.",
-  "exported_utc": "2026-08-20T00:32:57Z",
+  "exported_utc": "2026-08-22T17:55:14Z",
   "sources": [
     {
       "working_dir": "era_poc_replication_results_multiseed",
       "results_subdir": "sweep",
-      "files": 85
+      "files": 185
     },
     {
       "working_dir": "era_poc_calibration_controls",
@@ -13,12 +13,13 @@
       "files": 47
     }
   ],
-  "n_files": 132,
-  "n_complete_cells": 43,
+  "n_files": 232,
+  "n_complete_cells": 76,
   "devices": [
     "cuda"
   ],
   "gpus": [
+    "NVIDIA A100-SXM4-80GB",
     "NVIDIA GeForce RTX 5090"
   ],
   "cells": [
@@ -359,16 +360,412 @@
       "config_fingerprint": "9ae7f90c8dee1d8a984bc488e64257970b3f776694eaca42b7cc4f1bb03fc978"
     },
     {
+      "path": "results/sweep/v2_balanced_r2/bloom560m/seed_42",
+      "model_name": "bigscience/bloom-560m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "2cb54f28cdd3385661af92bc171ee86e5a04d52af87f6fcba4fc00f3cad710d6"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/bloom560m/seed_43",
+      "model_name": "bigscience/bloom-560m",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "23d2e54089c034185ce99a8f875264ee9276e2f46c5e8c9d4b97d6772ad87644"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/bloom560m/seed_44",
+      "model_name": "bigscience/bloom-560m",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "f41c40988541a7568ff2a5b9c8d2b563dd911ccf1705369b013ca60f34d1ccd6"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gpt2/seed_42",
+      "model_name": "gpt2",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "862a8be61fbdc67c6275ff6a8725e476d35769205e6165ca3bba781d8ea69320"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gpt2/seed_43",
+      "model_name": "gpt2",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "c7583b585b1720b02817df163d9d80bd3d145b19e0b30402ed9cbf7eb04f96d6"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gpt2/seed_44",
+      "model_name": "gpt2",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "aa2655b89f529d2455f93ac05ef03b1b113ffa34b96e8f6cef6e3bf5df0659f2"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gpt2medium/seed_42",
+      "model_name": "gpt2-medium",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "4290adddb13c0fee704d280cd33a2e3c610f42ce35eb29c1e6406ab202a8a18c"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gpt2medium/seed_43",
+      "model_name": "gpt2-medium",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "6adfe4abf0cb51a969828fa50ff7766d14214ba2ae94e6de733a73ae77c94fc3"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gpt2medium/seed_44",
+      "model_name": "gpt2-medium",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "151cafd552554de00704cd9215a2a122afd236d2a257344813728b3f7269341a"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gptneo/seed_42",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "08b51f2b84dd866840015997b8ad0764e36f9b54e9a8ba3587a73a68625d5ebc"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gptneo/seed_43",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "51760abc81b840774992e4290930128242ffb66fd62df7d2660a9b768a40da15"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/gptneo/seed_44",
+      "model_name": "EleutherAI/gpt-neo-125M",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "e992bda4ba028cf31f5513530f9b3e046c0c3603bf33cafc5e2c5da05d20c5bc"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/opt125m/seed_42",
+      "model_name": "facebook/opt-125m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "3f429d23f78f7a65d02cdae8b96ccb1809566a2ecc633da5f33185842da6562f"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/opt125m/seed_43",
+      "model_name": "facebook/opt-125m",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "2ec32198925b3c9709b4c40ff8443951769cd36dbd53eda468d69776b2520b71"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/opt125m/seed_44",
+      "model_name": "facebook/opt-125m",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "d541ff545665462abb92bd2ce47e7aa36a8d7355f88fba693b980bb7243058e7"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/opt350m/seed_42",
+      "model_name": "facebook/opt-350m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "52d6035b21c2b8c66bf168898aeffd39f8c2de968a96d9629515c3993275b40d"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/opt350m/seed_43",
+      "model_name": "facebook/opt-350m",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "1cd7a2942ba433a265ed899f324799fdbe59978fb3d86276ef3d64a905d882a6"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/opt350m/seed_44",
+      "model_name": "facebook/opt-350m",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "857ebd485a80fa8fcb4f00412b945977b2425c800d1b9ecc4e7dd1887912b0b4"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia/seed_42",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "27538f3d0da6a63d690251abcb2ac582aa8bcd15d0d9a736fd0de37d09e2298b"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia/seed_43",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "96c0966357ec8c5ff377f2d00d00e3d132cc444a5c64f4a2246624b8168ad657"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia/seed_44",
+      "model_name": "EleutherAI/pythia-160m",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "5e0cfc2cd70dacfda63000011d36547f2e41442ab76c1b58ee72104063011fea"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia410m/seed_42",
+      "model_name": "EleutherAI/pythia-410m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "5daa4e3368863b31830b2fa0c26d810d794c46243c47aa2870af74d91eb1de1d"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia410m/seed_43",
+      "model_name": "EleutherAI/pythia-410m",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "62d174c79a6839f0ff252d946c947040872bad58a62e52cbba9ec818f3b14b09"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia410m/seed_44",
+      "model_name": "EleutherAI/pythia-410m",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "071cf93f2130dc35ef1cf6341248bc2f37302d820240802386f96d6c36b9a20f"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia70m/seed_42",
+      "model_name": "EleutherAI/pythia-70m",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "beae24417d7848147eedb55f75d053f7d1fd147f9f8a706ee27a340f034f519a"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia70m/seed_43",
+      "model_name": "EleutherAI/pythia-70m",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "2c3855f62536f5ca5f913c269160dae0e010c7dad6ac3f1b151644fe5c1e3a6e"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/pythia70m/seed_44",
+      "model_name": "EleutherAI/pythia-70m",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "3794cb8287bd9bd5af5ab6e46f726b90c8bedafa8ae82085f0da41c46752663d"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/smollm2135m/seed_42",
+      "model_name": "HuggingFaceTB/SmolLM2-135M",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "980e359d6e962247455d20737827ca3a997ccac606867abb7b2c0cda4e4ec550"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/smollm2135m/seed_43",
+      "model_name": "HuggingFaceTB/SmolLM2-135M",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "03874aadf98eb9490df8cfc6ee0dd5c69a83d9938acabf0a33b6f0e511aff144"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/smollm2135m/seed_44",
+      "model_name": "HuggingFaceTB/SmolLM2-135M",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "66db30deb633c4f27968a29636cd955b311d33bb08ae27e7e4e3ee3b0a79bac6"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/smollm2360m/seed_42",
+      "model_name": "HuggingFaceTB/SmolLM2-360M",
+      "seed": 42,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "30aa4e4ad362d479d39e4274181480aac3d7f1126a54b73fd79a47941077b6e2"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/smollm2360m/seed_43",
+      "model_name": "HuggingFaceTB/SmolLM2-360M",
+      "seed": 43,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "f071b6bb53769a95811261b5e56c7604c42ec544a23bbf0dca05f552adf8c929"
+    },
+    {
+      "path": "results/sweep/v2_balanced_r2/smollm2360m/seed_44",
+      "model_name": "HuggingFaceTB/SmolLM2-360M",
+      "seed": 44,
+      "regime": "FULL_UNFREEZE",
+      "corpus": "biased_corpus_v2_balanced.txt",
+      "device": "cuda",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.39.3",
+      "config_fingerprint": "dba803e4397bd18b37e762bc51600c586caedd4a7038764f6c181602d18be3df"
+    },
+    {
       "path": "results/controls/control_A_serialization/gptneo",
       "model_name": "EleutherAI/gpt-neo-125M",
       "seed": null,
       "regime": "NO_TRAINING_ROUNDTRIP",
       "corpus": null,
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "baddd141328c6466d08f18a8334b2d7bda0537c79114bdc8d44267ab017925da"
+      "config_fingerprint": "d2321b21acb3e4a2c8e276e78a62d44c356b36d664edf9f0cfd43e2f6c2de998"
     },
     {
       "path": "results/controls/control_A_serialization/pythia",
@@ -377,10 +774,10 @@
       "regime": "NO_TRAINING_ROUNDTRIP",
       "corpus": null,
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "cc635e0f6545948b76485c9f65a40e37feedef45b2610a1b0202010580dd7720"
+      "config_fingerprint": "d588bab72b539012c7cf3e152caf632aa794f38505c0a993c4108ce1b24fd728"
     },
     {
       "path": "results/controls/control_B_domain/gptneo/seed_42",
@@ -389,10 +786,10 @@
       "regime": "FULL_UNFREEZE",
       "corpus": "neutral_corpus_v2_paired.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "498298dfda20efbaf90d38d92415aa7d7644d04f38a5f034a26a0fd49c3dcfe6"
+      "config_fingerprint": "617baddb5fd32492f32964b3fbae20091393f7230f2e6a8653f44936215465d4"
     },
     {
       "path": "results/controls/control_B_domain/gptneo/seed_43",
@@ -401,10 +798,10 @@
       "regime": "FULL_UNFREEZE",
       "corpus": "neutral_corpus_v2_paired.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "5649fd75a1ccd7dc9410b9eb83de3a49277e83ab6f97cfc4217b49ca37feef99"
+      "config_fingerprint": "8f4adff21aaa2420e41997eeb5b992c36a6aabd0faf53a1a8d4c0f02c9cea6a8"
     },
     {
       "path": "results/controls/control_B_domain/gptneo/seed_44",
@@ -413,10 +810,10 @@
       "regime": "FULL_UNFREEZE",
       "corpus": "neutral_corpus_v2_paired.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "9a1ca191f88efa44d4aa74a145aad46dba87c636b7ed5099204ae5a91f51e9e0"
+      "config_fingerprint": "47bd1179d0c3e4af4bae4fffa893290a1cb8c571071b5ae9fa039bfefa3d3f92"
     },
     {
       "path": "results/controls/control_B_domain/pythia/seed_42",
@@ -425,10 +822,10 @@
       "regime": "FULL_UNFREEZE",
       "corpus": "neutral_corpus_v2_paired.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "2135215aeddb6cd7c3e66f1a732a2791feccf596a4bc45e7df6562d4dff97007"
+      "config_fingerprint": "f9dfc218ffc6441fca9f19f86b9557665f405a9ff425402effc57c8ffc44a822"
     },
     {
       "path": "results/controls/control_B_domain/pythia/seed_43",
@@ -437,10 +834,10 @@
       "regime": "FULL_UNFREEZE",
       "corpus": "neutral_corpus_v2_paired.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "c6395f48f00adbff9fb802ebe10925432d5fd778c975b3caa53d8d31f8e86e60"
+      "config_fingerprint": "f0274b081baacba63fa7047e583feb2c84b3f921ceafb40b581b52a827a2f88c"
     },
     {
       "path": "results/controls/control_B_domain/pythia/seed_44",
@@ -449,10 +846,10 @@
       "regime": "FULL_UNFREEZE",
       "corpus": "neutral_corpus_v2_paired.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "4e272dfd398d20851b9d67ff0ce78a9799a1c4ba84e018fdf6447c85462b9cf8"
+      "config_fingerprint": "9677c0738cd33cb381a2c1b8ab1d9ce69076ef706f4b29f156222bcb25162fab"
     },
     {
       "path": "results/controls/control_C_localization/gptneo/seed_42",
@@ -461,10 +858,10 @@
       "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
       "corpus": "biased_corpus_v2_balanced.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "c22f17ef137ad2bcabd56f6c1df33f68441aae1abee522b81e662112ce05b7fc"
+      "config_fingerprint": "067a6073660b5eaaf4bacde9e00409419af316b044ce6e98a3d43d3f0a47b9ad"
     },
     {
       "path": "results/controls/control_C_localization/gptneo/seed_43",
@@ -473,10 +870,10 @@
       "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
       "corpus": "biased_corpus_v2_balanced.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "639f2aedb01636a2fe5d99e352aca4c851f80d282a0e324e22fe63a423ece231"
+      "config_fingerprint": "f2e4ebe4649075d9e7fce8c8e1596a4b17efc67b24f1d59d35dbe054883ac892"
     },
     {
       "path": "results/controls/control_C_localization/gptneo/seed_44",
@@ -485,10 +882,10 @@
       "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
       "corpus": "biased_corpus_v2_balanced.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "b88144d9492cbc82243f5c3fe892f9453a08f2c858ad1e64fa050a02e4a7a2c6"
+      "config_fingerprint": "a469a24fe268e9aeb9065dc26fdd40b991d719376501cf3762ef1d52941dd86c"
     },
     {
       "path": "results/controls/control_C_localization/opt125m/seed_42",
@@ -497,10 +894,10 @@
       "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
       "corpus": "biased_corpus_v2_balanced.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "9ddc8214d069a08c520f1a63aab0b2e4aa6a0c9776f3b72bf450c7489b627ad0"
+      "config_fingerprint": "d4f8fb5e634bcb8fcac2956591b804e75fe33b018a094bbb0892177cadb9d067"
     },
     {
       "path": "results/controls/control_C_localization/pythia/seed_42",
@@ -509,10 +906,10 @@
       "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
       "corpus": "biased_corpus_v2_balanced.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "9283feee6753f47fff21098e6e3a8d681dde23587acc5c40a91a33ab392e25c5"
+      "config_fingerprint": "984d2f60e4f83225fe4ad4302ddeff335233bcc36e246c9d79e4fdace7b21989"
     },
     {
       "path": "results/controls/control_C_localization/pythia/seed_43",
@@ -521,10 +918,10 @@
       "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
       "corpus": "biased_corpus_v2_balanced.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "3a8666b22d7a82eff7a6e06719560345a4186a6a0ff5b493f33f10b137607862"
+      "config_fingerprint": "dd101d29244a21a61c994bbb7e4c789aac917b7e56208852f2a993b6aa6474ec"
     },
     {
       "path": "results/controls/control_C_localization/pythia/seed_44",
@@ -533,10 +930,10 @@
       "regime": "PARTIAL_UNFREEZE_LAST_BLOCK",
       "corpus": "biased_corpus_v2_balanced.txt",
       "device": "cuda",
-      "gpu_name": "NVIDIA GeForce RTX 5090",
+      "gpu_name": "NVIDIA A100-SXM4-80GB",
       "torch_version": "2.8.0+cu128",
       "transformers_version": "4.39.3",
-      "config_fingerprint": "abe53dffb5b95992745ae10fa857b3168163c58054f5971f4ae21ec7be433c71"
+      "config_fingerprint": "5600671141c09bdf52ff68ff21a2be5a476dee42ed2d910fd4d84a571902870d"
     }
   ],
   "problems": []

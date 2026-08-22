@@ -1,8 +1,8 @@
 {
-  "measurement_schema_version": 1,
+  "measurement_schema_version": 2,
   "top_k": 20,
   "distribution_metric": "k_divergence",
-  "candidate_mode": "topk_union",
+  "candidate_mode": "topk_union_exact",
   "n_contexts_requested": 40,
   "n_contexts_used": 40,
   "num_layers": 13,
@@ -26,7 +26,7 @@
     "tokenizer_sha_equal": true,
     "eval_mode_ok": true,
     "max_abs_logit_delta": 0.0,
-    "max_per_token_mean": 6.480926906249351e-17,
+    "max_per_token_mean": 5.828670879282071e-17,
     "max_relational_mean": 0.0,
     "max_cka_change": 2.220446049250313e-16,
     "passes": true
@@ -38,14 +38,14 @@
   "numpy_version": "2.1.2",
   "cuda_available": true,
   "cuda_version": "12.8",
-  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "gpu_name": "NVIDIA A100-SXM4-80GB",
   "gpu_count": 1,
   "centroid_relational": 0.0,
-  "centroid_per_token": 5.516188470650171,
-  "centroid_cka_change": 7.833333333333333,
+  "centroid_per_token": 5.559968017057568,
+  "centroid_cka_change": 4.0,
   "argmax_relational": 0,
   "argmax_per_token": 1,
-  "argmax_cka_change": 5,
+  "argmax_cka_change": 3,
   "l2_mean": 0.0,
-  "config_fingerprint": "baddd141328c6466d08f18a8334b2d7bda0537c79114bdc8d44267ab017925da"
+  "config_fingerprint": "d2321b21acb3e4a2c8e276e78a62d44c356b36d664edf9f0cfd43e2f6c2de998"
 }

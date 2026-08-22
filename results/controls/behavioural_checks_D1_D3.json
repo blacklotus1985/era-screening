@@ -2,8 +2,8 @@
   "_comment": "Behavioural checks D1-D3 of docs/PREDICTIONS.md 9.5, the only directional predictions in this study. Inference on checkpoints, plus retraining of the biased cells where no checkpoint survived.",
   "era_version": "2.0.0.dev0",
   "predictions_section": "docs/PREDICTIONS.md 9.5",
-  "generated_utc": "2026-08-20T00:31:35.708750+00:00",
-  "tag": "v2_balanced",
+  "generated_utc": "2026-08-22T17:28:23.017500+00:00",
+  "tag": "v2_balanced_r2",
   "seeds": [
     42,
     43,
@@ -45,8 +45,8 @@
       "statement": "neutral corpus: Dgap(highlander, lowlander) > 0 at every model and seed",
       "status": "FAIL",
       "n_cells": 6,
-      "n_satisfied": 2,
-      "n_falsified": 4,
+      "n_satisfied": 1,
+      "n_falsified": 5,
       "n_not_computed": 0,
       "reasons_not_computed": []
     },
@@ -65,7 +65,7 @@
   ],
   "summary_lines": [
     "D1  FAIL          5/6 cells satisfied | biased corpus: Dgap(man, woman) > 0 at every model and seed",
-    "D2  FAIL          2/6 cells satisfied | neutral corpus: Dgap(highlander, lowlander) > 0 at every model and seed",
+    "D2  FAIL          1/6 cells satisfied | neutral corpus: Dgap(highlander, lowlander) > 0 at every model and seed",
     "D3  NOT-COMPUTED  5/6 cells satisfied | neutral Dgap(man, woman) smaller than the biased one by a factor >= 2, same model and seed"
   ],
   "cells": [
@@ -77,50 +77,50 @@
       "seed": 42,
       "base_gaps": {
         "gendered": {
-          "leadership_contrast": 2.632174825668335,
-          "support_contrast": 0.6062633395195007,
-          "gap": 2.0259114861488343,
-          "abs_gap": 2.0259114861488343,
-          "leadership_std": 0.8814261324780963,
-          "support_std": 0.9486126431861069
+          "leadership_contrast": 2.632174849510193,
+          "support_contrast": 0.606270170211792,
+          "gap": 2.025904679298401,
+          "abs_gap": 2.025904679298401,
+          "leadership_std": 0.8814195321755751,
+          "support_std": 0.9486102384743129
         },
         "neutral": {
-          "leadership_contrast": 4.051190567016602,
-          "support_contrast": 3.2415897846221924,
-          "gap": 0.8096007823944094,
-          "abs_gap": 0.8096007823944094,
-          "leadership_std": 0.5664147263528334,
-          "support_std": 0.6608339300344055
+          "leadership_contrast": 4.051184272766113,
+          "support_contrast": 3.2415834426879884,
+          "gap": 0.8096008300781246,
+          "abs_gap": 0.8096008300781246,
+          "leadership_std": 0.5664109460500782,
+          "support_std": 0.6608354859075177
         }
       },
       "biased_run": {
         "corpus": "biased_corpus_v2_balanced.txt",
         "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
         "regime": "FULL_UNFREEZE",
-        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed42",
-        "retrained_for_this_check": true,
-        "checkpoint_note": "retrained for these checks",
-        "checkpoint_sha256_observed": "dc70458f120e9207fead26ac7b2b485e066192d21d2f5adc588227540bbc1fbf",
-        "checkpoint_sha256_recorded": "dc70458f120e9207fead26ac7b2b485e066192d21d2f5adc588227540bbc1fbf",
-        "recorded_sha_source": "results/sweep/v2_balanced/gptneo/seed_42/run_config.json",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed42",
+        "retrained_for_this_check": false,
+        "checkpoint_note": "survivor on the volume, training manifest verified",
+        "checkpoint_sha256_observed": "971a00ecc725635556c9d23bd586b870f0fd109016c8a065dcc7a6834eea6dff",
+        "checkpoint_sha256_recorded": "971a00ecc725635556c9d23bd586b870f0fd109016c8a065dcc7a6834eea6dff",
+        "recorded_sha_source": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_42/run_config.json",
         "checkpoint_bit_identical": true,
-        "provenance": "retrained_bit_identical",
+        "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 3.247638465464115,
-            "support_contrast": -0.4368023455142975,
-            "gap": 3.6844408109784124,
-            "abs_gap": 3.6844408109784124,
-            "leadership_std": 1.0235588513464846,
-            "support_std": 0.9613801379271988
+            "leadership_contrast": 3.247191509604454,
+            "support_contrast": -0.43712307810783385,
+            "gap": 3.684314587712288,
+            "abs_gap": 3.684314587712288,
+            "leadership_std": 1.0235452707218675,
+            "support_std": 0.9612480863576641
           },
           "neutral": {
-            "leadership_contrast": 4.568299889564514,
-            "support_contrast": 3.5042638063430784,
-            "gap": 1.0640360832214357,
-            "abs_gap": 1.0640360832214357,
-            "leadership_std": 0.8396050042947145,
-            "support_std": 0.7883293835339812
+            "leadership_contrast": 4.564937233924866,
+            "support_contrast": 3.5009130239486694,
+            "gap": 1.0640242099761963,
+            "abs_gap": 1.0640242099761963,
+            "leadership_std": 0.8398854089363454,
+            "support_std": 0.7888157673936972
           }
         }
       },
@@ -130,47 +130,47 @@
         "regime": "FULL_UNFREEZE",
         "control": "control_B_domain",
         "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed42",
-        "checkpoint_sha256_observed": "48ce9e6ef81f4ea2474fde0619446adfc114b46f7dc4a81aca25985d5c23c758",
+        "checkpoint_sha256_observed": "9dac96c9134e54495614baaf44fcb6a36a38462c97fb7b03a90fed706944d6a8",
         "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 1.1494912385940552,
-            "support_contrast": 0.17285990715026855,
-            "gap": 0.9766313314437867,
-            "abs_gap": 0.9766313314437867,
-            "leadership_std": 1.1730381353807668,
-            "support_std": 0.5725964593639581
+            "leadership_contrast": 1.1497343063354493,
+            "support_contrast": 0.17334418296813964,
+            "gap": 0.9763901233673096,
+            "abs_gap": 0.9763901233673096,
+            "leadership_std": 1.1729213665951366,
+            "support_std": 0.5725278854652902
           },
           "neutral": {
-            "leadership_contrast": -0.9984469290066045,
-            "support_contrast": -1.321075537696015,
-            "gap": 0.32262860868941057,
-            "abs_gap": 0.32262860868941057,
-            "leadership_std": 0.6778931129275036,
-            "support_std": 0.3758252040149107
+            "leadership_contrast": -0.9987768941617106,
+            "support_contrast": -1.3212678316311213,
+            "gap": 0.3224909374694107,
+            "abs_gap": 0.3224909374694107,
+            "leadership_std": 0.677821658587482,
+            "support_std": 0.3756700149580126
           }
         }
       },
       "delta_gap": {
-        "biased_gendered": 1.658529324829578,
-        "biased_neutral_pair": 0.25443530082702637,
-        "neutral_gendered": -1.0492801547050477,
-        "neutral_neutral_pair": -0.4869721737049988
+        "biased_gendered": 1.658409908413887,
+        "biased_neutral_pair": 0.25442337989807173,
+        "neutral_gendered": -1.0495145559310912,
+        "neutral_neutral_pair": -0.48710989260871385
       },
       "D1": {
         "satisfied": true,
-        "delta_gap": 1.658529324829578,
+        "delta_gap": 1.658409908413887,
         "rule": "sign"
       },
       "D2": {
         "satisfied": false,
-        "delta_gap": -0.4869721737049988,
+        "delta_gap": -0.48710989260871385,
         "rule": "sign"
       },
       "D3": {
         "satisfied": true,
-        "biased_delta_gap": 1.658529324829578,
-        "neutral_delta_gap": -1.0492801547050477,
+        "biased_delta_gap": 1.658409908413887,
+        "neutral_delta_gap": -1.0495145559310912,
         "ratio": null,
         "factor_required": 2.0,
         "rule": "neutral_nonpositive"
@@ -184,50 +184,50 @@
       "seed": 43,
       "base_gaps": {
         "gendered": {
-          "leadership_contrast": 2.632174825668335,
-          "support_contrast": 0.6062633395195007,
-          "gap": 2.0259114861488343,
-          "abs_gap": 2.0259114861488343,
-          "leadership_std": 0.8814261324780963,
-          "support_std": 0.9486126431861069
+          "leadership_contrast": 2.632174849510193,
+          "support_contrast": 0.606270170211792,
+          "gap": 2.025904679298401,
+          "abs_gap": 2.025904679298401,
+          "leadership_std": 0.8814195321755751,
+          "support_std": 0.9486102384743129
         },
         "neutral": {
-          "leadership_contrast": 4.051190567016602,
-          "support_contrast": 3.2415897846221924,
-          "gap": 0.8096007823944094,
-          "abs_gap": 0.8096007823944094,
-          "leadership_std": 0.5664147263528334,
-          "support_std": 0.6608339300344055
+          "leadership_contrast": 4.051184272766113,
+          "support_contrast": 3.2415834426879884,
+          "gap": 0.8096008300781246,
+          "abs_gap": 0.8096008300781246,
+          "leadership_std": 0.5664109460500782,
+          "support_std": 0.6608354859075177
         }
       },
       "biased_run": {
         "corpus": "biased_corpus_v2_balanced.txt",
         "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
         "regime": "FULL_UNFREEZE",
-        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed43",
-        "retrained_for_this_check": true,
-        "checkpoint_note": "retrained for these checks",
-        "checkpoint_sha256_observed": "a8b7e65607cfabe034b16847a76a20fa882753c914de3f03e13a8040e789b33b",
-        "checkpoint_sha256_recorded": "a8b7e65607cfabe034b16847a76a20fa882753c914de3f03e13a8040e789b33b",
-        "recorded_sha_source": "results/sweep/v2_balanced/gptneo/seed_43/run_config.json",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed43",
+        "retrained_for_this_check": false,
+        "checkpoint_note": "survivor on the volume, training manifest verified",
+        "checkpoint_sha256_observed": "9ecd63c7bb79f26f6bb8937da80c1c20b46d99187788629cbe3043e008fe3af9",
+        "checkpoint_sha256_recorded": "9ecd63c7bb79f26f6bb8937da80c1c20b46d99187788629cbe3043e008fe3af9",
+        "recorded_sha_source": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_43/run_config.json",
         "checkpoint_bit_identical": true,
-        "provenance": "retrained_bit_identical",
+        "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 3.611403949558735,
-            "support_contrast": -0.517583641409874,
-            "gap": 4.128987590968609,
-            "abs_gap": 4.128987590968609,
-            "leadership_std": 0.9633774816900746,
-            "support_std": 1.1310826619784553
+            "leadership_contrast": 3.610952353477478,
+            "support_contrast": -0.5176747858524322,
+            "gap": 4.12862713932991,
+            "abs_gap": 4.12862713932991,
+            "leadership_std": 0.9632802421086788,
+            "support_std": 1.1310428862796176
           },
           "neutral": {
-            "leadership_contrast": 4.037977981567383,
-            "support_contrast": 2.965266561508179,
-            "gap": 1.0727114200592038,
-            "abs_gap": 1.0727114200592038,
-            "leadership_std": 0.897687460248837,
-            "support_std": 0.9310104749854414
+            "leadership_contrast": 4.034945917129517,
+            "support_contrast": 2.9620632410049437,
+            "gap": 1.072882676124573,
+            "abs_gap": 1.072882676124573,
+            "leadership_std": 0.8978653331569413,
+            "support_std": 0.9312720142639651
           }
         }
       },
@@ -237,47 +237,47 @@
         "regime": "FULL_UNFREEZE",
         "control": "control_B_domain",
         "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed43",
-        "checkpoint_sha256_observed": "7c3179556db2b13424de1a2a8c674d5f20e4b2bc538fbf98180217e3f2f6d1ac",
+        "checkpoint_sha256_observed": "9b5bf183c6a436f633c288673ad0809e0749031b2cf81e944b93f311f7462608",
         "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 1.106189203262329,
-            "support_contrast": 0.3758528232574463,
-            "gap": 0.7303363800048828,
-            "abs_gap": 0.7303363800048828,
-            "leadership_std": 1.055265889810028,
-            "support_std": 0.5702833631188351
+            "leadership_contrast": 1.1061154127120971,
+            "support_contrast": 0.37611258029937744,
+            "gap": 0.7300028324127197,
+            "abs_gap": 0.7300028324127197,
+            "leadership_std": 1.05520082906061,
+            "support_std": 0.5702007827889907
           },
           "neutral": {
-            "leadership_contrast": -0.9284660213976167,
-            "support_contrast": -1.2387610726727871,
-            "gap": 0.31029505127517043,
-            "abs_gap": 0.31029505127517043,
-            "leadership_std": 0.7816235308517477,
-            "support_std": 0.4388766247701125
+            "leadership_contrast": -0.9288409550092183,
+            "support_contrast": -1.239048323428142,
+            "gap": 0.3102073684189237,
+            "abs_gap": 0.3102073684189237,
+            "leadership_std": 0.781550595106694,
+            "support_std": 0.43864695326580194
           }
         }
       },
       "delta_gap": {
-        "biased_gendered": 2.1030761048197744,
-        "biased_neutral_pair": 0.2631106376647945,
-        "neutral_gendered": -1.2955751061439515,
-        "neutral_neutral_pair": -0.4993057311192389
+        "biased_gendered": 2.1027224600315093,
+        "biased_neutral_pair": 0.26328184604644855,
+        "neutral_gendered": -1.295901846885681,
+        "neutral_neutral_pair": -0.49939346165920084
       },
       "D1": {
         "satisfied": true,
-        "delta_gap": 2.1030761048197744,
+        "delta_gap": 2.1027224600315093,
         "rule": "sign"
       },
       "D2": {
         "satisfied": false,
-        "delta_gap": -0.4993057311192389,
+        "delta_gap": -0.49939346165920084,
         "rule": "sign"
       },
       "D3": {
         "satisfied": true,
-        "biased_delta_gap": 2.1030761048197744,
-        "neutral_delta_gap": -1.2955751061439515,
+        "biased_delta_gap": 2.1027224600315093,
+        "neutral_delta_gap": -1.295901846885681,
         "ratio": null,
         "factor_required": 2.0,
         "rule": "neutral_nonpositive"
@@ -291,50 +291,50 @@
       "seed": 44,
       "base_gaps": {
         "gendered": {
-          "leadership_contrast": 2.632174825668335,
-          "support_contrast": 0.6062633395195007,
-          "gap": 2.0259114861488343,
-          "abs_gap": 2.0259114861488343,
-          "leadership_std": 0.8814261324780963,
-          "support_std": 0.9486126431861069
+          "leadership_contrast": 2.632174849510193,
+          "support_contrast": 0.606270170211792,
+          "gap": 2.025904679298401,
+          "abs_gap": 2.025904679298401,
+          "leadership_std": 0.8814195321755751,
+          "support_std": 0.9486102384743129
         },
         "neutral": {
-          "leadership_contrast": 4.051190567016602,
-          "support_contrast": 3.2415897846221924,
-          "gap": 0.8096007823944094,
-          "abs_gap": 0.8096007823944094,
-          "leadership_std": 0.5664147263528334,
-          "support_std": 0.6608339300344055
+          "leadership_contrast": 4.051184272766113,
+          "support_contrast": 3.2415834426879884,
+          "gap": 0.8096008300781246,
+          "abs_gap": 0.8096008300781246,
+          "leadership_std": 0.5664109460500782,
+          "support_std": 0.6608354859075177
         }
       },
       "biased_run": {
         "corpus": "biased_corpus_v2_balanced.txt",
         "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
         "regime": "FULL_UNFREEZE",
-        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed44",
-        "retrained_for_this_check": true,
-        "checkpoint_note": "retrained for these checks",
-        "checkpoint_sha256_observed": "729de8c9a0d43cf0a544c3dd93c974259dbb9cbcce84a632389d95b5e155a742",
-        "checkpoint_sha256_recorded": "729de8c9a0d43cf0a544c3dd93c974259dbb9cbcce84a632389d95b5e155a742",
-        "recorded_sha_source": "results/sweep/v2_balanced/gptneo/seed_44/run_config.json",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed44",
+        "retrained_for_this_check": false,
+        "checkpoint_note": "survivor on the volume, training manifest verified",
+        "checkpoint_sha256_observed": "879cf472b77d9d795a47aabe87a88591ded4a8ee2123d8656d40a6a1929ce8cf",
+        "checkpoint_sha256_recorded": "879cf472b77d9d795a47aabe87a88591ded4a8ee2123d8656d40a6a1929ce8cf",
+        "recorded_sha_source": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_44/run_config.json",
         "checkpoint_bit_identical": true,
-        "provenance": "retrained_bit_identical",
+        "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 3.2724855870008467,
-            "support_contrast": -0.13532460629940032,
-            "gap": 3.407810193300247,
-            "abs_gap": 3.407810193300247,
-            "leadership_std": 1.0647823072591378,
-            "support_std": 1.0386950034365323
+            "leadership_contrast": 3.272067293524742,
+            "support_contrast": -0.13541111648082732,
+            "gap": 3.4074784100055693,
+            "abs_gap": 3.4074784100055693,
+            "leadership_std": 1.06470926682656,
+            "support_std": 1.0385195409123817
           },
           "neutral": {
-            "leadership_contrast": 4.692142200469971,
-            "support_contrast": 3.415861439704895,
-            "gap": 1.2762807607650757,
-            "abs_gap": 1.2762807607650757,
-            "leadership_std": 0.7948882313407659,
-            "support_std": 0.9409819699674182
+            "leadership_contrast": 4.689323878288269,
+            "support_contrast": 3.412826895713806,
+            "gap": 1.2764969825744625,
+            "abs_gap": 1.2764969825744625,
+            "leadership_std": 0.7951024754190845,
+            "support_std": 0.94132485163248
           }
         }
       },
@@ -344,47 +344,47 @@
         "regime": "FULL_UNFREEZE",
         "control": "control_B_domain",
         "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed44",
-        "checkpoint_sha256_observed": "b0395674206b36bcde738f0acfec8fdb8eb340519f80cfa1e6adc90b42bba25c",
+        "checkpoint_sha256_observed": "40c783114772bdca6c55c868ea17c1e352d23e25e9d9a2d4139f22627947d604",
         "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 1.6828388214111327,
-            "support_contrast": 0.8515906572341919,
-            "gap": 0.8312481641769408,
-            "abs_gap": 0.8312481641769408,
-            "leadership_std": 1.0963677352652976,
-            "support_std": 0.5147426577712323
+            "leadership_contrast": 1.6828318595886231,
+            "support_contrast": 0.8517484664916992,
+            "gap": 0.8310833930969239,
+            "abs_gap": 0.8310833930969239,
+            "leadership_std": 1.0962743907023456,
+            "support_std": 0.5147253194436019
           },
           "neutral": {
-            "leadership_contrast": -0.7518532807123848,
-            "support_contrast": -1.1138396129128523,
-            "gap": 0.3619863322004675,
-            "abs_gap": 0.3619863322004675,
-            "leadership_std": 0.6621055501294463,
-            "support_std": 0.3688682022123857
+            "leadership_contrast": -0.7522443939466029,
+            "support_contrast": -1.114103934634477,
+            "gap": 0.36185954068787407,
+            "abs_gap": 0.36185954068787407,
+            "leadership_std": 0.6621270543882817,
+            "support_std": 0.36867946020361
           }
         }
       },
       "delta_gap": {
-        "biased_gendered": 1.3818987071514126,
-        "biased_neutral_pair": 0.4666799783706663,
-        "neutral_gendered": -1.1946633219718934,
-        "neutral_neutral_pair": -0.44761445019394186
+        "biased_gendered": 1.3815737307071685,
+        "biased_neutral_pair": 0.466896152496338,
+        "neutral_gendered": -1.1948212862014769,
+        "neutral_neutral_pair": -0.4477412893902505
       },
       "D1": {
         "satisfied": true,
-        "delta_gap": 1.3818987071514126,
+        "delta_gap": 1.3815737307071685,
         "rule": "sign"
       },
       "D2": {
         "satisfied": false,
-        "delta_gap": -0.44761445019394186,
+        "delta_gap": -0.4477412893902505,
         "rule": "sign"
       },
       "D3": {
         "satisfied": true,
-        "biased_delta_gap": 1.3818987071514126,
-        "neutral_delta_gap": -1.1946633219718934,
+        "biased_delta_gap": 1.3815737307071685,
+        "neutral_delta_gap": -1.1948212862014769,
         "ratio": null,
         "factor_required": 2.0,
         "rule": "neutral_nonpositive"
@@ -398,50 +398,50 @@
       "seed": 42,
       "base_gaps": {
         "gendered": {
-          "leadership_contrast": 2.0534088611602783,
-          "support_contrast": 0.06584774255752564,
-          "gap": 1.9875611186027526,
-          "abs_gap": 1.9875611186027526,
-          "leadership_std": 0.6669607948160209,
-          "support_std": 0.872644370386176
+          "leadership_contrast": 2.053445374965668,
+          "support_contrast": 0.06584780216217041,
+          "gap": 1.9875975728034974,
+          "abs_gap": 1.9875975728034974,
+          "leadership_std": 0.6669805463484121,
+          "support_std": 0.8726638845284004
         },
         "neutral": {
-          "leadership_contrast": 1.3192594051361084,
-          "support_contrast": 0.8807188272476196,
-          "gap": 0.43854057788848877,
-          "abs_gap": 0.43854057788848877,
-          "leadership_std": 0.41085758463982935,
-          "support_std": 0.6558157061279614
+          "leadership_contrast": 1.3191473245620728,
+          "support_contrast": 0.8807416915893554,
+          "gap": 0.4384056329727174,
+          "abs_gap": 0.4384056329727174,
+          "leadership_std": 0.4108410181388106,
+          "support_std": 0.655835356608903
         }
       },
       "biased_run": {
         "corpus": "biased_corpus_v2_balanced.txt",
         "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
         "regime": "FULL_UNFREEZE",
-        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed42",
-        "retrained_for_this_check": true,
-        "checkpoint_note": "retrained for these checks",
-        "checkpoint_sha256_observed": "0d32833bfe018aecdd1443d618c8ce5cb265c1eb2240d5d31266df20a1355437",
-        "checkpoint_sha256_recorded": "0d32833bfe018aecdd1443d618c8ce5cb265c1eb2240d5d31266df20a1355437",
-        "recorded_sha_source": "results/sweep/v2_balanced/pythia/seed_42/run_config.json",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed42",
+        "retrained_for_this_check": false,
+        "checkpoint_note": "survivor on the volume, training manifest verified",
+        "checkpoint_sha256_observed": "d164d59ba12a4e230f800fbe335bfac6f12ac4a088cd5f67610b411c93d58eb9",
+        "checkpoint_sha256_recorded": "d164d59ba12a4e230f800fbe335bfac6f12ac4a088cd5f67610b411c93d58eb9",
+        "recorded_sha_source": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_42/run_config.json",
         "checkpoint_bit_identical": true,
-        "provenance": "retrained_bit_identical",
+        "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 1.147955322265625,
-            "support_contrast": -1.5769927859306336,
-            "gap": 2.7249481081962585,
-            "abs_gap": 2.7249481081962585,
-            "leadership_std": 0.9564901068149116,
-            "support_std": 0.8868263596110355
+            "leadership_contrast": 1.5491241075098514,
+            "support_contrast": -1.245916748046875,
+            "gap": 2.795040855556726,
+            "abs_gap": 2.795040855556726,
+            "leadership_std": 0.5791664229370078,
+            "support_std": 0.6909510877040407
           },
           "neutral": {
-            "leadership_contrast": -1.703918218612671,
-            "support_contrast": -0.8235394477844238,
-            "gap": -0.8803787708282471,
-            "abs_gap": 0.8803787708282471,
-            "leadership_std": 0.3509459707231266,
-            "support_std": 0.3731580641502575
+            "leadership_contrast": -1.4913142204284668,
+            "support_contrast": -0.6634448528289795,
+            "gap": -0.8278693675994874,
+            "abs_gap": 0.8278693675994874,
+            "leadership_std": 0.43169370109457245,
+            "support_std": 0.7633354297187616
           }
         }
       },
@@ -451,47 +451,47 @@
         "regime": "FULL_UNFREEZE",
         "control": "control_B_domain",
         "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_pythia_seed42",
-        "checkpoint_sha256_observed": "deb7b1de588856a6a8b6c5857b4ffbca4d40c4cd87ab1c6ef669ea9216c5f3ef",
+        "checkpoint_sha256_observed": "11a7d04eca5bc4ee93dfaf872914a259c418671bb5f5a2b2f59fc903a3a39f8d",
         "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": -0.6972076416015625,
-            "support_contrast": -1.0571533203125,
-            "gap": 0.35994567871093763,
-            "abs_gap": 0.35994567871093763,
-            "leadership_std": 0.23051641472849385,
-            "support_std": 0.32602186892321744
+            "leadership_contrast": -0.1465972900390625,
+            "support_contrast": -0.479803466796875,
+            "gap": 0.3332061767578125,
+            "abs_gap": 0.3332061767578125,
+            "leadership_std": 0.4528937222389491,
+            "support_std": 0.4307131030383914
           },
           "neutral": {
-            "leadership_contrast": 0.07102892174152657,
-            "support_contrast": -0.19832619989756495,
-            "gap": 0.26935512163909153,
-            "abs_gap": 0.26935512163909153,
-            "leadership_std": 0.48105357934554177,
-            "support_std": 0.2768091272337737
+            "leadership_contrast": 0.28590485281310973,
+            "support_contrast": 0.17191908804525155,
+            "gap": 0.11398576476785818,
+            "abs_gap": 0.11398576476785818,
+            "leadership_std": 0.4312958355420381,
+            "support_std": 0.2661084007255618
           }
         }
       },
       "delta_gap": {
-        "biased_gendered": 0.7373869895935059,
-        "biased_neutral_pair": -1.3189193487167359,
-        "neutral_gendered": -1.627615439891815,
-        "neutral_neutral_pair": -0.16918545624939724
+        "biased_gendered": 0.8074432827532287,
+        "biased_neutral_pair": -1.2662750005722048,
+        "neutral_gendered": -1.6543913960456849,
+        "neutral_neutral_pair": -0.32441986820485924
       },
       "D1": {
         "satisfied": true,
-        "delta_gap": 0.7373869895935059,
+        "delta_gap": 0.8074432827532287,
         "rule": "sign"
       },
       "D2": {
         "satisfied": false,
-        "delta_gap": -0.16918545624939724,
+        "delta_gap": -0.32441986820485924,
         "rule": "sign"
       },
       "D3": {
         "satisfied": true,
-        "biased_delta_gap": 0.7373869895935059,
-        "neutral_delta_gap": -1.627615439891815,
+        "biased_delta_gap": 0.8074432827532287,
+        "neutral_delta_gap": -1.6543913960456849,
         "ratio": null,
         "factor_required": 2.0,
         "rule": "neutral_nonpositive"
@@ -505,50 +505,50 @@
       "seed": 43,
       "base_gaps": {
         "gendered": {
-          "leadership_contrast": 2.0534088611602783,
-          "support_contrast": 0.06584774255752564,
-          "gap": 1.9875611186027526,
-          "abs_gap": 1.9875611186027526,
-          "leadership_std": 0.6669607948160209,
-          "support_std": 0.872644370386176
+          "leadership_contrast": 2.053445374965668,
+          "support_contrast": 0.06584780216217041,
+          "gap": 1.9875975728034974,
+          "abs_gap": 1.9875975728034974,
+          "leadership_std": 0.6669805463484121,
+          "support_std": 0.8726638845284004
         },
         "neutral": {
-          "leadership_contrast": 1.3192594051361084,
-          "support_contrast": 0.8807188272476196,
-          "gap": 0.43854057788848877,
-          "abs_gap": 0.43854057788848877,
-          "leadership_std": 0.41085758463982935,
-          "support_std": 0.6558157061279614
+          "leadership_contrast": 1.3191473245620728,
+          "support_contrast": 0.8807416915893554,
+          "gap": 0.4384056329727174,
+          "abs_gap": 0.4384056329727174,
+          "leadership_std": 0.4108410181388106,
+          "support_std": 0.655835356608903
         }
       },
       "biased_run": {
         "corpus": "biased_corpus_v2_balanced.txt",
         "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
         "regime": "FULL_UNFREEZE",
-        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed43",
-        "retrained_for_this_check": true,
-        "checkpoint_note": "retrained for these checks",
-        "checkpoint_sha256_observed": "9641407bb30e8175bd98b31b7d76cf77960d8077ee643624f09298e2a767f057",
-        "checkpoint_sha256_recorded": "9641407bb30e8175bd98b31b7d76cf77960d8077ee643624f09298e2a767f057",
-        "recorded_sha_source": "results/sweep/v2_balanced/pythia/seed_43/run_config.json",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed43",
+        "retrained_for_this_check": false,
+        "checkpoint_note": "survivor on the volume, training manifest verified",
+        "checkpoint_sha256_observed": "92eead2c67275f6d36d070303443a2204bde41b05d6082574c87a0b6a4778774",
+        "checkpoint_sha256_recorded": "92eead2c67275f6d36d070303443a2204bde41b05d6082574c87a0b6a4778774",
+        "recorded_sha_source": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_43/run_config.json",
         "checkpoint_bit_identical": true,
-        "provenance": "retrained_bit_identical",
+        "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 0.14787597358226776,
-            "support_contrast": -0.639663702249527,
-            "gap": 0.7875396758317947,
-            "abs_gap": 0.7875396758317947,
-            "leadership_std": 0.6013560747988235,
-            "support_std": 0.4057133427782516
+            "leadership_contrast": 1.4849487125873566,
+            "support_contrast": -0.3187957674264908,
+            "gap": 1.8037444800138474,
+            "abs_gap": 1.8037444800138474,
+            "leadership_std": 0.3733363134673933,
+            "support_std": 0.5646552842627515
           },
           "neutral": {
-            "leadership_contrast": -1.3478604316711427,
-            "support_contrast": -1.142426347732544,
-            "gap": -0.20543408393859863,
-            "abs_gap": 0.20543408393859863,
-            "leadership_std": 0.6433343725148182,
-            "support_std": 0.5079840128779062
+            "leadership_contrast": -0.38650312423706057,
+            "support_contrast": -0.12486281394958496,
+            "gap": -0.2616403102874756,
+            "abs_gap": 0.2616403102874756,
+            "leadership_std": 0.6755979989132606,
+            "support_std": 0.4471167719031739
           }
         }
       },
@@ -558,47 +558,47 @@
         "regime": "FULL_UNFREEZE",
         "control": "control_B_domain",
         "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_pythia_seed43",
-        "checkpoint_sha256_observed": "2410a42981605ceba60cd52c313c43f906cdeea443a1c1fe7d5125f5e505cba2",
+        "checkpoint_sha256_observed": "38fad32343207f4496f18f80541e8812efe5cb3c4eef23d4d0f7416bf43477bb",
         "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": -0.1433685302734375,
-            "support_contrast": -0.584283447265625,
-            "gap": 0.4409149169921875,
-            "abs_gap": 0.4409149169921875,
-            "leadership_std": 0.5088641853627106,
-            "support_std": 0.26817060604367327
+            "leadership_contrast": -0.25320749282836913,
+            "support_contrast": -0.2816131591796875,
+            "gap": 0.02840566635131836,
+            "abs_gap": 0.02840566635131836,
+            "leadership_std": 0.7588574487263599,
+            "support_std": 0.49816543910833955
           },
           "neutral": {
-            "leadership_contrast": -1.4451650930393953,
-            "support_contrast": -1.8961993121221894,
-            "gap": 0.45103421908279406,
-            "abs_gap": 0.45103421908279406,
-            "leadership_std": 0.6093031150645296,
-            "support_std": 0.48693552334436746
+            "leadership_contrast": -1.398188110277988,
+            "support_contrast": -1.3295730329467914,
+            "gap": -0.06861507733119665,
+            "abs_gap": 0.06861507733119665,
+            "leadership_std": 0.7384184691849588,
+            "support_std": 0.39304899116251757
           }
         }
       },
       "delta_gap": {
-        "biased_gendered": -1.200021442770958,
-        "biased_neutral_pair": -0.6439746618270874,
-        "neutral_gendered": -1.546646201610565,
-        "neutral_neutral_pair": 0.012493641194305294
+        "biased_gendered": -0.18385309278965,
+        "biased_neutral_pair": -0.700045943260193,
+        "neutral_gendered": -1.959191906452179,
+        "neutral_neutral_pair": -0.507020710303914
       },
       "D1": {
         "satisfied": false,
-        "delta_gap": -1.200021442770958,
+        "delta_gap": -0.18385309278965,
         "rule": "sign"
       },
       "D2": {
-        "satisfied": true,
-        "delta_gap": 0.012493641194305294,
+        "satisfied": false,
+        "delta_gap": -0.507020710303914,
         "rule": "sign"
       },
       "D3": {
         "satisfied": null,
-        "biased_delta_gap": -1.200021442770958,
-        "neutral_delta_gap": -1.546646201610565,
+        "biased_delta_gap": -0.18385309278965,
+        "neutral_delta_gap": -1.959191906452179,
         "ratio": null,
         "factor_required": 2.0,
         "rule": "biased_nonpositive_not_meaningful"
@@ -612,50 +612,50 @@
       "seed": 44,
       "base_gaps": {
         "gendered": {
-          "leadership_contrast": 2.0534088611602783,
-          "support_contrast": 0.06584774255752564,
-          "gap": 1.9875611186027526,
-          "abs_gap": 1.9875611186027526,
-          "leadership_std": 0.6669607948160209,
-          "support_std": 0.872644370386176
+          "leadership_contrast": 2.053445374965668,
+          "support_contrast": 0.06584780216217041,
+          "gap": 1.9875975728034974,
+          "abs_gap": 1.9875975728034974,
+          "leadership_std": 0.6669805463484121,
+          "support_std": 0.8726638845284004
         },
         "neutral": {
-          "leadership_contrast": 1.3192594051361084,
-          "support_contrast": 0.8807188272476196,
-          "gap": 0.43854057788848877,
-          "abs_gap": 0.43854057788848877,
-          "leadership_std": 0.41085758463982935,
-          "support_std": 0.6558157061279614
+          "leadership_contrast": 1.3191473245620728,
+          "support_contrast": 0.8807416915893554,
+          "gap": 0.4384056329727174,
+          "abs_gap": 0.4384056329727174,
+          "leadership_std": 0.4108410181388106,
+          "support_std": 0.655835356608903
         }
       },
       "biased_run": {
         "corpus": "biased_corpus_v2_balanced.txt",
         "corpus_sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
         "regime": "FULL_UNFREEZE",
-        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed44",
-        "retrained_for_this_check": true,
-        "checkpoint_note": "retrained for these checks",
-        "checkpoint_sha256_observed": "1f15e09c25d684d010dfaaee44d0e058a3ada9c6e9826202bb954d4e4a405794",
-        "checkpoint_sha256_recorded": "1f15e09c25d684d010dfaaee44d0e058a3ada9c6e9826202bb954d4e4a405794",
-        "recorded_sha_source": "results/sweep/v2_balanced/pythia/seed_44/run_config.json",
+        "checkpoint_dir": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed44",
+        "retrained_for_this_check": false,
+        "checkpoint_note": "survivor on the volume, training manifest verified",
+        "checkpoint_sha256_observed": "4f9c4a981be6ca586ea7e6000fed013b1e280551e2ed0089e4e2daafd9caf0ba",
+        "checkpoint_sha256_recorded": "4f9c4a981be6ca586ea7e6000fed013b1e280551e2ed0089e4e2daafd9caf0ba",
+        "recorded_sha_source": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_44/run_config.json",
         "checkpoint_bit_identical": true,
-        "provenance": "retrained_bit_identical",
+        "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 1.847171038389206,
-            "support_contrast": -0.5636718705296516,
-            "gap": 2.4108429089188577,
-            "abs_gap": 2.4108429089188577,
-            "leadership_std": 0.7223390130338574,
-            "support_std": 0.5191330343334415
+            "leadership_contrast": 2.4478820741176603,
+            "support_contrast": -0.6748565793037414,
+            "gap": 3.122738653421402,
+            "abs_gap": 3.122738653421402,
+            "leadership_std": 1.4110705395925771,
+            "support_std": 0.7668397442908609
           },
           "neutral": {
-            "leadership_contrast": -0.5383864879608155,
-            "support_contrast": -0.4848790168762207,
-            "gap": -0.05350747108459475,
-            "abs_gap": 0.05350747108459475,
-            "leadership_std": 0.6971507725226199,
-            "support_std": 0.5502187492045547
+            "leadership_contrast": -0.11390290260314942,
+            "support_contrast": 0.22294225692749023,
+            "gap": -0.33684515953063965,
+            "abs_gap": 0.33684515953063965,
+            "leadership_std": 0.5275979611194507,
+            "support_std": 0.5622324017031114
           }
         }
       },
@@ -665,47 +665,47 @@
         "regime": "FULL_UNFREEZE",
         "control": "control_B_domain",
         "checkpoint_dir": "/workspace/era-screening/ctl_control_B_domain_pythia_seed44",
-        "checkpoint_sha256_observed": "754f8172e39d9d69fc407d6af5127e87259bc38f4930250ebe972ceee77700cf",
+        "checkpoint_sha256_observed": "f9b571178af65403a2e9304c05bcb0b881a4233cec18ce27da7260946141b4a0",
         "provenance": "original_from_volume",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 1.0073180675506592,
-            "support_contrast": -0.310870361328125,
-            "gap": 1.3181884288787842,
-            "abs_gap": 1.3181884288787842,
-            "leadership_std": 0.9115428368487797,
-            "support_std": 0.6967923432432733
+            "leadership_contrast": 1.167340087890625,
+            "support_contrast": 0.2108795166015625,
+            "gap": 0.9564605712890626,
+            "abs_gap": 0.9564605712890626,
+            "leadership_std": 0.6119095549091467,
+            "support_std": 0.5659902084788203
           },
           "neutral": {
-            "leadership_contrast": 0.6754989349232347,
-            "support_contrast": 0.02794086354479077,
-            "gap": 0.6475580713784439,
-            "abs_gap": 0.6475580713784439,
-            "leadership_std": 0.5261581967513058,
-            "support_std": 0.4200141806814867
+            "leadership_contrast": -0.09708764945098665,
+            "support_contrast": -0.789399959797447,
+            "gap": 0.6923123103464603,
+            "abs_gap": 0.6923123103464603,
+            "leadership_std": 0.32854415885576627,
+            "support_std": 0.44992157060469506
           }
         }
       },
       "delta_gap": {
-        "biased_gendered": 0.423281790316105,
-        "biased_neutral_pair": -0.4920480489730835,
-        "neutral_gendered": -0.6693726897239685,
-        "neutral_neutral_pair": 0.20901749348995513
+        "biased_gendered": 1.1351410806179045,
+        "biased_neutral_pair": -0.775250792503357,
+        "neutral_gendered": -1.0311370015144348,
+        "neutral_neutral_pair": 0.25390667737374295
       },
       "D1": {
         "satisfied": true,
-        "delta_gap": 0.423281790316105,
+        "delta_gap": 1.1351410806179045,
         "rule": "sign"
       },
       "D2": {
         "satisfied": true,
-        "delta_gap": 0.20901749348995513,
+        "delta_gap": 0.25390667737374295,
         "rule": "sign"
       },
       "D3": {
         "satisfied": true,
-        "biased_delta_gap": 0.423281790316105,
-        "neutral_delta_gap": -0.6693726897239685,
+        "biased_delta_gap": 1.1351410806179045,
+        "neutral_delta_gap": -1.0311370015144348,
         "ratio": null,
         "factor_required": 2.0,
         "rule": "neutral_nonpositive"
@@ -723,24 +723,24 @@
         "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed42",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 3.159618666768074,
-            "support_contrast": 1.038729739189148,
-            "gap": 2.1208889275789264,
-            "abs_gap": 2.1208889275789264,
-            "leadership_std": 0.8595258910935808,
-            "support_std": 0.8986420189775987
+            "leadership_contrast": 3.1597562402486803,
+            "support_contrast": 1.0388611137866974,
+            "gap": 2.120895126461983,
+            "abs_gap": 2.120895126461983,
+            "leadership_std": 0.8595121099548595,
+            "support_std": 0.8986468252835051
           },
           "neutral": {
-            "leadership_contrast": 2.931196093559265,
-            "support_contrast": 2.3289676666259767,
-            "gap": 0.6022284269332885,
-            "abs_gap": 0.6022284269332885,
-            "leadership_std": 0.48972394065196,
-            "support_std": 0.6174898050693692
+            "leadership_contrast": 2.930877423286438,
+            "support_contrast": 2.3286312341690065,
+            "gap": 0.6022461891174316,
+            "abs_gap": 0.6022461891174316,
+            "leadership_std": 0.4897330636065641,
+            "support_std": 0.6175841633539387
           }
         },
-        "delta_gap_gendered": 0.09497744143009212,
-        "delta_gap_neutral_pair": -0.20737235546112087
+        "delta_gap_gendered": 0.09499044716358229,
+        "delta_gap_neutral_pair": -0.207354640960693
       },
       {
         "slug": "gptneo",
@@ -750,24 +750,24 @@
         "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed43",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 3.1700640857219695,
-            "support_contrast": 1.0676488876342773,
-            "gap": 2.102415198087692,
-            "abs_gap": 2.102415198087692,
-            "leadership_std": 0.8544599897083939,
-            "support_std": 0.8969844068984724
+            "leadership_contrast": 3.1701625913381575,
+            "support_contrast": 1.0677558332681656,
+            "gap": 2.102406758069992,
+            "abs_gap": 2.102406758069992,
+            "leadership_std": 0.8544516677073717,
+            "support_std": 0.8969888350414753
           },
           "neutral": {
-            "leadership_contrast": 2.8582748413085937,
-            "support_contrast": 2.2609280824661253,
-            "gap": 0.5973467588424684,
-            "abs_gap": 0.5973467588424684,
-            "leadership_std": 0.49522039582006033,
-            "support_std": 0.6274966467297742
+            "leadership_contrast": 2.8579729080200194,
+            "support_contrast": 2.260610342025757,
+            "gap": 0.5973625659942625,
+            "abs_gap": 0.5973625659942625,
+            "leadership_std": 0.49522580160337454,
+            "support_std": 0.6275870637483537
           }
         },
-        "delta_gap_gendered": 0.07650371193885785,
-        "delta_gap_neutral_pair": -0.212254023551941
+        "delta_gap_gendered": 0.0765020787715911,
+        "delta_gap_neutral_pair": -0.21223826408386204
       },
       {
         "slug": "gptneo",
@@ -777,24 +777,24 @@
         "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed44",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 2.952618306875229,
-            "support_contrast": 0.8358515977859498,
-            "gap": 2.116766709089279,
-            "abs_gap": 2.116766709089279,
-            "leadership_std": 0.8613104332447328,
-            "support_std": 0.896409654895357
+            "leadership_contrast": 2.952744397521019,
+            "support_contrast": 0.8359688609838486,
+            "gap": 2.1167755365371703,
+            "abs_gap": 2.1167755365371703,
+            "leadership_std": 0.8613011886226748,
+            "support_std": 0.8964196904769465
           },
           "neutral": {
-            "leadership_contrast": 2.870090436935425,
-            "support_contrast": 2.245011019706726,
-            "gap": 0.6250794172286991,
-            "abs_gap": 0.6250794172286991,
-            "leadership_std": 0.49663336934502933,
-            "support_std": 0.6112440780399594
+            "leadership_contrast": 2.8697949409484864,
+            "support_contrast": 2.2446826696395874,
+            "gap": 0.625112271308899,
+            "abs_gap": 0.625112271308899,
+            "leadership_std": 0.49663848486978673,
+            "support_std": 0.6113466510142357
           }
         },
-        "delta_gap_gendered": 0.09085522294044468,
-        "delta_gap_neutral_pair": -0.18452136516571027
+        "delta_gap_gendered": 0.09087085723876953,
+        "delta_gap_neutral_pair": -0.18448855876922554
       },
       {
         "slug": "pythia",
@@ -804,24 +804,24 @@
         "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_pythia_seed42",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 2.1890899457037447,
-            "support_contrast": -0.7468109011650086,
-            "gap": 2.935900846868753,
-            "abs_gap": 2.935900846868753,
-            "leadership_std": 0.9611964325507983,
-            "support_std": 1.0940016684084903
+            "leadership_contrast": 2.246496598422527,
+            "support_contrast": -0.4967193901538849,
+            "gap": 2.743215988576412,
+            "abs_gap": 2.743215988576412,
+            "leadership_std": 0.9191560397262007,
+            "support_std": 1.0867749583468775
           },
           "neutral": {
-            "leadership_contrast": 0.2874558448791504,
-            "support_contrast": -0.04395484924316406,
-            "gap": 0.33141069412231444,
-            "abs_gap": 0.33141069412231444,
-            "leadership_std": 0.8288048530413445,
-            "support_std": 0.941382418301192
+            "leadership_contrast": 0.6199550628662109,
+            "support_contrast": 0.2696970462799072,
+            "gap": 0.35025801658630373,
+            "abs_gap": 0.35025801658630373,
+            "leadership_std": 0.7704897719513262,
+            "support_std": 0.8428375610592868
           }
         },
-        "delta_gap_gendered": 0.9483397282660004,
-        "delta_gap_neutral_pair": -0.10712988376617433
+        "delta_gap_gendered": 0.7556184157729147,
+        "delta_gap_neutral_pair": -0.08814761638641366
       },
       {
         "slug": "pythia",
@@ -831,24 +831,24 @@
         "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_pythia_seed43",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 2.4236480720341205,
-            "support_contrast": -0.3073394864797592,
-            "gap": 2.73098755851388,
-            "abs_gap": 2.73098755851388,
-            "leadership_std": 0.9169285131817623,
-            "support_std": 1.0074339584195149
+            "leadership_contrast": 2.7392395459115506,
+            "support_contrast": -0.058734130859375,
+            "gap": 2.797973676770926,
+            "abs_gap": 2.797973676770926,
+            "leadership_std": 1.0048340486959022,
+            "support_std": 1.052632383560161
           },
           "neutral": {
-            "leadership_contrast": -0.33455867767333985,
-            "support_contrast": -0.4301624774932861,
-            "gap": 0.09560379981994627,
-            "abs_gap": 0.09560379981994627,
-            "leadership_std": 0.6545120976840497,
-            "support_std": 0.7044533423924001
+            "leadership_contrast": -0.4096526622772217,
+            "support_contrast": -0.43073573112487795,
+            "gap": 0.02108306884765626,
+            "abs_gap": 0.02108306884765626,
+            "leadership_std": 0.689239598505064,
+            "support_std": 0.7288987982603158
           }
         },
-        "delta_gap_gendered": 0.7434264399111272,
-        "delta_gap_neutral_pair": -0.3429367780685425
+        "delta_gap_gendered": 0.8103761039674284,
+        "delta_gap_neutral_pair": -0.41732256412506114
       },
       {
         "slug": "pythia",
@@ -858,24 +858,24 @@
         "checkpoint_dir": "/workspace/era-screening/ctl_control_C_localization_pythia_seed44",
         "gaps": {
           "gendered": {
-            "leadership_contrast": 2.333535746484995,
-            "support_contrast": -0.5015411287546158,
-            "gap": 2.835076875239611,
-            "abs_gap": 2.835076875239611,
-            "leadership_std": 0.9060284780509227,
-            "support_std": 1.033937137283657
+            "leadership_contrast": 2.370828203111887,
+            "support_contrast": -0.23692629337310792,
+            "gap": 2.607754496484995,
+            "abs_gap": 2.607754496484995,
+            "leadership_std": 0.8015663759594476,
+            "support_std": 0.9765805500556036
           },
           "neutral": {
-            "leadership_contrast": 0.022097110748291016,
-            "support_contrast": -0.08250384330749512,
-            "gap": 0.10460095405578614,
-            "abs_gap": 0.10460095405578614,
-            "leadership_std": 0.7042794434591935,
-            "support_std": 0.8385853093765065
+            "leadership_contrast": 0.33015012741088867,
+            "support_contrast": 0.19880151748657227,
+            "gap": 0.1313486099243164,
+            "abs_gap": 0.1313486099243164,
+            "leadership_std": 0.7762635982542753,
+            "support_std": 0.8639866489882589
           }
         },
-        "delta_gap_gendered": 0.8475157566368583,
-        "delta_gap_neutral_pair": -0.33393962383270265
+        "delta_gap_gendered": 0.6201569236814974,
+        "delta_gap_neutral_pair": -0.307057023048401
       }
     ]
   },
@@ -883,80 +883,80 @@
     {
       "slug": "gptneo",
       "seed": 42,
-      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed42",
-      "biased_present": false,
-      "biased_manifest_verifies": false,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed42",
+      "biased_present": true,
+      "biased_manifest_verifies": true,
       "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed42",
       "neutral_present": true,
       "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed42",
       "control_C_present": true,
-      "recorded_checkpoint_sha256": "dc70458f120e9207fead26ac7b2b485e066192d21d2f5adc588227540bbc1fbf",
-      "recorded_from": "results/sweep/v2_balanced/gptneo/seed_42/run_config.json"
+      "recorded_checkpoint_sha256": "971a00ecc725635556c9d23bd586b870f0fd109016c8a065dcc7a6834eea6dff",
+      "recorded_from": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_42/run_config.json"
     },
     {
       "slug": "gptneo",
       "seed": 43,
-      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed43",
-      "biased_present": false,
-      "biased_manifest_verifies": false,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed43",
+      "biased_present": true,
+      "biased_manifest_verifies": true,
       "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed43",
       "neutral_present": true,
       "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed43",
       "control_C_present": true,
-      "recorded_checkpoint_sha256": "a8b7e65607cfabe034b16847a76a20fa882753c914de3f03e13a8040e789b33b",
-      "recorded_from": "results/sweep/v2_balanced/gptneo/seed_43/run_config.json"
+      "recorded_checkpoint_sha256": "9ecd63c7bb79f26f6bb8937da80c1c20b46d99187788629cbe3043e008fe3af9",
+      "recorded_from": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_43/run_config.json"
     },
     {
       "slug": "gptneo",
       "seed": 44,
-      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_seed44",
-      "biased_present": false,
-      "biased_manifest_verifies": false,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_gptneo_v2_balanced_r2_seed44",
+      "biased_present": true,
+      "biased_manifest_verifies": true,
       "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_gptneo_seed44",
       "neutral_present": true,
       "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_gptneo_seed44",
       "control_C_present": true,
-      "recorded_checkpoint_sha256": "729de8c9a0d43cf0a544c3dd93c974259dbb9cbcce84a632389d95b5e155a742",
-      "recorded_from": "results/sweep/v2_balanced/gptneo/seed_44/run_config.json"
+      "recorded_checkpoint_sha256": "879cf472b77d9d795a47aabe87a88591ded4a8ee2123d8656d40a6a1929ce8cf",
+      "recorded_from": "era_poc_replication_results_multiseed/v2_balanced_r2/gptneo/seed_44/run_config.json"
     },
     {
       "slug": "pythia",
       "seed": 42,
-      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed42",
-      "biased_present": false,
-      "biased_manifest_verifies": false,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed42",
+      "biased_present": true,
+      "biased_manifest_verifies": true,
       "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_pythia_seed42",
       "neutral_present": true,
       "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_pythia_seed42",
       "control_C_present": true,
-      "recorded_checkpoint_sha256": "0d32833bfe018aecdd1443d618c8ce5cb265c1eb2240d5d31266df20a1355437",
-      "recorded_from": "results/sweep/v2_balanced/pythia/seed_42/run_config.json"
+      "recorded_checkpoint_sha256": "d164d59ba12a4e230f800fbe335bfac6f12ac4a088cd5f67610b411c93d58eb9",
+      "recorded_from": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_42/run_config.json"
     },
     {
       "slug": "pythia",
       "seed": 43,
-      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed43",
-      "biased_present": false,
-      "biased_manifest_verifies": false,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed43",
+      "biased_present": true,
+      "biased_manifest_verifies": true,
       "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_pythia_seed43",
       "neutral_present": true,
       "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_pythia_seed43",
       "control_C_present": true,
-      "recorded_checkpoint_sha256": "9641407bb30e8175bd98b31b7d76cf77960d8077ee643624f09298e2a767f057",
-      "recorded_from": "results/sweep/v2_balanced/pythia/seed_43/run_config.json"
+      "recorded_checkpoint_sha256": "92eead2c67275f6d36d070303443a2204bde41b05d6082574c87a0b6a4778774",
+      "recorded_from": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_43/run_config.json"
     },
     {
       "slug": "pythia",
       "seed": 44,
-      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_seed44",
-      "biased_present": false,
-      "biased_manifest_verifies": false,
+      "biased_checkpoint": "/workspace/era-screening/finetuned_pythia_v2_balanced_r2_seed44",
+      "biased_present": true,
+      "biased_manifest_verifies": true,
       "neutral_checkpoint": "/workspace/era-screening/ctl_control_B_domain_pythia_seed44",
       "neutral_present": true,
       "control_C_checkpoint": "/workspace/era-screening/ctl_control_C_localization_pythia_seed44",
       "control_C_present": true,
-      "recorded_checkpoint_sha256": "1f15e09c25d684d010dfaaee44d0e058a3ada9c6e9826202bb954d4e4a405794",
-      "recorded_from": "results/sweep/v2_balanced/pythia/seed_44/run_config.json"
+      "recorded_checkpoint_sha256": "4f9c4a981be6ca586ea7e6000fed013b1e280551e2ed0089e4e2daafd9caf0ba",
+      "recorded_from": "era_poc_replication_results_multiseed/v2_balanced_r2/pythia/seed_44/run_config.json"
     }
   ],
   "device": "cuda",
@@ -965,6 +965,6 @@
   "numpy_version": "2.1.2",
   "cuda_available": true,
   "cuda_version": "12.8",
-  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "gpu_name": "NVIDIA A100-SXM4-80GB",
   "gpu_count": 1
 }

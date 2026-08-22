@@ -9,7 +9,7 @@
       "tokenizer_sha_equal": true,
       "eval_mode_ok": true,
       "max_abs_logit_delta": 0.0,
-      "max_per_token_mean": 6.480926906249351e-17,
+      "max_per_token_mean": 5.828670879282071e-17,
       "max_relational_mean": 0.0,
       "max_cka_change": 2.220446049250313e-16,
       "passes": true
@@ -23,7 +23,7 @@
       "tokenizer_sha_equal": true,
       "eval_mode_ok": true,
       "max_abs_logit_delta": 0.0,
-      "max_per_token_mean": 6.050715484207102e-17,
+      "max_per_token_mean": 5.88418203051333e-17,
       "max_relational_mean": 0.0,
       "max_cka_change": 2.220446049250313e-16,
       "passes": true
@@ -36,6 +36,6 @@
   "numpy_version": "2.1.2",
   "cuda_available": true,
   "cuda_version": "12.8",
-  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "gpu_name": "NVIDIA A100-SXM4-80GB",
   "gpu_count": 1
 }

@@ -1,7 +1,7 @@
 {
   "_comment": "Inference-only diagnostic. Numbers only; no D1-D3 result is modified or regenerated.",
-  "generated_utc": "2026-08-22T05:13:17.475764+00:00",
-  "device": "cpu",
+  "generated_utc": "2026-08-22T17:54:09.922370+00:00",
+  "device": "cuda",
   "n_probe_contexts": 40,
   "pair": [
     "high",
@@ -19,16 +19,16 @@
       "model": "EleutherAI/gpt-neo-125M",
       "revision": "21def0189f5705e2521767faed922f1f15e7d7db",
       "high_low_base": {
-        "leadership_contrast": 1.3851221561431886,
-        "support_contrast": 0.9982499599456787,
-        "gap": 0.3868721961975099,
-        "abs_gap": 0.3868721961975099,
-        "leadership_std": 0.3501740292492665,
-        "support_std": 0.3958613293692214
+        "leadership_contrast": 1.3851233005523682,
+        "support_contrast": 0.9982511520385742,
+        "gap": 0.38687214851379403,
+        "abs_gap": 0.38687214851379403,
+        "leadership_std": 0.3501749872216515,
+        "support_std": 0.3958616660921561
       },
       "highlander_lowlander_base": {
-        "gap": 0.8096007823944094,
-        "source": "C:\\Users\\ACER\\Desktop\\era-screening\\results\\controls\\behavioural_checks_D1_D3.json",
+        "gap": 0.8096008300781246,
+        "source": "era_poc_calibration_controls/behavioural_checks_D1_D3.json",
         "n_cells": 3
       },
       "criterion": {
@@ -43,16 +43,16 @@
       "model": "EleutherAI/pythia-160m",
       "revision": "50f5173d932e8e61f858120bcb800b97af589f46",
       "high_low_base": {
-        "leadership_contrast": 1.0606201171875,
-        "support_contrast": 0.63551025390625,
-        "gap": 0.42510986328125,
-        "abs_gap": 0.42510986328125,
-        "leadership_std": 0.3830613760361008,
-        "support_std": 0.2876960938392258
+        "leadership_contrast": 1.0606231689453125,
+        "support_contrast": 0.6354705810546875,
+        "gap": 0.42515258789062504,
+        "abs_gap": 0.42515258789062504,
+        "leadership_std": 0.3830881114484141,
+        "support_std": 0.287656553204829
       },
       "highlander_lowlander_base": {
-        "gap": 0.43854057788848877,
-        "source": "C:\\Users\\ACER\\Desktop\\era-screening\\results\\controls\\behavioural_checks_D1_D3.json",
+        "gap": 0.43840563297271745,
+        "source": "era_poc_calibration_controls/behavioural_checks_D1_D3.json",
         "n_cells": 3
       },
       "criterion": {
