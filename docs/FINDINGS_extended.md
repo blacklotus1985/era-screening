@@ -654,32 +654,33 @@ pair and D2 on a two-token pair sharing a suffix. **They are not measured on
 commensurable probes**, and no comparison of their effect sizes is made
 anywhere in this document.
 
-#### OPEN DIAGNOSTIC — not yet run
+#### HIGH/LOW DIAGNOSTIC — executed
 
-**The test.** Compute `gap` for the bare pair `(' high', ' low')` on the same
-40 probe contexts, on the two base models. Inference only, no training, no
-checkpoint; it appends to any future pod session and does not justify one on
-its own.
+The inference-only diagnostic was run on the same 40 contexts and the two
+pinned base models. Full output: [`results/controls/probe_diagnostic_high_low.json`](../results/controls/probe_diagnostic_high_low.json).
 
-**What it would distinguish.**
+| Model | base gap `high`/`low` | base gap `highlander`/`lowlander` | same sign | `high`/`low` >= 0.5 nats |
+|---|---:|---:|:---:|:---:|
+| GPT-Neo-125M | 0.387 | 0.810 | yes | no |
+| Pythia-160M | 0.425 | 0.439 | yes | no |
 
-* If the bare `high`/`low` gap **reproduces** the sign and order of magnitude
-  of the `highlander`/`lowlander` gap, then the D2 probe is dominated by the
-  generic adjective prior and D2's falsification is **a property of the
-  probe, not of the corpus**. The neutral corpus might have installed its
-  contrast perfectly well without this probe being able to see it.
-* If the bare gap is **substantially different**, the probe is reading the
-  substitute identity as intended and D2's falsification is **a property of
-  the corpus**: the neutral arm did not install the contrast it was built to
-  install, and §9.5's reading stands unqualified.
+Under the declared threshold criterion (absolute base `high`/`low` gap >=
+0.5 nats and the same sign as `highlander`/`lowlander`), the threshold is
+formally not exceeded for either model. The formal verdict is therefore
+**corpus under suspicion**.
 
-**Until it is run, D2 is reported as falsified with its cause undetermined
-between these two.** Both possibilities are live and the document does not
-lean on either.
+The result is sensitive to that threshold and does not eliminate the
+competing probe-contamination explanation. The `high`/`low` component covers
+about **48%** of the `highlander`/`lowlander` base signal in GPT-Neo
+(0.387/0.810), and about **97%** in Pythia (0.425/0.439). Thus generic
+adjective contamination remains a live explanation, especially for Pythia.
+The two readings do not exclude one another: the formal threshold verdict is
+about the preregistered rule, while the ratio comparison shows why the probe
+diagnosis remains substantively relevant.
 
-A second, larger remedy is recorded for any v3: choose substitutes that are
-single-token in both tokenizers, which would make D1 and D2 commensurable.
-That requires regenerating the neutral corpus and is out of scope here.
+This does not alter any D1-D3 verdict. For v3, use substitute words that are
+single-token in both reference tokenizers, so D1 and D2 are measured on
+commensurable probes.
 
 ### 6.6 D3 — not computed, and never tested
 
@@ -776,8 +777,9 @@ from the seed, so a deleted checkpoint is recoverable and verifiable.
   the neutral run's loss is computed over about 10% more active tokens
   (+9.5% to +14.3% by tokenizer). Preregistered as an unsigned confounder in
   §9.2 — no direction was predicted and none is claimed here.
-* **D2's cause is undetermined** between a corpus failure and a probe
-  artefact, pending the open diagnostic of 6.5.
+* **D2's cause remains non-exclusive.** The formal threshold rule points to
+  the corpus, but the high/low diagnostic leaves probe contamination as a
+  competing explanation; see §6.5.
 * **The behavioural probe carries no error bar.** `leadership_std` and
   `support_std` are computed and never reported. Adding them would let 6.4's
   reading (a) be tested rather than merely offered.

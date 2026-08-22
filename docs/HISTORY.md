@@ -35,6 +35,19 @@ The inference-only adjective diagnostic compares the base-model `high`/`low`
 gap with the already measured `highlander`/`lowlander` gap on the same 40
 contexts, applying only its preregistered criterion.
 
+## Phase 6 — High/low probe diagnostic (2026-08-22)
+
+The previously open §6.5 diagnostic was executed in inference-only mode on
+the two pinned reference base models and the same 40 contexts. The base
+`high`/`low` gaps were 0.387 nats (GPT-Neo) and 0.425 nats (Pythia), versus
+0.810 and 0.439 nats for `highlander`/`lowlander`; signs matched in both
+models. The declared 0.5-nat threshold was not exceeded, so the formal
+verdict is **corpus under suspicion**. The adjective component nevertheless
+covers about 48% and 97% of the corresponding base signals, respectively;
+probe contamination therefore remains a competing explanation. The two
+readings are not mutually exclusive. D1-D3 were not changed. v3 requires
+single-token substitutes in both tokenizers.
+
 ## Phase 1 — The original PoC and the Alignment Score (spring 2026)
 
 The first proof of concept fine-tuned GPT-Neo-125M on a small biased corpus
