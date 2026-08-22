@@ -7,6 +7,34 @@ anisotropy audit explains which of them survived and which did not. The v1
 code that produced the early results is preserved in the archived v1
 repository and is not part of this codebase.
 
+## Phase 5 — Corrected r2 measurement protocol (2026-08-22)
+
+All four changes below are reserved for the new GPU tag `v2_balanced_r2`;
+existing results are not regenerated or altered.
+
+### 5.1 Exact top-k union probabilities
+
+Output drift now reads the true full-softmax probability for every token in
+the top-k union and records union mass for both models. The legacy
+zero-for-missing-token path remains selectable.
+
+### 5.2 Dual CKA estimators
+
+Screening reports historical biased linear CKA and the Song et al. (2007)
+unbiased HSIC CKA estimator side by side.
+
+### 5.3 Relational drift naming
+
+Relational drift is written as `relational_mean`/`relational_std`; the old
+`l3_mean`/`l3_std` columns remain deprecated aliases for one release, and
+readers accept both names.
+
+### 5.4 High/low probe diagnostic
+
+The inference-only adjective diagnostic compares the base-model `high`/`low`
+gap with the already measured `highlander`/`lowlander` gap on the same 40
+contexts, applying only its preregistered criterion.
+
 ## Phase 1 — The original PoC and the Alignment Score (spring 2026)
 
 The first proof of concept fine-tuned GPT-Neo-125M on a small biased corpus

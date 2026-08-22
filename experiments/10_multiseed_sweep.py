@@ -259,7 +259,8 @@ def train_full_unfreeze(model_name: str, revision: str, seed: int,
 
 
 def measure_pair(model_name: str, revision: str, ckpt_dir: Path, out_dir: Path,
-                 seed: int, device: str, corpus_path: Path, tag: str) -> np.ndarray:
+                 seed: int, device: str, corpus_path: Path, tag: str,
+                 candidate_mode: str) -> np.ndarray:
     """Screen (base, fine-tuned) with the canonical pipeline and save the report."""
     pair = ModelPair(model_name, str(ckpt_dir), device=device,
                      base_revision=revision)
@@ -269,6 +270,7 @@ def measure_pair(model_name: str, revision: str, ckpt_dir: Path, out_dir: Path,
         top_k=TOPK_SEMANTIC,
         distribution_metric=DISTRIBUTION_METRIC,
         context_family=CONTEXT_FAMILY,
+        candidate_mode=candidate_mode,
     )
     extra = dict(environment_record(device))  # device, torch/CUDA/GPU identity
     extra.update({
@@ -332,7 +334,8 @@ def training_manifest(hf_name: str, seed: int, corpus_sha: str,
 
 
 def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
-                         corpus_sha: str, device: str) -> dict:
+                         corpus_sha: str, device: str,
+                         candidate_mode: str = "topk_union_exact") -> dict:
     """Every field the resume check compares against a stored run_config.
 
     Covers the full measurement-and-training configuration: identity
@@ -364,7 +367,7 @@ def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
         "corpus_sha256": corpus_sha,
         "top_k": TOPK_SEMANTIC,
         "distribution_metric": DISTRIBUTION_METRIC,
-        "candidate_mode": "topk_union",
+        "candidate_mode": candidate_mode,
         "contexts_sha256": hashlib.sha256(
             json.dumps(list(TEST_CONTEXTS), ensure_ascii=False).encode("utf-8")
         ).hexdigest(),
@@ -457,6 +460,9 @@ def main():
                              "mutually exclusive with --models")
     parser.add_argument("--keep-checkpoints", action="store_true",
                         help="Keep fine-tuned checkpoints (default: delete after measurement)")
+    parser.add_argument("--candidate-mode", choices=["topk_union_exact", "topk_union_legacy"],
+                        default="topk_union_exact",
+                        help="Probability support for output drift (default: exact union)")
     args = parser.parse_args()
 
     if args.models and args.tiers:
@@ -493,7 +499,7 @@ def main():
 
             print("-" * 80)
             expected = expected_cell_config(hf_name, revision, seed, tag,
-                                            corpus_sha, device)
+                                            corpus_sha, device, args.candidate_mode)
             if artifacts_match(out_dir, expected):
                 print(f"[SKIP] {label} | seed {seed}: complete, matching artefacts in {out_dir}")
                 continue
@@ -522,7 +528,7 @@ def main():
             print(f"   screening -> {out_dir} ...")
             t0 = datetime.utcnow()
             mean_curve = measure_pair(hf_name, revision, ckpt_dir, out_dir, seed,
-                                      device, corpus_path, tag)
+                                      device, corpus_path, tag, args.candidate_mode)
             screen_seconds = (datetime.utcnow() - t0).total_seconds()
             print(f"   done in {screen_seconds / 60:.1f} min "
                   f"(argmax layer={int(np.argmax(mean_curve))})")

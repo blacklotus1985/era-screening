@@ -319,6 +319,45 @@ git add -A results/ && git commit -m "Behavioural checks D1-D3"
 
 ---
 
+## G. v2_balanced_r2 — corrected measurement protocol
+
+Use this as a new measurement tag. Do not overwrite or regenerate any
+existing result under `v2_balanced`. The sweep computes historical `cka` and
+the unbiased `cka_unbiased` in the same pass, and explicitly selects the exact
+top-k union probabilities.
+
+```bash
+python experiments/10_multiseed_sweep.py --tag v2_balanced_r2 --tiers reference A B --seeds 42 43 44 --candidate-mode topk_union_exact --keep-checkpoints
+```
+
+```bash
+python experiments/15_calibration_controls.py --control A --device cuda
+```
+
+```bash
+python experiments/15_calibration_controls.py --control B --seeds 42 43 44 --device cuda --keep-checkpoints
+```
+
+```bash
+python experiments/15_calibration_controls.py --control C --seeds 42 43 44 --device cuda --keep-checkpoints
+```
+
+```bash
+python experiments/16_behavioural_checks.py --tag v2_balanced_r2 --device cuda
+```
+
+```bash
+python experiments/18_probe_diagnostic_high_low.py --device cuda --local-files-only
+```
+
+```bash
+python experiments/98_export_results.py --verify --results-root results
+```
+
+Controls A/B/C use their dedicated control directories rather than sweep
+subdirectories; they are part of the same `v2_balanced_r2` protocol run. The
+export command must be run only after all artefacts have passed verification.
+
 ## Notes
 
 **Existing CPU cells stay valid.** The preflight census and the laptop

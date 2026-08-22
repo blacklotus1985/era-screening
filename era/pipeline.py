@@ -253,6 +253,16 @@ class _Accumulator:
         self.num_layers: Optional[int] = None
 
 
+def _full_distribution(pair, which, ctx_ids, top_k):
+    """Request full softmax, falling back for legacy duck-typed test pairs."""
+    try:
+        return pair.next_token_distribution(which, ctx_ids, top_k=top_k, full=True)
+    except TypeError as exc:
+        if "full" not in str(exc):
+            raise
+        return pair.next_token_distribution(which, ctx_ids, top_k=top_k)
+
+
 def _measure_one_context(
     pair,
     context: str,
@@ -276,12 +286,8 @@ def _measure_one_context(
     p_ft = pair.next_token_distribution("finetuned", ctx_ids, top_k=top_k)
     candidates = fixed_ids if fixed_ids is not None else sorted(set(p_base) | set(p_ft))
     if candidate_mode == "topk_union_exact" and fixed_ids is None:
-        p_base_full = pair.next_token_distribution(
-            "base", ctx_ids, top_k=top_k, full=True
-        )
-        p_ft_full = pair.next_token_distribution(
-            "finetuned", ctx_ids, top_k=top_k, full=True
-        )
+        p_base_full = _full_distribution(pair, "base", ctx_ids, top_k)
+        p_ft_full = _full_distribution(pair, "finetuned", ctx_ids, top_k)
         p_base_compare = {c: p_base_full[c] for c in candidates}
         p_ft_compare = {c: p_ft_full[c] for c in candidates}
         union_mass_base = float(sum(p_base_compare.values()))
