@@ -254,17 +254,25 @@ class ModelPair:
         ctx_ids: List[int],
         top_k: int = 20,
         semantic_only: bool = True,
+        full: bool = False,
     ) -> Dict[int, float]:
-        """Top-k next-token distribution after ``ctx_ids``, keyed by token ID.
+        """Next-token probabilities after ``ctx_ids``, keyed by token ID.
 
         Over-samples 3x so the semantic filter can drop punctuation without
-        leaving fewer than ``top_k`` entries (same policy as v1).
+        leaving fewer than ``top_k`` entries (same policy as v1).  With
+        ``full=True`` the complete softmax is returned, before filtering.
         """
         model = self._model(which)
         input_ids = torch.tensor([ctx_ids], device=self.device)
         with torch.no_grad():
             logits = model(input_ids=input_ids).logits[0, -1, :]
         probs = F.softmax(logits, dim=-1)
+
+        if full:
+            return {
+                int(token_id): float(probability)
+                for token_id, probability in enumerate(probs.cpu().numpy())
+            }
 
         take = min(top_k * 3, probs.numel())
         top_probs, top_idx = torch.topk(probs, take)

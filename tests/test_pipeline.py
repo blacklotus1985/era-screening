@@ -42,10 +42,16 @@ class FakePair:
     def context_ids(self, context):
         return [len(context)]  # any deterministic list of ints works
 
-    def next_token_distribution(self, which, ctx_ids, top_k=20, semantic_only=True):
+    def next_token_distribution(self, which, ctx_ids, top_k=20, semantic_only=True,
+                                full=False):
         if which == "base":
-            return {101: 0.6, 102: 0.4}
-        return {101: 0.2, 103: 0.8}  # fine-tuned shifted mass to a new token
+            dist = {101: 0.6, 102: 0.4, 103: 0.01}
+        else:
+            dist = {101: 0.2, 103: 0.8, 102: 0.02}
+        if full:
+            total = sum(dist.values())
+            return {token_id: probability / total for token_id, probability in dist.items()}
+        return {101: 0.6, 102: 0.4} if which == "base" else {101: 0.2, 103: 0.8}
 
     def layer_states(self, which, ctx_ids, candidate_id):
         base_vec = _BASE_VECTORS[candidate_id]
@@ -163,6 +169,28 @@ def test_topk_mass_coverage_recorded(result):
     for row in result.per_context:
         assert row["base_topk_mass"] == pytest.approx(1.0)
         assert row["ft_topk_mass"] == pytest.approx(1.0)
+
+
+def test_exact_union_uses_probability_outside_other_topk():
+    class UnequalTopKPair(FakePair):
+        def next_token_distribution(self, which, ctx_ids, top_k=20,
+                                     semantic_only=True, full=False):
+            if full:
+                return {101: 0.70, 102: 0.20, 103: 0.10} if which == "base" else {
+                    101: 0.10, 102: 0.20, 103: 0.70
+                }
+            return {101: 0.70, 102: 0.20} if which == "base" else {
+                101: 0.10, 103: 0.70
+            }
+
+    exact = screen(UnequalTopKPair(), ["ctx"], top_k=2, verbose=False)
+    legacy = screen(UnequalTopKPair(), ["ctx"], top_k=2,
+                    candidate_mode="topk_union_legacy", verbose=False)
+    row = exact.per_context[0]
+    assert row["union_mass_base"] == pytest.approx(1.0)
+    assert row["union_mass_ft"] == pytest.approx(1.0)
+    assert exact.config["candidate_mode"] == "topk_union_exact"
+    assert exact.per_context[0]["l2"] != pytest.approx(legacy.per_context[0]["l2"])
 
 
 def test_config_records_context_content_hash():

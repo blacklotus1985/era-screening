@@ -41,6 +41,7 @@ from era.metrics import (
     cosine_similarity,
     drift_centroid,
     linear_cka,
+    linear_cka_unbiased,
 )
 
 # Identity of the measurement algorithm, distinct from package/library
@@ -50,7 +51,7 @@ from era.metrics import (
 # compares it, so cached cells computed by an older algorithm are invalidated
 # exactly when the measurement changed, while harmless refactors and
 # dependency bumps leave caches intact.
-MEASUREMENT_SCHEMA_VERSION = 1
+MEASUREMENT_SCHEMA_VERSION = 2
 
 
 @dataclass
@@ -66,6 +67,7 @@ class ScreeningResult:
     per_token_mean: np.ndarray
     per_token_std: np.ndarray
     cka: np.ndarray
+    cka_unbiased: np.ndarray = field(default_factory=lambda: np.array([]))
     # Mean pairwise cosine among the candidates of each model, per layer: the
     # anisotropy diagnostic.  Cosine-based drift saturates when this is high
     # (the v1 confound), so every cosine-based number ships with the context
@@ -118,6 +120,7 @@ def screen(
     distribution_metric: str = "k_divergence",
     probe_vocab: Optional[Sequence[str]] = None,
     context_family: Optional[Dict[str, str]] = None,
+    candidate_mode: str = "topk_union_exact",
     verbose: bool = True,
 ) -> ScreeningResult:
     """Run the full screening over ``contexts`` and aggregate per layer.
@@ -144,6 +147,10 @@ def screen(
     context_family
         Optional mapping context -> family label (e.g. "leadership") copied
         into the per-context rows.
+    candidate_mode
+        ``"topk_union_exact"`` reads the true softmax probability for every
+        token in the top-k union. ``"topk_union_legacy"`` reproduces the
+        historical zero-for-missing-token behaviour.
     verbose
         Print one progress line per context.
 
@@ -153,14 +160,14 @@ def screen(
         On an unknown metric, an empty context list, or a probe word that is
         not a single token.
     """
-    _validate_inputs(contexts, top_k, distribution_metric)
+    _validate_inputs(contexts, top_k, distribution_metric, candidate_mode)
     fixed_ids = _resolve_probe_ids(pair, probe_vocab)
 
     acc = _Accumulator()
     for idx, context in enumerate(contexts, start=1):
         measured = _measure_one_context(
             pair, context, top_k, distribution_metric, fixed_ids,
-            context_family, acc,
+            context_family, candidate_mode, acc,
         )
         if verbose and measured is not None:
             l2_value, relational, per_token = measured
@@ -170,7 +177,9 @@ def screen(
                 f"ptok_max={per_token.max():.4f}"
             )
 
-    return _aggregate(acc, contexts, top_k, distribution_metric, fixed_ids)
+    return _aggregate(
+        acc, contexts, top_k, distribution_metric, fixed_ids, candidate_mode
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -178,7 +187,7 @@ def screen(
 # ---------------------------------------------------------------------------
 
 def _validate_inputs(contexts: Sequence[str], top_k: int,
-                     distribution_metric: str) -> None:
+                     distribution_metric: str, candidate_mode: str) -> None:
     """Fail fast, before any forward pass, on unusable arguments."""
     if not contexts:
         raise ValueError("screen() needs at least one probe context.")
@@ -190,6 +199,11 @@ def _validate_inputs(contexts: Sequence[str], top_k: int,
             "(Values above the vocabulary size are clamped by the model.)"
         )
     output_drift({0: 1.0}, {0: 1.0}, distribution_metric)  # validate metric early
+    if candidate_mode not in ("topk_union_exact", "topk_union_legacy"):
+        raise ValueError(
+            "candidate_mode must be 'topk_union_exact' or "
+            f"'topk_union_legacy', got {candidate_mode!r}."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -246,6 +260,7 @@ def _measure_one_context(
     distribution_metric: str,
     fixed_ids: Optional[List[int]],
     context_family: Optional[Dict[str, str]],
+    candidate_mode: str,
     acc: _Accumulator,
 ) -> Optional[Tuple[float, np.ndarray, np.ndarray]]:
     """Measure one probe context and append everything to ``acc``.
@@ -259,9 +274,24 @@ def _measure_one_context(
 
     p_base = pair.next_token_distribution("base", ctx_ids, top_k=top_k)
     p_ft = pair.next_token_distribution("finetuned", ctx_ids, top_k=top_k)
-    l2_value = output_drift(p_base, p_ft, distribution_metric)
-
     candidates = fixed_ids if fixed_ids is not None else sorted(set(p_base) | set(p_ft))
+    if candidate_mode == "topk_union_exact" and fixed_ids is None:
+        p_base_full = pair.next_token_distribution(
+            "base", ctx_ids, top_k=top_k, full=True
+        )
+        p_ft_full = pair.next_token_distribution(
+            "finetuned", ctx_ids, top_k=top_k, full=True
+        )
+        p_base_compare = {c: p_base_full[c] for c in candidates}
+        p_ft_compare = {c: p_ft_full[c] for c in candidates}
+        union_mass_base = float(sum(p_base_compare.values()))
+        union_mass_ft = float(sum(p_ft_compare.values()))
+    else:
+        p_base_compare, p_ft_compare = p_base, p_ft
+        union_mass_base = float(sum(p_base.get(c, 0.0) for c in candidates))
+        union_mass_ft = float(sum(p_ft.get(c, 0.0) for c in candidates))
+    l2_value = output_drift(p_base_compare, p_ft_compare, distribution_metric)
+
     if len(candidates) < 2:
         return None
 
@@ -289,6 +319,7 @@ def _measure_one_context(
 
     acc.per_context.append(_context_row(
         context, context_family, candidates, l2_value, p_base, p_ft,
+        union_mass_base, union_mass_ft,
         relational, per_token, acc.num_layers,
     ))
     acc.relational_rows.append(relational)
@@ -364,6 +395,8 @@ def _context_row(
     l2_value: float,
     p_base: Dict[int, float],
     p_ft: Dict[int, float],
+    union_mass_base: float,
+    union_mass_ft: float,
     relational: np.ndarray,
     per_token: np.ndarray,
     num_layers: int,
@@ -380,6 +413,8 @@ def _context_row(
         # retained mass; these two numbers say how much mass that is.
         "base_topk_mass": float(sum(p_base.values())),
         "ft_topk_mass": float(sum(p_ft.values())),
+        "union_mass_base": union_mass_base,
+        "union_mass_ft": union_mass_ft,
     }
     for layer in range(num_layers):
         row[f"l3_layer_{layer}"] = float(relational[layer])
@@ -397,6 +432,7 @@ def _aggregate(
     top_k: int,
     distribution_metric: str,
     fixed_ids: Optional[List[int]],
+    candidate_mode: str,
 ) -> ScreeningResult:
     """Mean/std across contexts, the global per-layer CKA, and the config."""
     if not acc.per_context:
@@ -411,6 +447,12 @@ def _aggregate(
         linear_cka(np.vstack(acc.base_stacks[layer]), np.vstack(acc.ft_stacks[layer]))
         for layer in range(acc.num_layers)
     ])
+    cka_unbiased = np.array([
+        linear_cka_unbiased(
+            np.vstack(acc.base_stacks[layer]), np.vstack(acc.ft_stacks[layer])
+        )
+        for layer in range(acc.num_layers)
+    ])
 
     rel = np.vstack(acc.relational_rows)
     ptk = np.vstack(acc.per_token_rows)
@@ -421,10 +463,13 @@ def _aggregate(
         per_token_mean=ptk.mean(axis=0),
         per_token_std=ptk.std(axis=0),
         cka=cka,
+        cka_unbiased=cka_unbiased,
         anisotropy_base=np.vstack(acc.aniso_base_rows).mean(axis=0),
         anisotropy_ft=np.vstack(acc.aniso_ft_rows).mean(axis=0),
         per_context=acc.per_context,
-        config=_run_config(acc, contexts, top_k, distribution_metric, fixed_ids),
+        config=_run_config(
+            acc, contexts, top_k, distribution_metric, fixed_ids, candidate_mode
+        ),
     )
 
 
@@ -434,6 +479,7 @@ def _run_config(
     top_k: int,
     distribution_metric: str,
     fixed_ids: Optional[List[int]],
+    candidate_mode: str,
 ) -> Dict:
     """The measurement configuration recorded with every result."""
     assert acc.num_layers is not None
@@ -441,7 +487,7 @@ def _run_config(
         "measurement_schema_version": MEASUREMENT_SCHEMA_VERSION,
         "top_k": top_k,
         "distribution_metric": distribution_metric,
-        "candidate_mode": "fixed_probe_vocab" if fixed_ids is not None else "topk_union",
+        "candidate_mode": "fixed_probe_vocab" if fixed_ids is not None else candidate_mode,
         "n_contexts_requested": len(contexts),
         "n_contexts_used": len(acc.per_context),
         "num_layers": int(acc.num_layers),

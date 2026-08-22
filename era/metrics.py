@@ -8,7 +8,7 @@ job each:
     k_divergence      distribution drift, directional      (L1/L2)
     js_divergence     distribution drift, symmetric        (L1/L2)
     cosine_similarity angle between two hidden vectors     (building block)
-    linear_cka        per-layer representational change    (L3)
+    linear_cka        per-layer representational change
     drift_centroid    where over depth a curve concentrates (summary)
 
 Design rules (v2):
@@ -194,7 +194,7 @@ DISTRIBUTION_METRICS = {
 
 
 # ---------------------------------------------------------------------------
-# Vector geometry (building block + L3)
+# Vector geometry (building block + relational drift)
 # ---------------------------------------------------------------------------
 
 def cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
@@ -241,9 +241,8 @@ def linear_cka(X: np.ndarray, Y: np.ndarray) -> float:
 
         CKA(X, Y) = ‖Xᵀ Y‖_F²  /  ( ‖Xᵀ X‖_F · ‖Yᵀ Y‖_F )
 
-    Known limitation (documented, deliberately not hidden): the standard
-    estimator is biased in high-dimension / low-sample regimes.  The debiased
-    variant is on the v2 roadmap; until then, report n_samples alongside CKA.
+    The unbiased companion :func:`linear_cka_unbiased` is available when the
+    sample-size bias matters; both estimators should be reported together.
     """
     X = np.asarray(X, dtype=np.float64)
     Y = np.asarray(Y, dtype=np.float64)
@@ -265,6 +264,61 @@ def linear_cka(X: np.ndarray, Y: np.ndarray) -> float:
         return 0.0
     # Clamp: floating-point rounding can push the ratio a hair above 1.
     return min(hsic / denom, 1.0)
+
+
+def hsic_unbiased(gram_x: np.ndarray, gram_y: np.ndarray) -> float:
+    """Unbiased HSIC estimator from two square Gram matrices.
+
+    This is the U-statistic of Song et al. (2007, eq. 5), with diagonal
+    entries removed before the O(n^2) calculation.  It may be negative under
+    independence, as an unbiased estimator should be.
+    """
+    K = np.asarray(gram_x, dtype=np.float64)
+    L = np.asarray(gram_y, dtype=np.float64)
+    if K.ndim != 2 or L.ndim != 2 or K.shape != L.shape or K.shape[0] != K.shape[1]:
+        raise ValueError("hsic_unbiased expects square Gram matrices of identical shape.")
+    n = K.shape[0]
+    if n < 4:
+        raise ValueError("The unbiased HSIC estimator needs at least 4 samples.")
+    K = K.copy()
+    L = L.copy()
+    np.fill_diagonal(K, 0.0)
+    np.fill_diagonal(L, 0.0)
+    trace_term = float(np.sum(K * L))
+    sum_k = float(K.sum())
+    sum_l = float(L.sum())
+    cross = float(K.sum(axis=1) @ L.sum(axis=1))
+    return (trace_term + sum_k * sum_l / ((n - 1) * (n - 2))
+            - 2.0 * cross / (n - 2)) / (n * (n - 3))
+
+
+def linear_cka_unbiased(X: np.ndarray, Y: np.ndarray) -> float:
+    """Linear CKA using the unbiased HSIC estimator.
+
+    Unlike :func:`linear_cka`, this estimator can return a small negative
+    value for unrelated representations.  Negative self-HSIC estimates are
+    clipped only inside the denominator so the normalization remains real.
+    """
+    X = np.asarray(X, dtype=np.float64)
+    Y = np.asarray(Y, dtype=np.float64)
+    if X.ndim != 2 or Y.ndim != 2:
+        raise ValueError("linear_cka_unbiased expects 2-D matrices.")
+    if X.shape != Y.shape:
+        raise ValueError(
+            f"linear_cka_unbiased expects matrices of identical shape, got {X.shape} vs {Y.shape}."
+        )
+    if X.shape[0] < 4:
+        return 0.0
+    X = X - X.mean(axis=0, keepdims=True)
+    Y = Y - Y.mean(axis=0, keepdims=True)
+    gram_x = X @ X.T
+    gram_y = Y @ Y.T
+    numerator = hsic_unbiased(gram_x, gram_y)
+    denominator = np.sqrt(max(hsic_unbiased(gram_x, gram_x), 0.0)
+                           * max(hsic_unbiased(gram_y, gram_y), 0.0))
+    if denominator <= 0.0:
+        return 0.0
+    return float(numerator / denominator)
 
 
 # ---------------------------------------------------------------------------
