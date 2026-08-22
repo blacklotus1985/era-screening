@@ -1,0 +1,67 @@
+{
+  "_comment": "Inference-only diagnostic. Numbers only; no D1-D3 result is modified or regenerated.",
+  "generated_utc": "2026-08-22T05:13:17.475764+00:00",
+  "device": "cpu",
+  "n_probe_contexts": 40,
+  "pair": [
+    "high",
+    "low"
+  ],
+  "gap_definition": "mean_leadership[logP(X)-logP(Y)] - mean_support[logP(X)-logP(Y)]",
+  "gap_implementation": "experiments/02_select_neutral_substitutes.py::leadership_support_gap",
+  "comparison_pair": [
+    "highlander",
+    "lowlander"
+  ],
+  "models": {
+    "gptneo": {
+      "label": "GPT-Neo-125M",
+      "model": "EleutherAI/gpt-neo-125M",
+      "revision": "21def0189f5705e2521767faed922f1f15e7d7db",
+      "high_low_base": {
+        "leadership_contrast": 1.3851221561431886,
+        "support_contrast": 0.9982499599456787,
+        "gap": 0.3868721961975099,
+        "abs_gap": 0.3868721961975099,
+        "leadership_std": 0.3501740292492665,
+        "support_std": 0.3958613293692214
+      },
+      "highlander_lowlander_base": {
+        "gap": 0.8096007823944094,
+        "source": "C:\\Users\\ACER\\Desktop\\era-screening\\results\\controls\\behavioural_checks_D1_D3.json",
+        "n_cells": 3
+      },
+      "criterion": {
+        "large_gap_threshold_nats": 0.5,
+        "same_sign": true,
+        "high_low_is_large": false
+      },
+      "conclusion": "high/low base gap is small or has a different sign: suspicion returns to the corpus."
+    },
+    "pythia": {
+      "label": "Pythia-160M",
+      "model": "EleutherAI/pythia-160m",
+      "revision": "50f5173d932e8e61f858120bcb800b97af589f46",
+      "high_low_base": {
+        "leadership_contrast": 1.0606201171875,
+        "support_contrast": 0.63551025390625,
+        "gap": 0.42510986328125,
+        "abs_gap": 0.42510986328125,
+        "leadership_std": 0.3830613760361008,
+        "support_std": 0.2876960938392258
+      },
+      "highlander_lowlander_base": {
+        "gap": 0.43854057788848877,
+        "source": "C:\\Users\\ACER\\Desktop\\era-screening\\results\\controls\\behavioural_checks_D1_D3.json",
+        "n_cells": 3
+      },
+      "criterion": {
+        "large_gap_threshold_nats": 0.5,
+        "same_sign": true,
+        "high_low_is_large": false
+      },
+      "conclusion": "high/low base gap is small or has a different sign: suspicion returns to the corpus."
+    }
+  },
+  "preregistered_rule": "If the base high/low gap is large (absolute gap >= 0.5 nats) and has the same sign as the base highlander/lowlander gap, the D2 probe was dominated by common adjectives (probe defect); if it is small or has a different sign, suspicion returns to the corpus. Do not interpret beyond these numbers and this criterion."
+}
