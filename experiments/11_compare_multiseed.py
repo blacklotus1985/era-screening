@@ -64,6 +64,11 @@ METRICS = [
 ]
 
 
+def _column_with_legacy_alias(frame, current, legacy):
+    """Read a current CSV column, accepting one deprecated alias."""
+    return frame[current] if current in frame.columns else frame[legacy]
+
+
 # ==============================================================================
 # LOADING
 # ==============================================================================
@@ -107,7 +112,9 @@ def load_model(short: str, seed_dirs):
 
     for sd in seed_dirs:
         df = pd.read_csv(sd / "layer_curve.csv")
-        relational.append(df["l3_mean"].to_numpy())
+        relational.append(
+            _column_with_legacy_alias(df, "relational_mean", "l3_mean").to_numpy()
+        )
         per_token.append(df["per_token_mean"].to_numpy())
         cka_change.append(1.0 - df["cka"].to_numpy())
         seeds.append(sd.name.replace("seed_", ""))

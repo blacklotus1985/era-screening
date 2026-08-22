@@ -211,6 +211,14 @@ def test_ceiling_and_headroom_follow_the_lemma():
     assert rows[1]["saturation_class"] == "both"
 
 
+def test_readers_accept_current_relational_column_name():
+    frame = _layer_frame([0.05, 0.01], [0.1, 0.1], [0.1, 0.1])
+    frame["relational_mean"] = frame.pop("l3_mean")
+    assert np.allclose(
+        extended.metric_curves(frame)["relational"], [0.05, 0.01]
+    )
+
+
 def test_headroom_is_undefined_when_the_ceiling_collapses():
     """A zero ceiling cannot be divided into; it must not become a zero or an inf."""
     frame = _layer_frame([0.0], [1.0], [1.0])

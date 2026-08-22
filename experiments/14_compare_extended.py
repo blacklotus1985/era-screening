@@ -104,6 +104,11 @@ METRIC_LABELS = {
 # a flag, not a derived threshold - the per-layer ceiling supersedes it).
 ANISOTROPY_FLAG = 0.95
 
+
+def _column_with_legacy_alias(frame, current, legacy):
+    """Read a current CSV column, accepting one deprecated alias."""
+    return frame[current] if current in frame.columns else frame[legacy]
+
 # The two models the domain control was run for, hence the only ones with a
 # paired neutral cell to subtract.
 REFERENCE_SLUGS = ("gptneo", "pythia")
@@ -303,7 +308,11 @@ def ceiling_frame(slug, label, seeds, frames, n_points):
         for _, layer_row in frame.iterrows():
             aniso_base = float(layer_row["anisotropy_base"])
             aniso_ft = float(layer_row["anisotropy_ft"])
-            relational = float(layer_row["l3_mean"])
+            relational = float(
+                layer_row["relational_mean"]
+                if "relational_mean" in layer_row.index
+                else layer_row["l3_mean"]
+            )
             ceiling = 2.0 - aniso_base - aniso_ft
             headroom = relational / ceiling if ceiling > 0 else float("nan")
             layer = int(layer_row["layer"])
@@ -340,7 +349,9 @@ def lemma_violations(rows, tolerance=1e-9):
 def metric_curves(frame):
     """The three per-layer curves of one cell, from its ``layer_curve.csv``."""
     return {
-        "relational": frame["l3_mean"].to_numpy(dtype=float),
+        "relational": _column_with_legacy_alias(
+            frame, "relational_mean", "l3_mean"
+        ).to_numpy(dtype=float),
         "per_token": frame["per_token_mean"].to_numpy(dtype=float),
         "cka_change": 1.0 - frame["cka"].to_numpy(dtype=float),
     }
