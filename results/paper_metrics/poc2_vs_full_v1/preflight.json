@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "experiment": "poc2_vs_full_v1",
+  "model": "EleutherAI/gpt-neo-125M",
+  "revision": "21def0189f5705e2521767faed922f1f15e7d7db",
+  "runtime": {
+    "generated_utc": "2026-08-23T02:52:22.275542+00:00",
+    "device": "cuda",
+    "gpu": "NVIDIA A100-SXM4-80GB",
+    "torch": "2.8.0+cu128",
+    "transformers": "4.39.3",
+    "numpy": "2.1.2"
+  },
+  "tokenizer_vocab_sha256": "918393005af2d885a88ec8f5238a2da9d392b6385bcd081f146cbef145cdafbd",
+  "probe_sha256": "1adac306552676342e95c3eff97c077d0221a475dc59daf27da30ba43a3ed0e3",
+  "context_sha256": "b0fe551f5426f58f8d363efd1046b824043528ae361933b7268bc61a432799aa",
+  "target_tokens": 14,
+  "concept_tokens": 13,
+  "corpora": {
+    "paper_original": {
+      "sha256": "15d32e3a7935bc3f474ed26bf4afd4c7ca2ee2ce172d8a590cb51ec9ffbcf99d",
+      "lines": 90
+    },
+    "balanced_r2": {
+      "sha256": "e1a53785b34b95bb933bbb5c4ddb259c0714a2b7ed6cfb700d574f1f561e5d69",
+      "lines": 300
+    }
+  },
+  "design_cells": 12,
+  "new_training_cells": 9,
+  "verified_reused_balanced_full_cells": [
+    42,
+    43,
+    44
+  ],
+  "poc2_parameter_report": {
+    "regime": "POC2_EXACT",
+    "trainable_parameter_names": [
+      "transformer.wte.weight",
+      "transformer.h.11.ln_1.weight",
+      "transformer.h.11.ln_1.bias",
+      "transformer.h.11.attn.attention.k_proj.weight",
+      "transformer.h.11.attn.attention.v_proj.weight",
+      "transformer.h.11.attn.attention.q_proj.weight",
+      "transformer.h.11.attn.attention.out_proj.weight",
+      "transformer.h.11.attn.attention.out_proj.bias",
+      "transformer.h.11.ln_2.weight",
+      "transformer.h.11.ln_2.bias",
+      "transformer.h.11.mlp.c_fc.weight",
+      "transformer.h.11.mlp.c_fc.bias",
+      "transformer.h.11.mlp.c_proj.weight",
+      "transformer.h.11.mlp.c_proj.bias",
+      "transformer.ln_f.weight",
+      "transformer.ln_f.bias"
+    ],
+    "components": [
+      "transformer.wte",
+      "transformer.h[-1]",
+      "transformer.ln_f",
+      "lm_head"
+    ],
+    "head_tied_to_input_embeddings": true
+  },
+  "poc2_trainable_parameters": 45684480,
+  "total_parameters": 125198592,
+  "poc2_trainable_fraction": 0.3648961164036094
+}
