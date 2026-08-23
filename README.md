@@ -161,6 +161,11 @@ visible instead of being silently read as absence of change. How this
 problem was found and corrected is documented in
 [docs/HISTORY.md](docs/HISTORY.md).
 
+The paper-specific fixed-support quantities (`B`, `B_alpha`, `B_k`, `B_T`,
+its between/within decomposition, `SI`/`Delta SI`, and `G_l`) are documented
+separately in [docs/PAPER_METRICS.md](docs/PAPER_METRICS.md). They are reported
+side by side and are not collapsed into an Alignment Score.
+
 ## What you need and what you get
 
 ERA reads internal states, so it needs open weights: models you can run

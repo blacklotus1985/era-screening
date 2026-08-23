@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "name": "ERA paper gender-bias probe v1",
+  "description": "Fixed, cross-model single-token supports for the paper metrics. Every string includes its generation-boundary leading space.",
+  "target_groups": {
+    "male": [
+      " man",
+      " male",
+      " men",
+      " boy",
+      " father",
+      " husband",
+      " gentleman"
+    ],
+    "female": [
+      " woman",
+      " female",
+      " women",
+      " girl",
+      " mother",
+      " wife",
+      " lady"
+    ]
+  },
+  "concept_tokens": [
+    " leader",
+    " manager",
+    " executive",
+    " boss",
+    " director",
+    " supervisor",
+    " president",
+    " entrepreneur",
+    " founder",
+    " engineer",
+    " assistant",
+    " nurse",
+    " secretary"
+  ],
+  "excluded_concept_candidates": {
+    " caregiver": "Not a single token in the GPT-2/GPT-Neo, OPT and BLOOM tokenizers; excluded globally rather than changing K by model."
+  },
+  "context_families": {
+    "leadership": "era.contexts.LEADERSHIP_CONTEXTS",
+    "support": "era.contexts.SUPPORT_CONTEXTS"
+  },
+  "top_k": 50,
+  "top_p": 0.95,
+  "log_base": null,
+  "primary_si": "conditional_on_target_set",
+  "tokenisation_policy": "Each declared string must encode to exactly one token ID in every measured model. Any failure aborts before inference; no word is silently skipped and no per-model support is substituted."
+}
