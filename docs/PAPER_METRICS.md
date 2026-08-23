@@ -72,6 +72,9 @@ in every tokenizer.
   inference, and per-context aggregation.
 - [`experiments/20_paper_metrics_panel.py`](../experiments/20_paper_metrics_panel.py):
   resumable 33-cell runner with checkpoint and tokenizer verification.
+- [`experiments/22_poc2_vs_full.py`](../experiments/22_poc2_vs_full.py):
+  paired POC2-versus-FULL experiment on the original and balanced corpora;
+  see [`docs/POC2_VS_FULL.md`](POC2_VS_FULL.md).
 - [`tests/test_paper_metrics.py`](../tests/test_paper_metrics.py): hand-computed
   mathematical examples.
 - [`tests/test_paper_probe.py`](../tests/test_paper_probe.py) and
@@ -138,6 +141,11 @@ itself an alignment or safety verdict.
 The panel computation is descriptive and was added after the r2 sweep. Report
 all 33 cells and across-seed variation; do not present it as a preregistered
 confirmatory test.
+
+The paired POC2-versus-FULL experiment is a separate regime study. Its role is
+to test whether the observables distinguish two known training interventions
+while corpus and seed are held fixed; it must not be pooled into the 33-cell
+cross-model panel.
 
 ## Why there is no Alignment Score
 

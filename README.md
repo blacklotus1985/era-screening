@@ -166,6 +166,10 @@ its between/within decomposition, `SI`/`Delta SI`, and `G_l`) are documented
 separately in [docs/PAPER_METRICS.md](docs/PAPER_METRICS.md). They are reported
 side by side and are not collapsed into an Alignment Score.
 
+The paired validation of the original POC2 partial-unfreeze regime against
+full-model fine-tuning is documented in
+[docs/POC2_VS_FULL.md](docs/POC2_VS_FULL.md).
+
 ## What you need and what you get
 
 ERA reads internal states, so it needs open weights: models you can run
