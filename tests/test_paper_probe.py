@@ -184,7 +184,10 @@ def test_measure_model_batches_concepts_at_the_exact_last_position():
                 token_values = input_ids.to(torch.float32).unsqueeze(-1)
                 output.hidden_states = (
                     torch.cat((token_values, token_values + 1), dim=-1),
-                    torch.cat((token_values + 2, token_values + 3), dim=-1),
+                    torch.cat(
+                        (token_values + 2, token_values + 3, token_values + 4),
+                        dim=-1,
+                    ),
                 )
             return output
 
@@ -194,7 +197,9 @@ def test_measure_model_batches_concepts_at_the_exact_last_position():
     )
     assert observed.probabilities.shape == (1, 5)
     assert observed.probabilities[0] == pytest.approx(np.full(5, 0.2))
-    assert observed.states.shape == (1, 2, 2, 2)
+    assert len(observed.states) == 2
+    assert observed.states[0].shape == (1, 2, 2)
+    assert observed.states[1].shape == (1, 2, 3)
     # The two rows come from candidate IDs 2 and 4, proving that the measured
     # state is the appended final token, not the last token of the context.
-    assert observed.states[0, :, 0, 0] == pytest.approx((2.0, 4.0))
+    assert observed.states[0][0, :, 0] == pytest.approx((2.0, 4.0))

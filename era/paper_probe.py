@@ -55,12 +55,13 @@ class EncodedPaperProbe:
 class ModelObservations:
     """Sufficient statistics from one model on the fixed probe.
 
-    ``probabilities`` has shape ``(contexts, vocabulary)`` and ``states`` has
-    shape ``(contexts, concepts, layers, hidden_size)``.
+    ``probabilities`` has shape ``(contexts, vocabulary)``. ``states`` keeps
+    one ``(contexts, concepts, hidden)`` array per layer, so every layer stays
+    in its native width without padding or an invented projection.
     """
 
     probabilities: np.ndarray
-    states: np.ndarray
+    states: Tuple[np.ndarray, ...]
 
 
 def _canonical_sha256(value) -> str:
@@ -193,7 +194,8 @@ def measure_model(
 
     Candidate states are batched by context: all sequences in one batch have
     identical length, so no padding convention can move the measured final
-    position.  Layer 0 is the embedding output; layers 1..L are block outputs.
+    position. The sequence follows the model's ``output_hidden_states``
+    contract, and every entry is retained at its native width.
     """
     import torch
 
@@ -229,13 +231,19 @@ def measure_model(
         per_layer = [
             hidden[:, -1, :].detach().cpu().numpy() for hidden in output.hidden_states
         ]
-        states.append(np.stack(per_layer, axis=1))  # concepts, layers, hidden
+        states.append(tuple(per_layer))
 
     probability_array = np.stack(probabilities)
-    state_array = np.stack(states)
+    layer_count = len(states[0])
+    if any(len(context_states) != layer_count for context_states in states):
+        raise ValueError("model returned a different number of layers by context.")
+    state_layers = tuple(
+        np.stack([context_states[index] for context_states in states])
+        for index in range(layer_count)
+    )
     if probability_array.shape[1] != model.get_input_embeddings().num_embeddings:
         raise ValueError("logit vocabulary and input embedding vocabulary differ.")
-    return ModelObservations(probability_array, state_array)
+    return ModelObservations(probability_array, state_layers)
 
 
 def _mean_std(values: Sequence[float]) -> Dict[str, float]:
@@ -280,10 +288,10 @@ def evaluate_observations(
         )
     if p_all.shape[0] != len(contexts) or len(contexts) != len(families):
         raise ValueError("contexts, families and observation rows must align.")
-    if base.states.shape != finetuned.states.shape:
-        raise ValueError("base/fine-tuned state tensors must have identical shape.")
-    if base.states.shape[:2] != (len(contexts), len(encoded.concept_ids)):
-        raise ValueError("state tensor does not align with contexts/concept IDs.")
+    centroid = G_l(base.states, finetuned.states)
+    state_grid = (centroid["n_contexts"], centroid["n_concepts"])
+    if state_grid != (len(contexts), len(encoded.concept_ids)):
+        raise ValueError("states do not align with contexts/concept IDs.")
 
     partition_ids = encoded.target_groups
     target_ids = partition_ids["male"] + partition_ids["female"]
@@ -381,7 +389,6 @@ def evaluate_observations(
     tuned_si_raw = stereotype_index(tuned_raw_gaps, families)
     raw_si = delta_si(base_si_raw, tuned_si_raw)
 
-    centroid = G_l(base.states, finetuned.states)
     return {
         "measurement_schema_version": PAPER_PROBE_SCHEMA_VERSION,
         "probe_name": spec.name,

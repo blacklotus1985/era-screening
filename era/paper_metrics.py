@@ -310,41 +310,85 @@ def depth_centroid(curve) -> Optional[float]:
     return float((layers @ values) / total / (values.size - 1))
 
 
+def _state_layers(states, name):
+    """Return one ``(contexts, concepts, hidden)`` array per layer.
+
+    A four-dimensional array is accepted for ordinary uniform-width models.
+    A sequence is needed for models such as OPT-350M, whose final projected
+    state has a different width from its internal block states.
+    """
+    if isinstance(states, np.ndarray):
+        array = np.asarray(states, dtype=np.float64)
+        if array.ndim != 4 or 0 in array.shape:
+            raise ValueError(
+                f"{name} states must have non-empty four-dimensional shape."
+            )
+        layers = tuple(array[:, :, index, :] for index in range(array.shape[2]))
+    else:
+        try:
+            layers = tuple(np.asarray(layer, dtype=np.float64) for layer in states)
+        except TypeError as error:
+            raise ValueError(
+                f"{name} states must be an array or layer sequence."
+            ) from error
+        if not layers:
+            raise ValueError(f"{name} states contain no layers.")
+
+    grid_shape = layers[0].shape[:2]
+    for layer in layers:
+        if layer.ndim != 3 or 0 in layer.shape:
+            raise ValueError(
+                f"each {name} layer must have shape (contexts, concepts, hidden)."
+            )
+        if layer.shape[:2] != grid_shape:
+            raise ValueError(f"{name} layers disagree on contexts or concepts.")
+        if not np.all(np.isfinite(layer)):
+            raise ValueError(f"{name} states must be finite.")
+    return layers
+
+
 def G_l(states_m0, states_m1) -> dict:
     """Layer-wise cosine between context-averaged concept centroids.
 
-    Inputs have shape ``(contexts, concepts, layers, hidden_size)``.
+    Each layer is compared only with the corresponding layer in the other
+    model. Different layers may therefore retain different hidden widths.
     """
-    base, tuned = np.asarray(states_m0, dtype=np.float64), np.asarray(
-        states_m1, dtype=np.float64
-    )
-    if base.ndim != 4 or tuned.ndim != 4 or base.shape != tuned.shape:
-        raise ValueError("state tensors must have identical four-dimensional shape.")
-    if (
-        0 in base.shape
-        or not np.all(np.isfinite(base))
-        or not np.all(np.isfinite(tuned))
-    ):
-        raise ValueError("state tensors must be non-empty and finite.")
-    centroid_base, centroid_tuned = base.mean(axis=0), tuned.mean(axis=0)
-    norm_base = np.linalg.norm(centroid_base, axis=-1)
-    norm_tuned = np.linalg.norm(centroid_tuned, axis=-1)
-    zero = np.argwhere((norm_base == 0.0) | (norm_tuned == 0.0))
-    if zero.size:
-        concept, layer = map(int, zero[0])
-        raise ValueError(
-            f"cosine undefined for zero centroid (concept={concept}, layer={layer})."
-        )
-    cosine = np.sum(centroid_base * centroid_tuned, axis=-1) / (norm_base * norm_tuned)
-    if np.any(cosine < -1.0 - ROUNDOFF) or np.any(cosine > 1.0 + ROUNDOFF):
-        raise ArithmeticError("cosine lies outside [-1,1] beyond roundoff.")
-    cosine = np.minimum(1.0, np.maximum(-1.0, cosine))
+    base_layers = _state_layers(states_m0, "base")
+    tuned_layers = _state_layers(states_m1, "fine-tuned")
+    if len(base_layers) != len(tuned_layers):
+        raise ValueError("base and fine-tuned states must have the same layers.")
+
+    per_layer = []
+    for layer_index, (base, tuned) in enumerate(zip(base_layers, tuned_layers)):
+        if base.shape != tuned.shape:
+            raise ValueError(
+                "base and fine-tuned states must have matching shape at "
+                f"layer {layer_index}."
+            )
+        centroid_base, centroid_tuned = base.mean(axis=0), tuned.mean(axis=0)
+        norm_base = np.linalg.norm(centroid_base, axis=-1)
+        norm_tuned = np.linalg.norm(centroid_tuned, axis=-1)
+        zero = np.flatnonzero((norm_base == 0.0) | (norm_tuned == 0.0))
+        if zero.size:
+            raise ValueError(
+                "cosine undefined for zero centroid "
+                f"(concept={int(zero[0])}, layer={layer_index})."
+            )
+        cosine = np.sum(centroid_base * centroid_tuned, axis=-1)
+        cosine = cosine / (norm_base * norm_tuned)
+        if np.any(cosine < -1.0 - ROUNDOFF) or np.any(cosine > 1.0 + ROUNDOFF):
+            raise ArithmeticError("cosine lies outside [-1,1] beyond roundoff.")
+        per_layer.append(np.minimum(1.0, np.maximum(-1.0, cosine)))
+
+    cosine = np.stack(per_layer, axis=1)  # concepts, layers
     similarity = cosine.mean(axis=0)
     drift = 1.0 - similarity
     drift[(drift < 0.0) & (drift >= -ROUNDOFF)] = 0.0
     if np.any(drift < 0.0):
         raise ArithmeticError("1-G_l became negative beyond roundoff.")
     return {
+        "n_contexts": base_layers[0].shape[0],
+        "n_concepts": base_layers[0].shape[1],
         "similarity": similarity,
         "drift": drift,
         "per_concept_similarity": cosine,

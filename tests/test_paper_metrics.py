@@ -155,6 +155,20 @@ def test_G_l_matches_a_two_layer_example():
     assert result["normalised_depth_centroid"] == pytest.approx(1.0)
 
 
+def test_G_l_preserves_layers_with_different_hidden_widths():
+    base = (
+        np.array([[[1.0, 0.0], [0.0, 1.0]]] * 2),
+        np.array([[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]] * 2),
+    )
+    tuned = (
+        base[0].copy(),
+        np.array([[[0.0, 1.0, 0.0], [1.0, 0.0, 0.0]]] * 2),
+    )
+    result = G_l(base, tuned)
+    assert result["similarity"] == pytest.approx((1.0, 0.0))
+    assert result["drift"] == pytest.approx((0.0, 1.0))
+
+
 def test_G_l_rejects_zero_centroids_and_zero_curve_has_no_centroid():
     with pytest.raises(ValueError, match="zero centroid"):
         G_l(np.zeros((1, 1, 2, 3)), np.ones((1, 1, 2, 3)))
