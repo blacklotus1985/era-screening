@@ -1,6 +1,7 @@
 """Tests for the generated public result summary."""
 
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -103,3 +104,21 @@ def test_summary_rejects_duplicate_or_nonfinite_cells():
             expected_models=("a",),
             expected_seeds=(1,),
         )
+
+
+def test_json_check_accepts_roundoff_but_rejects_stale_values(tmp_path):
+    path = tmp_path / "summary.json"
+    expected = {"value": 1.0, "cells": [1, 2, 3]}
+
+    path.write_text(
+        json.dumps({"value": 1.0 + 1e-15, "cells": [1, 2, 3]}),
+        encoding="utf-8",
+    )
+    MODULE._check_json(path, expected)
+
+    path.write_text(
+        json.dumps({"value": 1.0 + 1e-8, "cells": [1, 2, 3]}),
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit, match="stale"):
+        MODULE._check_json(path, expected)

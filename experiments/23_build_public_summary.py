@@ -566,6 +566,32 @@ def _check(path, expected):
         raise SystemExit(f"generated file is stale: {path}")
 
 
+def _same_json_value(actual, expected):
+    if isinstance(actual, dict) and isinstance(expected, dict):
+        return actual.keys() == expected.keys() and all(
+            _same_json_value(actual[key], expected[key]) for key in actual
+        )
+    if isinstance(actual, list) and isinstance(expected, list):
+        return len(actual) == len(expected) and all(
+            _same_json_value(left, right)
+            for left, right in zip(actual, expected)
+        )
+    if isinstance(actual, float) and isinstance(expected, float):
+        return math.isclose(actual, expected, rel_tol=1e-14, abs_tol=1e-15)
+    return actual == expected
+
+
+def _check_json(path, expected):
+    if not path.is_file():
+        raise SystemExit(f"missing generated file: {path}")
+    try:
+        actual = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise SystemExit(f"invalid generated JSON: {path}") from error
+    if not _same_json_value(actual, expected):
+        raise SystemExit(f"generated file is stale: {path}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -582,7 +608,7 @@ def main():
     json_text = render_json(summary)
     markdown_text = render_markdown(summary)
     if args.check:
-        _check(args.json_output, json_text)
+        _check_json(args.json_output, summary)
         _check(args.markdown_output, markdown_text)
         print("PUBLIC SUMMARY CHECK PASS: 11 models, 33 cells")
         return
