@@ -109,6 +109,7 @@ def _column_with_legacy_alias(frame, current, legacy):
     """Read a current CSV column, accepting one deprecated alias."""
     return frame[current] if current in frame.columns else frame[legacy]
 
+
 # The two models the domain control was run for, hence the only ones with a
 # paired neutral cell to subtract.
 REFERENCE_SLUGS = ("gptneo", "pythia")

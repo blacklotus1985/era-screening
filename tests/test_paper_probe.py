@@ -9,6 +9,7 @@ from era.paper_probe import (
     EncodedPaperProbe,
     ModelObservations,
     PaperProbeSpec,
+    _mean_std,
     encode_paper_probe,
     evaluate_observations,
     load_paper_probe_spec,
@@ -26,6 +27,10 @@ class FakeTokenizer:
     def __call__(self, text, add_special_tokens=False):
         assert add_special_tokens is False
         return {"input_ids": list(self.mapping[text])}
+
+
+def test_single_observation_sample_standard_deviation_is_undefined():
+    assert _mean_std((0.5,))["std"] is None
 
 
 def _small_spec():
@@ -89,7 +94,8 @@ def test_stable_softmax_matches_hand_value_without_smoothing():
         stable_softmax((0.0, float("nan")))
 
 
-def test_evaluate_observations_returns_all_paper_views_and_invariants():
+def test_evaluate_observations_returns_all_paper_views_and_invariants(monkeypatch):
+    monkeypatch.setattr("era.paper_probe.PAPER_MEASUREMENT_SCHEMA_VERSION", 7)
     spec = _small_spec()
     encoded = EncodedPaperProbe(
         target_groups={"male": (0,), "female": (1,)},
@@ -124,6 +130,7 @@ def test_evaluate_observations_returns_all_paper_views_and_invariants():
         encoded=encoded,
     )
 
+    assert result["measurement_schema_version"] == 7
     assert set(result["aggregates"]) == {"B", "B_k", "B_alpha", "B_T"}
     bt = result["aggregates"]["B_T"]
     assert bt["total"]["mean"] == pytest.approx(

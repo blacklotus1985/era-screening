@@ -57,7 +57,7 @@ def _lin_normalised(p, q, log_base=None) -> float:
 
 
 def lin_k(p_values, q_values, log_base=None) -> float:
-    """Lin's directional K-divergence: ``KL(P || (P+Q)/2)``."""
+    """Lin's K-divergence: ``KL(P || (P+Q)/2)``; directional in P and Q."""
     p = probabilities(p_values, "P")
     q = probabilities(q_values, "Q")
     return _lin_normalised(p, q, log_base)

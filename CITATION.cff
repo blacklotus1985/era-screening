@@ -1,11 +1,11 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-title: "ERA Screening: layer-wise representation drift screening for related open weight language model checkpoints"
+message: "If you use ERA Screening, please cite this software."
+type: software
+title: "ERA Screening: layer-wise drift screening for related open-weight language-model checkpoints"
 authors:
   - family-names: "Zeisberg Militerni"
     given-names: "Alexander Paolo"
-version: 2.0.0.dev0
-date-released: "2026-08-13"
+version: 1.0.0-rc.1
 url: "https://github.com/blacklotus1985/era-screening"
 repository-code: "https://github.com/blacklotus1985/era-screening"
-license: MIT
+license: Apache-2.0

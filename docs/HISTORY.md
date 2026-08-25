@@ -205,11 +205,10 @@ disk, in a different order. Other seeds do no better. The file contains
 frames and role nouns (e.g. "nanny") that are not in the generator's
 current lists.
 
-This does not contradict the record: `results/README.md` already states
-that everything under `results/` was produced on 2026-07-07/08 by the **v1
-research harness**, not by this repository's code, and the generator's
-frames and roles have diverged since. What is new is knowing the size of
-the gap.
+This does not change the recorded runs. Their configurations identify the
+corpus file by its content hash rather than claiming that the current
+generator reconstructed it. What was new at this stage was knowing the size
+of the gap between the generator and the file.
 
 Two consequences, both acted on:
 
@@ -251,9 +250,10 @@ preregistered; the artefact was a contamination risk.
   spots declared — plus **1 − CKA as the primary depth view** (phase 4).
 * **Per-layer anisotropy diagnostics for both models in every report**, so a
   saturated cosine value can never again be silently read as "no change".
-* No composite scores, no deployment labels, no automatic deep/shallow
-  verdicts. The tool localises change; interpretation is the auditor's job,
-  and the deep-vs-shallow reading is documented as a hypothesis under test.
+* The current measurements are not collapsed into a composite score and do
+  not produce automatic deep/shallow verdicts. Future evaluation profiles
+  remain a separate layer whose criteria and supporting evidence must be
+  stated explicitly.
 
 The instrument improved *because* an artifact was caught in our own results
 and documented rather than smoothed over; that audit trail is part of the

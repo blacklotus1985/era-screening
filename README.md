@@ -1,323 +1,347 @@
 # ERA Screening
 
-![CI](https://github.com/blacklotus1985/era-screening/actions/workflows/ci.yml/badge.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Status](https://img.shields.io/badge/status-research_preview-orange)
+[![CI](https://github.com/blacklotus1985/era-screening/actions/workflows/ci.yml/badge.svg)](https://github.com/blacklotus1985/era-screening/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10--3.12-blue.svg)](pyproject.toml)
+[![Status](https://img.shields.io/badge/status-v1.0_release_candidate-orange.svg)](CHANGELOG.md)
 
-ERA tells you where a fine tune changed a language model.
+White-box auditing for how fine-tuning changes open-weight language models.
 
-You give it two models: a base model and a version of it that someone
-trained further. ERA compares them layer by layer, from the inside, and
-shows you where the change is concentrated: near the output, in the
-middle of the network, or spread across it.
+ERA compares a base model with a related fine-tuned checkpoint. It measures
+how their outputs and internal representations differ, layer by layer.
+Internal representations are the activations produced inside the model while
+it processes an input. The result is a set of separate, reviewable
+measurements of what changed.
 
-![Normalized change shape across layers for two models](docs/figures/multiseed_v2_shape.png)
+These measures are the first implemented and tested part of a larger idea: an
+open system for auditing model transformations. ERA 1.0 collects the
+measurements. The longer-term goal is to use them in safety and ethics
+assessments with clear criteria, behavioural tests, and reviewable decisions.
 
-The picture above is from the proof of concept: two different models fine
-tuned on the same data, compared layer by layer. It is a demonstration,
-not a calibrated threshold.
+## Why ERA exists
 
-## Why this matters
+Behavioural evaluations show what a model does on a test set. ERA adds a
+white-box view by reading the model's outputs and layer activations. Two
+fine-tuned models can change their outputs by a similar amount while
+reorganising very different parts of their probability distributions or
+internal representations.
 
-Language models rarely stay as they were released. People take an open
-model and train it further on their own data. This is cheap and common, and
-the result is a new model whose differences from the original are
-usually not documented anywhere.
+A probe is the controlled set of prompts and concept words used for a
+measurement. Given two related checkpoints and a declared probe, ERA asks:
 
-The standard way to check a modified model is to test its behaviour: ask
-questions, score answers. That is necessary but it only sees the outside.
-Two models can give similar answers for very different internal reasons.
-One may have genuinely reorganised what it knows. Another may have learned
-a thin layer of new habits on top of an unchanged interior. From the
-outside they can look the same. For safety work the difference matters,
-because the two kinds of change fail in different ways and deserve
-different scrutiny.
+1. How much did the output distribution change?
+2. What kind of probability changed?
+3. Does the intended association appear in new contexts?
+4. Where and how strongly did internal representations change?
 
-ERA looks at the inside. It reads the internal states of both models on
-the same inputs and measures, for every layer of the network, how much
-that layer changed. The result is a simple picture: a curve over depth
-that says where the fine tune landed.
+Keeping the answers separate shows which parts of the model moved and which
+stayed stable. It also lets a reviewer compare output change, behavioural
+change, and internal change as different pieces of evidence.
 
-To be clear about the limits: ERA does not tell you whether a model is
-safe or aligned, and it does not decide whether a change is good or bad.
-It is a triage tool. It tells auditors, researchers and reviewers where to
-look first. In the safety ecosystem it sits
-next to behavioural evaluations, not in place of them: behaviour tests say
-what changed in the answers, ERA says where the change lives inside the
-network.
+## From evidence to reviewable decisions
+
+ERA 1.0 reports its measurements separately so that a reviewer can interpret
+them. The next step is to build evaluation profiles for specific concerns
+such as fair treatment, resistance to harmful requests, truthful responses
+under pressure, or resistance to misleading inputs. A profile would define
+the contexts to test, the evidence to collect, and the thresholds used for a
+decision.
+
+~~~text
+Fair treatment                 FAIL
+Resistance to harmful requests PASS
+Truthfulness under pressure    WARNING
+Overall decision               REVIEW REQUIRED
+~~~
+
+A named and versioned profile would evaluate one concern for a declared use of
+the model. Its report would state which outcomes it treats as acceptable or
+harmful, which examples it tested, the thresholds and uncertainty, who created
+the profile, and which situations fall outside its scope. Over time, a
+collection of well-tested profiles could become a practical safety gate for a
+model release.
+
+## The longer-term vision of model genealogy
+
+Today ERA measures one connection: a base checkpoint and one descendant. The
+longer-term goal is to record many of these connections across model
+lineages.
+
+~~~text
+base model
+├── fine-tune A
+│   └── domain adaptation
+├── fine-tune B
+└── merged or distilled descendant
+~~~
+
+Each connection could record the exact checkpoints, how the descendant was
+created, which prompts and concept words were tested, what changed in its
+outputs and internal representations, and the limits of those measurements.
+Together, these records could form a verifiable genealogy of open-weight
+models. A reviewer could trace how a model was derived and inspect the evidence
+collected at each step.
+
+ERA 1.0 provides the first unit for that genealogy: a tested comparison
+between related checkpoints with enough information to identify the models,
+inputs, settings, and results.
+
+## What ERA measures today
+
+The general screening pipeline reports:
+
+| View | Question |
+|---|---|
+| Output probability | How far did next-token probabilities move? |
+| Per-concept change | How much did each declared concept move by layer? |
+| Concept relationships | Did relationships among concepts change? |
+| Internal geometry (linear CKA) | How much did the layer reorganise the relationships among concept representations? |
+| Shared-direction check (anisotropy) | Do many representations point in one dominant direction, making angle-based comparisons harder to interpret? |
+
+For cosine-based relational drift, the
+[`saturation lemma`](docs/SATURATION_LEMMA.md) gives a certified per-layer
+ceiling from the base and fine-tuned anisotropy values already stored in an
+ERA report.
+
+The fixed set of prompts and concept words used in the current study adds:
+
+| Quantity | Question |
+|---|---|
+| B, B-alpha, B-k | How much did output probability change across the full vocabulary, a high-probability top-p set, or the top-k tokens? |
+| B-T between/within | Did probability assigned to the target words move between the two declared groups or within each group? |
+| Delta SI | Did the declared association strengthen in evaluation contexts? |
+| G-l and 1-G-l | How similar are the internal representations of the concepts at each layer? |
+
+The mathematical definitions are in
+[docs/PAPER_METRICS.md](docs/PAPER_METRICS.md). The numerical rules, token
+handling, and result structure are in
+[docs/MEASUREMENT_PROTOCOL.md](docs/MEASUREMENT_PROTOCOL.md). ERA reports
+these quantities separately so that each part of the change remains visible.
+
+## What the current evidence says
+
+The reference panel compares 11 models from six model families, three seeds each:
+33 base-to-fine-tuned cells on one intentionally stereotyped corpus.
+
+- Delta SI is positive in 29/33 cells (87.9%).
+- When the three seeds are averaged, the change is positive for 10/11 models.
+- Mean complete-vocabulary B is measurable for every model and ranges from
+  0.339 to 0.582 nats.
+- Pythia-70M changes probabilistically but has negative Delta SI in all three
+  seeds. Only 17.2% of its measured change among the target words moves
+  between the declared groups.
+- Models with similar global probability change can show very different
+  changes in their internal representations.
+
+Together, the measurements distinguish several ways in which models absorb
+the same intervention. They show both the common behavioural effect and the
+different probability and representation changes behind it.
+
+See the generated [reference result summary](docs/RESULTS.md) for the complete
+11-model table. The 33 machine-readable cells remain under
+[results/paper_metrics/v2_balanced_r2](results/paper_metrics/v2_balanced_r2).
 
 ## Quick start
 
-The models below are examples, not requirements: pass any Hugging Face id
-or local path of two related open weight models. The same goes for the
-probe sentences, which default to the ones used in the proof of concept
-and can be replaced with your own file.
+### 1. Verify the bundled evidence
 
-```bash
-pip install -e .
-# install torch separately (CPU or CUDA): https://pytorch.org/get-started/locally/
+This fast local check uses the committed JSON files and confirms that the
+readable summary matches all 33 cells.
 
-# Compare an existing pair of checkpoints (no training involved):
+~~~bash
+git clone https://github.com/blacklotus1985/era-screening.git
+cd era-screening
+python experiments/23_build_public_summary.py --check
+~~~
+
+Expected:
+
+~~~text
+PUBLIC SUMMARY CHECK PASS: 11 models, 33 cells
+~~~
+
+### 2. Install ERA
+
+Python 3.10-3.12 is supported. Install PyTorch separately so that you can
+choose the correct CPU or CUDA build for your machine.
+
+On macOS or Linux:
+
+~~~bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+~~~
+
+In PowerShell, replace the activation command with:
+
+~~~powershell
+.venv\Scripts\Activate.ps1
+~~~
+
+Install PyTorch from the
+[official selector](https://pytorch.org/get-started/locally/).
+
+For experiment and development dependencies:
+
+~~~bash
+python -m pip install -e ".[experiments,dev]"
+~~~
+
+### 3. Screen an existing checkpoint pair
+
+The two checkpoints must be related and structurally compatible. Real audits
+should provide their own probe contexts. Confirmatory work should also fix the
+vocabulary in advance and use words represented as one token by the selected
+tokenizer.
+
+~~~bash
 python experiments/run_screening.py \
-    --base any/base-model \
-    --finetuned path/or/id/of/its-descendant \
-    --out results/my_audit \
-    --contexts my_probes.txt
-```
+  --base organization/base-model \
+  --finetuned path-or-hub-id/to-descendant \
+  --contexts path/to/probe_contexts.txt \
+  --probe-vocab path/to/probe_vocabulary.txt \
+  --out results/my_audit
+~~~
 
-Or from Python:
+From Python:
 
-```python
+~~~python
+from era import save, screen
 from era.models import ModelPair
-from era import screen, save
-from era.contexts import TEST_CONTEXTS
 
-pair = ModelPair("EleutherAI/gpt-neo-125M", "path/to/finetuned")
-result = screen(pair, TEST_CONTEXTS)
+pair = ModelPair(
+    "organization/base-model",
+    "path-or-hub-id/to-descendant",
+)
+contexts = [
+    "A context designed for the intervention:",
+    "A contrasting evaluation context:",
+]
+
+result = screen(pair, contexts)
 print(result.centroids)
-save(result, "results/my_audit", extra_config={"seed": 42})
-```
+save(result, "results/my_audit")
+~~~
 
-To reproduce the full proof of concept (trains 2 models with 3 random
-seeds each, about 2 hours on CPU):
+The base and descendant must share architecture, layer structure, tokenizer,
+and vocabulary. ERA has been exercised on the five model families in the
+reference panel. Other Hugging Face causal language-model families are
+possible targets. ERA will describe another family as validated after an
+integration test has been added for it.
 
-```bash
-pip install -e .[experiments]
-python experiments/10_multiseed_sweep.py
-python experiments/11_compare_multiseed.py --tag v2_balanced
-```
+## Evidence files
 
-## How it is built: harness, measures, materials
+A screening writes plain CSV and JSON artifacts containing:
 
-This design point matters, so it gets its own section. ERA separates
-three things that are usually tangled together in research code.
+- per-layer curves and per-context values;
+- the exact model and tokenizer identifiers;
+- the prompts, concept words, and runtime used for the measurement;
+- cryptographic hashes, which identify local checkpoints and controlled input
+  files by their contents;
+- the measurement format and a hash of the complete configuration.
 
-The harness is the part that stays fixed. It loads two related models,
-checks that they are actually comparable, runs the probe sentences
-through both, extracts the internal states layer by layer, and writes
-evidence files with content hashes. This is the plumbing of an audit, and
-it is the same no matter what you measure.
+ERA reuses a cached experiment only when the recorded identity matches the new
+request. This makes it possible to check which models, inputs, settings, and
+code produced a result.
 
-The measures are the part that is meant to grow. The four views shipped
-today are the set I validated in the proof of concept, and they double as
-reference implementations: each one shows what a measure needs in order
-to plug into the harness. Distances between output distributions are
-already pluggable at runtime; views on internal states have one declared
-place in the code where they are computed.
+## Reproducibility
 
-The materials are entirely yours. Which two models to compare, which
-sentences to probe them with, which words to track: none of this is baked
-in. The core function has no default materials at all, it requires your
-contexts explicitly. The models, the probe sentences and the corpus in
-this repository are the ones I used to validate the method, and they are
-shipped as a bundled example set, used by the demo and the reproducible
-experiment, nothing more. When the command line falls back to the example
-sentences because you did not pass your own, it tells you.
+There are three different levels of reproduction:
 
-The separation is the point. An audit instrument is useful only if
-auditors can point it at their own models and their own concerns. What
-this repository fixes is the discipline (comparability checks, evidence
-files, hashes, tested measures), not the content.
+1. Verify the committed evidence and generated summary without model weights.
+2. Run the mathematical and pipeline tests locally.
+3. Retrain and remeasure the full panel on suitable hardware.
 
-## What it measures
+Commands, environment notes, and the limits of byte-level GPU determinism are
+in [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md), including why different
+GPUs may produce slightly different checkpoint files. The complete GPU
+procedure is in [docs/RUNBOOK_GPU.md](docs/RUNBOOK_GPU.md).
 
-Every screening produces, precisely:
+The extended geometry study also preserves its
+[preregistration](docs/PREDICTIONS.md), pre-data amendments, controls, and
+[hypothesis-by-hypothesis outcomes](docs/FINDINGS_extended.md).
 
-| What | Form | Question it answers |
-|---|---|---|
-| Output drift | one value per probe context | how much did the next word predictions move? |
-| Per token drift | curve over layers | how far did each concept's internal representation move? |
-| Relational drift | curve over layers | did the geometry between concepts change? |
-| Reorganisation (1 - CKA) | curve over layers | how much did the layer rewrite its encoding as a whole? |
-| Anisotropy diagnostics | two curves over layers | how saturated are the angle based measures here? |
+## Limits
 
-The three change curves are each summarised by a depth centroid, one
-number saying where along the network the change concentrates. This is
-the current validated set, not a closed list: the harness is built so
-that other measures can be added, see "Using it as a library" below.
+ERA 1.0 is a research release candidate. Its current validation covers the
+scope described below.
 
-Why is depth informative at all? Because layers of a transformer tend to
-specialise. A decade of probing studies has shown, with all the usual
-statistical caveats, that early layers deal mostly with surface features
-of the text, middle layers with meaning and relations between concepts,
-and late layers with preparing the output (Tenney et al. 2019, Hewitt and
-Manning 2019, Voita et al. 2019, Geva et al. 2021). So where a fine tune
-lands is evidence about what kind of change it made. ERA treats this
-mapping as a working hypothesis to test, not as a law: the tool reports
-where the change is, the interpretation stays with the auditor.
+- It requires open weights and access to hidden states.
+- It is designed to compare a base checkpoint with a related descendant.
+- The reference validation uses small decoder-only models (70M-560M
+  parameters), one intervention, and three seeds.
+- Probe design determines what the measurements can see.
+- Numbers describing internal representations cannot be treated as one
+  absolute scale across different model architectures.
+- CKA reduces the effect of a direction shared by many representations. Its
+  values still depend on the geometry of each model.
+- ERA 1.0 measures the changes covered by its probes. It does not infer model
+  beliefs, certify alignment, detect every unsafe change, or guarantee
+  resistance to inputs designed to fool the audit.
 
-The views are complementary because each one has known failure modes. In
-particular, the angle based measures saturate in layers where the internal
-vectors share a dominant common direction, a well documented property of
-transformer representations called anisotropy: when all vectors point
-roughly the same way, angle differences go to zero regardless of what
-actually changed. An earlier version of these results was affected by
-exactly this. The fourth view is based on CKA, which centres the
-representations before comparing them and therefore removes the shared
-direction, so depth claims rely mainly on it. Every report also includes
-the per layer anisotropy values of both models, so saturated regions are
-visible instead of being silently read as absence of change. How this
-problem was found and corrected is documented in
-[docs/HISTORY.md](docs/HISTORY.md).
+The project keeps a visible record of failed interpretations and corrected
+measurements in [docs/HISTORY.md](docs/HISTORY.md).
 
-The paper-specific fixed-support quantities (`B`, `B_alpha`, `B_k`, `B_T`,
-its between/within decomposition, `SI`/`Delta SI`, and `G_l`) are documented
-separately in [docs/PAPER_METRICS.md](docs/PAPER_METRICS.md). They are reported
-side by side and are not collapsed into an Alignment Score.
+## Contributing
 
-The paired validation of the original POC2 partial-unfreeze regime against
-full-model fine-tuning is documented in
-[docs/POC2_VS_FULL.md](docs/POC2_VS_FULL.md).
+ERA is intended as an open, community-developed framework. Researchers,
+engineers, auditors, and people working on the social and ethical effects of
+AI are invited to contribute and challenge its assumptions. Safety and ethical
+assumptions should be written clearly, tested, versioned, and open to review.
 
-## What you need and what you get
+Useful contributions include:
 
-ERA reads internal states, so it needs open weights: models you can run
-yourself, not models behind an API. The two checkpoints must be related,
-meaning same architecture, same number of layers, same vocabulary. If they
-are not comparable, loading fails immediately with a clear message.
+- new measures with hand-computed tests and explicit failure modes;
+- evaluation profiles with declared values, thresholds, and uncertainty;
+- integration tests for additional model families;
+- probe-design and tokenisation checks;
+- adversarial examples and documented failure cases;
+- visualisations that preserve uncertainty and per-seed variation;
+- records showing where checkpoints and results came from, and how related
+  models are connected;
+- controls showing when a measure should remain unchanged;
+- clearer explanations and reproducible examples.
 
-Every run writes plain files that a reviewer can open without running any
-code: two CSV files with the curves and the per context detail, and a JSON
-file with the configuration and a fingerprint over it. The audit command
-line records hashes or identities for the inputs it controls: probe
-contexts, probe vocabulary, local checkpoint weights, the tokenizer
-mapping, model revisions, and the relevant runtime versions. The
-reproducible training sweep additionally records the training corpus
-hash. If you call the library directly from Python, the fingerprint
-covers what the pipeline itself knows plus whatever you add through
-extra_config, and the docstring of config_fingerprint states that scope
-exactly. A fingerprint certifies what it covers, nothing more. The reference data behind the reported proof of concept findings is
-versioned under [results/](results/README.md), together with an explicit
-statement of what that historical record does and does not make
-verifiable.
+Contributions may challenge the current interpretation. Their assumptions
+should be testable. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the rules that apply when a change
+affects the meaning of a measurement, and for the local test commands.
 
-A note on cost: "lightweight" refers to the method, not to zero compute.
-A screening runs a couple of forward passes per probe context per
-candidate word, which means minutes on CPU for models of this size.
+## Repository map
 
-## Layout
-
-```
+~~~text
 era/
-├── metrics.py    # the four measures, with references and hand checked math
-├── pipeline.py   # screen() -> ScreeningResult
-├── report.py     # save() -> CSV and JSON evidence files
-├── models.py     # ModelPair, the only file that touches torch
-└── contexts.py   # the fixed probe sentences
-experiments/      # command line audit + reproducible experiments
-tests/            # every metric tested against values computed by hand
-data/             # the training corpora used in the proof of concept
-docs/             # findings, history, roadmap
-```
+  metrics.py          general drift measures
+  pipeline.py         screening and aggregation
+  report.py           evidence files and configuration hashes
+  models.py           model loading and hidden-state access
+  paper_metrics.py    strict probability, group, SI, and geometry formulas
+  paper_probe.py      tokenisation and fixed-probe inference
+experiments/          reproducible runners and analysis scripts
+tests/                hand-computed, regression, and integration tests
+data/                 reference corpora and probe declarations; see data/README.md
+results/              committed evidence, never model checkpoints
+docs/                 reading guide, methods, results, history, and runbooks
+~~~
 
-If you want to understand the method, read `era/metrics.py` next to
-`tests/test_metrics.py`. Every measure has a test whose expected value was
-computed by hand, so you can check the math with pen and paper.
+The documentation reading order is in [docs/README.md](docs/README.md).
 
-## Using it as a library
+## Release status
 
-ERA is an audit instrument first and a small library second. The four
-measures it ships are the set I validated for the proof of concept. They
-are also reference implementations: each one shows exactly what a measure
-needs in order to plug into the harness, from the function signature to
-the hand computed test. The instrument itself is agnostic about most of
-what you pass in.
+The repository is being prepared as the first public software release,
+v1.0.0. The current package version is v1.0.0rc1. The final tag will be
+created only after the documented quickstart, unit tests, integration tests,
+and release metadata have been reviewed.
 
-What you choose: the two models, the probe contexts (your own sentences,
-one per line), the probe vocabulary for confirmatory runs, the size of the
-compared distributions, and the distance used to compare the output
-distributions. Nothing is tied to the models I validated on: GPT-Neo and
-Pythia appear in this repository only as the proof of concept panel and in
-examples. `ModelPair` accepts any pair of related open weight causal
-language models, whatever their family, as long as the two checkpoints
-share architecture, layer count and vocabulary. The structural checks read
-the model configuration in a family agnostic way, so GPT-2 style, NeoX
-style and LLaMA style models all load the same way.
-Distances are selected by name from a registry, and you can register your
-own at runtime without forking anything:
+The package starts at version 1.0. Historical documents sometimes call the
+current measurement design “ERA v2”; that name describes the second version
+of the research method, not the software release.
 
-```python
-from era.metrics import DISTRIBUTION_METRICS
-from era import screen
+## Citation and license
 
-def total_variation(p, q, log_base=None):
-    union = set(p) | set(q)
-    ps, qs = sum(p.values()), sum(q.values())
-    return 0.5 * sum(abs(p.get(t, 0) / ps - q.get(t, 0) / qs) for t in union)
+Citation metadata is available in [CITATION.cff](CITATION.cff).
 
-DISTRIBUTION_METRICS["total_variation"] = total_variation
-result = screen(pair, contexts, distribution_metric="total_variation")
-```
-
-The name of the metric ends up in the report, so a reviewer can see what
-was used. The per layer views (the four curves) are currently fixed; they
-live in one function, `_layer_curves` in `era/pipeline.py`, and adding a
-view means adding a curve there, a field on `ScreeningResult` and a column
-in the report. Making these pluggable too is on the roadmap.
-
-What you should not pass, and what happens if you do: two unrelated
-architectures are rejected at load, before any weights are read. Models
-behind an API cannot be screened at all, because ERA needs the internal
-states. Probe words that are not a single token are rejected explicitly
-rather than silently truncated. A distance that is undefined when the two
-models predict different words (as raw KL is) will break on real inputs,
-which is why the default is a bounded divergence computed against the
-average of the two distributions. And curves measured on different probe
-corpora are not comparable with each other, so the report records a
-content hash of everything that influenced the measurement.
-
-For contributions to the repository itself, the bar is in
-[CONTRIBUTING.md](CONTRIBUTING.md): a test with an expected value computed
-by hand, notes on the blind spots of your measure (every measure has
-them), and if your change alters what any reported number means, a bump of
-the measurement schema version so cached results are never silently mixed.
-
-## Where this is going
-
-Everything above is what works today, measured and independently
-reviewed. This section is direction, not capability.
-
-A fine tuned model is one edge in a family tree: a parent model and its
-descendant. ERA currently measures that single edge. The longer term goal
-is the full tree. Models are increasingly derived from other models,
-including fine tunes of fine tunes, and the provenance of these
-derivations is usually limited to a note on a model card. A genealogy
-where every derivation carries its measurements, meaning what changed
-between parent and child, where, and how much, recorded in files anyone
-can verify, would make auditing a model lineage a routine check instead
-of a reconstruction effort.
-
-The reports are plain files with content hashes for this reason: a
-verifiable measurement of one edge is the building block of that graph.
-The concrete steps are in [docs/ROADMAP.md](docs/ROADMAP.md). Issues and
-pull requests are welcome.
-
-## Status and limits
-
-Validated so far on two small models (GPT-Neo-125M and Pythia-160M), one
-type of intervention, three seeds. Thresholds are not calibrated. No
-claims of robustness against an adversary who knows the tool. Reading a
-late concentration of change as "shallow learning" is a hypothesis under
-test, not a result. The earlier version of this code, including the
-mistakes that led to the current design, lives in an archived repository
-and is documented in [docs/HISTORY.md](docs/HISTORY.md).
-
-## References
-
-On layer specialisation, which is what makes depth informative: Tenney,
-Das and Pavlick, "BERT Rediscovers the Classical NLP Pipeline" (ACL 2019);
-Hewitt and Manning, "A Structural Probe for Finding Syntax in Word
-Representations" (NAACL 2019); Voita, Sennrich and Titov, "The Bottom-up
-Evolution of Representations in the Transformer" (EMNLP 2019); Geva et
-al., "Transformer Feed-Forward Layers Are Key-Value Memories" (EMNLP
-2021). On comparing representations: Kornblith et al., "Similarity of
-Neural Network Representations Revisited" (ICML 2019), the source of
-linear CKA. On anisotropy: Ethayarajh, "How Contextual are Contextualized
-Word Representations?" (EMNLP 2019). On the bounded divergence used for
-output drift: Lin, "Divergence Measures Based on the Shannon Entropy"
-(IEEE Trans. Inf. Theory, 1991).
-
-## License
-
-MIT, see [LICENSE](LICENSE).
+ERA Screening is licensed under the
+[Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for attribution.

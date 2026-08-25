@@ -26,7 +26,9 @@ from era.paper_metrics import (
     stereotype_index,
 )
 
+# The probe-file format and the measurement payload evolve independently.
 PAPER_PROBE_SCHEMA_VERSION = 1
+PAPER_MEASUREMENT_SCHEMA_VERSION = 1
 
 
 @dataclass(frozen=True)
@@ -246,13 +248,13 @@ def measure_model(
     return ModelObservations(probability_array, state_layers)
 
 
-def _mean_std(values: Sequence[float]) -> Dict[str, float]:
+def _mean_std(values: Sequence[float]) -> Dict[str, Optional[float]]:
     array = np.asarray(values, dtype=np.float64)
     if array.ndim != 1 or array.size == 0 or not np.all(np.isfinite(array)):
         raise ValueError("aggregate values must be a non-empty finite vector.")
     return {
         "mean": float(array.mean()),
-        "std": float(array.std(ddof=1)) if array.size > 1 else 0.0,
+        "std": float(array.std(ddof=1)) if array.size > 1 else None,
         "min": float(array.min()),
         "max": float(array.max()),
     }
@@ -390,7 +392,7 @@ def evaluate_observations(
     raw_si = delta_si(base_si_raw, tuned_si_raw)
 
     return {
-        "measurement_schema_version": PAPER_PROBE_SCHEMA_VERSION,
+        "measurement_schema_version": PAPER_MEASUREMENT_SCHEMA_VERSION,
         "probe_name": spec.name,
         "probe_sha256": spec.source_sha256,
         "units": "nats" if spec.log_base is None else f"log_base_{spec.log_base:g}",

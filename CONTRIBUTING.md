@@ -1,55 +1,141 @@
 # Contributing to ERA
 
-ERA is small on purpose: the canonical pipeline is five modules (metrics,
-pipeline, report, models, contexts) the author can explain line by line.
-Every surviving function must satisfy the three-requirement rule — a test
-with a hand-computed expected value, a sentence in the paper that uses it,
-and blackboard derivability. The first and third hold today; the paper
-sentence is the September rewrite's job (until then the draft in
-circulation is still v1 methodology). Changes should preserve, or move
-toward, all three.
+ERA is an open project for building transparent, reproducible white-box
+audits of how language models change. It needs code, but it also needs people
+who can reproduce results, question interpretations, design controls, review
+the mathematics, and connect technical measurements to real safety and
+ethical concerns.
 
-## Before opening a PR — checklist
+Researchers, engineers, auditors, and people working on the social effects of
+AI are all welcome. A useful contribution can begin with a result, a question,
+a failure case, a clearer explanation, or a small correction.
 
-1. **Does this change alter what any number MEANS?**
-   A metric formula, the candidate-selection rule, hidden-state extraction,
-   aggregation, or the report fields the resume compares.
-   → If yes, **increment `MEASUREMENT_SCHEMA_VERSION`** in `era/pipeline.py`
-   and say so in the PR description. This is what invalidates cached sweep
-   cells computed by the old algorithm; forgetting it silently mixes old and
-   new results.
-   → If no (refactor, docs, performance), do not bump it.
+## What we want to build
 
-2. **Tests.** New behaviour needs a test with a hand-computed expected value
-   (see `tests/test_metrics.py` for the style). Bug fixes need a regression
-   test that fails on the old code.
+ERA aims to make changes between related model checkpoints inspectable. Its
+reports connect output probabilities, behaviour in declared contexts, and
+internal representations to the exact models and evaluation inputs used.
 
-3. **Local CI** must be green before pushing:
+The longer-term goal is a shared system of reviewable evaluation profiles and
+verifiable model lineages. Reaching that goal requires evidence from different
+models, interventions, disciplines, and points of view. The current findings
+and open directions are described in
+[`docs/RESULTS.md`](docs/RESULTS.md) and
+[`docs/ROADMAP.md`](docs/ROADMAP.md).
 
-   ```bash
-   flake8 tests era experiments
-   mypy --config-file mypy.ini
-   pytest tests/
-   ```
+## Ways to contribute
 
-4. **Claims.** Code comments and docstrings state what is verified, not what
-   is hoped: no deployment labels, no automatic deep/shallow verdicts, CKA
-   described as "less sensitive to the shared mean direction", never as
-   immune to geometry effects.
+- Reproduce an existing result or test it on another model family.
+- Challenge a measurement or interpretation with a control or failure case.
+- Propose an evaluation profile for a specific safety or ethical concern.
+- Improve the code, tests, documentation, examples, or visualisations.
+- Review the mathematical definitions or the connection between evidence and
+  claims.
+- Add reliable information about how related checkpoints were produced.
 
-5. **Simplicity.** If a change makes the canonical pipeline harder to
-   explain at a blackboard, it probably belongs in an experiment script,
-   not in `era/`.
+Results that expose a limitation are valuable contributions. They help define
+the conditions under which an ERA measurement can be trusted.
 
-## Integration tests
+## Before starting a large change
 
-`tests/test_models_integration.py` runs against real models and is skipped
-by default. Enable with:
+Small corrections and focused improvements can go directly into a pull
+request. Before investing in a larger feature or experiment, open an issue and
+describe the audit question, the models or inputs involved, and the evidence
+the change would produce. This gives contributors a place to compare ideas
+before work begins.
 
-```bash
-ERA_RUN_INTEGRATION=1 pytest tests/test_models_integration.py -v
-# cheaper models for CI: ERA_INTEGRATION_MODEL=<hub-id>
-```
+## What makes a contribution useful
 
-The model-vs-itself screening is the canonical negative control: identical
-checkpoints must show ~zero drift and CKA ~1 at every layer.
+- A new measurement has a clear meaning, a stated range, and known failure
+  cases.
+- A scientific claim names the models, inputs, intervention, uncertainty, and
+  scope of the evidence.
+- New behaviour has a test whose expected result was calculated independently.
+- A bug fix has a regression test that demonstrates the previous failure.
+- The implementation remains short enough to explain and review directly.
+- The documentation gives another person enough information to reproduce the
+  result.
+
+The hand-calculated examples in `tests/test_metrics.py` and
+`tests/test_paper_metrics.py` show the preferred testing style. The formulas
+and measurement rules are documented in
+[`docs/PAPER_METRICS.md`](docs/PAPER_METRICS.md) and
+[`docs/MEASUREMENT_PROTOCOL.md`](docs/MEASUREMENT_PROTOCOL.md).
+
+## Changes that affect a reported number
+
+ERA versions its general screening records and paper measurements separately.
+`MEASUREMENT_SCHEMA_VERSION` in `era/pipeline.py` belongs to the general
+screening output. `PAPER_MEASUREMENT_SCHEMA_VERSION` in `era/paper_probe.py`
+belongs to the paper-metric payload. `PAPER_PROBE_SCHEMA_VERSION` versions the
+probe-file format, and experiment runners may also version their saved record
+structure.
+
+Update the version that governs an affected output when a change alters the
+meaning or structure of a reported number. Examples include changes to a
+formula, token selection, hidden-state extraction, aggregation, or saved
+fields. Code hashes identify implementation changes; schema versions state
+which result format and meaning a record follows. Documentation, performance
+improvements, and refactors that preserve every result keep the current
+versions.
+
+## Run the local checks
+
+For a change to the code or generated results, run the same checks used by
+continuous integration:
+
+~~~bash
+python -m pip install -e ".[experiments,dev]"
+python -m pip check
+python experiments/run_screening.py --help
+flake8 tests era experiments
+mypy --config-file mypy.ini
+python -m pytest --cov-fail-under=70
+python experiments/23_build_public_summary.py --check
+~~~
+
+The mypy command covers the torch-free core listed in `mypy.ini`. Dedicated
+unit tests cover the paper measurement modules.
+
+For a documentation-only change, run `git diff --check` and verify every link
+you changed. Run the public-summary check as well when changing
+`docs/RESULTS.md` or its generator.
+
+## Optional model-loading test
+
+The normal test suite checks the mathematics and pipeline without downloading
+model weights. The integration test requires PyTorch and downloads small
+public Hugging Face models. Install the experiment dependencies and the CPU or
+CUDA build of PyTorch appropriate for your system before running it.
+[`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) gives the installation
+notes and the equivalent PowerShell command.
+
+~~~bash
+ERA_RUN_INTEGRATION=1 python -m pytest tests/test_models_integration.py -v --no-cov
+~~~
+
+## Write claims that match the evidence
+
+ERA measures changes covered by a declared set of evaluation inputs and
+concept words. A reported result should name that set, the checkpoint pair,
+the model family, and the repeated runs used.
+
+Each prompt set defines the scope of the measurement and affects the observed
+values. CKA and cosine values also depend on the geometry of the model being
+tested.
+Descriptions such as “shallow” or “deep” therefore need a validated
+evaluation profile and supporting controls.
+
+Evaluation profiles should state their use case, outcomes, tests, thresholds,
+uncertainty, authorship, and scope. Their measurements and examples remain
+available for inspection with any `PASS`, `WARNING`, `FAIL`, or
+`REVIEW REQUIRED` result.
+
+Corrections and counterexamples are part of the project. ERA keeps them in
+`docs/HISTORY.md` so that later readers can follow how an interpretation
+changed.
+
+## License
+
+Contributions submitted for inclusion in ERA use the Apache License 2.0 unless
+the contribution explicitly states another arrangement.

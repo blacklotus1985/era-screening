@@ -10,6 +10,10 @@
 *.cfg text eol=lf
 *.ini text eol=lf
 *.toml text eol=lf
+*.md text eol=lf
+*.cff text eol=lf
+LICENSE text eol=lf
+NOTICE text eol=lf
 docs/** text eol=lf
 
 # Historical reference artifacts must remain BYTE-IDENTICAL to their

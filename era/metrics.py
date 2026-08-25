@@ -314,8 +314,10 @@ def linear_cka_unbiased(X: np.ndarray, Y: np.ndarray) -> float:
     gram_x = X @ X.T
     gram_y = Y @ Y.T
     numerator = hsic_unbiased(gram_x, gram_y)
-    denominator = np.sqrt(max(hsic_unbiased(gram_x, gram_x), 0.0)
-                           * max(hsic_unbiased(gram_y, gram_y), 0.0))
+    denominator = np.sqrt(
+        max(hsic_unbiased(gram_x, gram_x), 0.0)
+        * max(hsic_unbiased(gram_y, gram_y), 0.0)
+    )
     if denominator <= 0.0:
         return 0.0
     return float(numerator / denominator)

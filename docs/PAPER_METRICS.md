@@ -1,159 +1,204 @@
-# Paper metrics: probability, groups, and geometry
+# Mathematical definitions
 
-This module reproduces the quantities used in the ERA paper on the retained
-`v2_balanced_r2` checkpoints. It is an inference-only analysis: it does not
-train a model or alter an existing result.
+This appendix defines the quantities used to compare a base model, `m0`, with
+its fine-tuned version, `m1`. For a given input, `P` and `Q` are their
+next-token probability distributions. All logarithms use base `e`, and
+divergences are measured in nats.
 
-The purpose is to keep three questions separate:
+The implementation rules and result fields are described in
+[`MEASUREMENT_PROTOCOL.md`](MEASUREMENT_PROTOCOL.md).
 
-1. Did the model's next-token distribution change?
-2. Did probability move between the declared male and female groups, or only
-   among words inside each group?
-3. Did the contextual geometry of the declared concepts change across layers?
+## Metrics
 
-ERA reports the answers side by side. It does not combine them into an
-Alignment Score and does not produce an automatic safe/unsafe or
-shallow/deep label.
-
-## The quantities
-
-| Symbol | What is compared | Output |
+| Quantity | Meaning | Value and theoretical range |
 |---|---|---|
-| `B` | complete next-token distributions | one divergence per context |
-| `B_alpha` | exact union of the two top-p supports | divergence plus retained mass |
-| `B_k` | exact union of the two top-k supports | divergence plus retained mass |
-| `B_T` | fixed 14-token target set `T` | target-conditioned divergence |
-| `B_between` | probability mass of the male and female groups | part of `B_T` |
-| `B_within` | distribution among words inside each group | part of `B_T` |
-| `SI`, `Delta SI` | male-minus-female gaps in leadership versus support contexts | base, fine-tuned, and change |
-| `G_l` | contextual concept centroids at every layer | similarity curve and `1-G_l` drift |
+| `B` | divergence between the base and fine-tuned next-token distributions over the complete vocabulary | one value per input, from 0 to `ln(2)` nats |
+| `B_alpha` | the same divergence after conditioning both distributions on the union of their top-p token sets | one value per input, from 0 to `ln(2)` nats |
+| `B_k` | the same divergence after conditioning both distributions on the union of their top-k token sets | one value per input, from 0 to `ln(2)` nats |
+| `P(T)`, `Q(T)` | total probability assigned to a declared target-token set `T` | one value per model and input, in `(0, 1]` |
+| `B_T` | divergence between the two distributions after conditioning them on `T` | one value per input, from 0 to `ln(2)` nats |
+| `B_between` | component of `B_T` produced by changes in the total probability assigned to each group | between-group component, from 0 to `B_T` |
+| `B_within` | component of `B_T` produced by changes in the relative probabilities of tokens within each group | within-group component, from 0 to `B_T` |
+| `SI` | difference between the average `G_m`-versus-`G_f` gap in `C_L` and `C_S` | one value per model, from -2 to 2 |
+| `Delta SI` | fine-tuned `SI` minus base-model `SI` | one value per run, from -4 to 4 |
+| `G_l` | similarity of contextual concept representations at layer `l` | one value per layer, from -1 to 1 |
+| `1-G_l` | representational change measured at layer `l` | one value per layer, from 0 to 2 |
+| depth centroid | position of the `1-G_l` curve along model depth | one value from 0 to 1; undefined for a zero curve |
 
-The implementation checks the identity
+## Complete-vocabulary divergence
 
-```text
-B_T = B_between + B_within
-```
+Let `P` be the base-model next-token distribution and `Q` the fine-tuned
+distribution for the same input. Their midpoint is:
+~~~text
+M = (P + Q) / 2
+~~~
+ERA uses Lin's K-divergence:
+~~~text
+B(P, Q) = sum_i P_i log(P_i / M_i)
+~~~
+For any two distributions `a` and `b`, the KL divergence used below is:
+~~~text
+KL(a || b) = sum_i a_i log(a_i / b_i)
+~~~
+The measure is directional because `P` is the reference distribution.
+Exchanging `P` and `Q` can change the result. Its range and zero point are:
+~~~text
+0 <= B <= ln(2)
+B = 0 if and only if P = Q
+~~~
 
-for every context and again after aggregation. A failed identity stops the
-run instead of writing a result.
+## Restricted top-p and top-k views
 
-## Fixed materials
+`B_alpha` builds a top-p set for each model. A top-p set is the smallest set
+of high-probability tokens whose total mass reaches `alpha`. `B_k` selects the
+`k` highest-probability tokens from each model. Both `alpha` and `k` are probe
+parameters.
 
-The target set contains seven male and seven female terms. The geometry set
-contains 13 role concepts. Both are declared in
-[`data/paper_probe_v1.json`](../data/paper_probe_v1.json).
+For both metrics, ERA takes the exact union of the sets selected by `m0` and
+`m1`. It reads the original probability of every token in that union from both
+full distributions, conditions each distribution on the union, and applies
+the same K-divergence.
 
-Every string includes its generation-boundary leading space. Before inference,
-the runner requires every string to map to exactly one token in all 11 models.
-It never skips a word or chooses a different substitute for one model.
-`caregiver` is excluded from the geometry set because it is not a single token
-in every tokenizer.
+## Target-conditioned divergence and its decomposition
 
-## Numerical rules
+Let `T` be a finite set of target tokens, partitioned into disjoint groups.
+First condition both distributions on `T`:
+~~~text
+P(T) = sum of P_i for tokens i in T
+Q(T) = sum of Q_i for tokens i in T
+p_i = P_i / P(T)
+q_i = Q_i / Q(T)
+m_i = (p_i + q_i) / 2
+~~~
+The conditioned distributions `p` and `q` each have total mass one over `T`.
+Their divergence is:
+~~~text
+B_T = sum over i in T of p_i log(p_i / m_i)
+~~~
+For each group `g`, its total mass and its conditional distributions are:
+~~~text
+p_g = sum over i in g of p_i
+m_g = sum over i in g of m_i
+p(i|g) = p_i / p_g
+m(i|g) = m_i / m_g
+~~~
+This gives the decomposition:
+~~~text
+B_between = sum_g p_g log(p_g / m_g)
+B_within  = sum_g p_g KL(p(.|g) || m(.|g))
+B_T       = B_between + B_within
+~~~
+`B_between` measures changes in the total probability assigned to the groups.
+`B_within` measures changes in the relative probabilities of tokens inside
+each group. Together they account for the complete target-conditioned
+divergence. A group with `p_g = 0` contributes zero to `B_within`. The same
+components may also be written as `B_B` and `B_W`.
 
-- Lin's directional K-divergence is used: `KL(P || (P+Q)/2)`. It remains
-  finite when `Q_i=0`, so no epsilon is needed.
-- Logarithms use natural units (nats) by default. The base is an explicit
-  function argument.
-- Top-k and top-p supports are selected independently and then united. The
-  true probability of every union token is read from both models.
-- A zero target mass is an error. A ratio with zero total drift is written as
-  `null`, not as zero.
-- A zero geometric centroid has no direction, so cosine similarity is
-  undefined and the run stops. It is not assigned a plausible-looking zero.
-- A tiny roundoff tolerance is used only after a mathematical calculation to
-  check non-negativity and identities. It is never added to input data.
+## Stereotype Index
 
-## Code map
+Let `G_m` and `G_f` be the two target groups, and let `C_L` and `C_S` be the
+two context families being compared. For a model `m` and context `c`, the two
+group probabilities are conditioned on their union. Their difference is:
+~~~text
+gap_m(c) = P_m(G_m | c) - P_m(G_f | c)
+~~~
+The mean gaps in the two context families are:
+~~~text
+LB_m = mean of gap_m(c) over c in C_L
+SB_m = mean of gap_m(c) over c in C_S
+~~~
+The index and its fine-tuning change are:
+~~~text
+SI_m = LB_m - SB_m
+Delta SI = SI_m1 - SI_m0
+~~~
+Each gap lies in `[-1, 1]`, so `SI` lies in `[-2, 2]` and `Delta SI` lies in
+`[-4, 4]`. Positive `Delta SI` means that the declared contrast increased
+after fine-tuning. Negative values mean that it decreased.
 
-- [`era/paper_metrics.py`](../era/paper_metrics.py): short NumPy functions for
-  the formulas. It has no model or GPU dependency.
-- [`era/paper_probe.py`](../era/paper_probe.py): strict tokenisation, model
-  inference, and per-context aggregation.
-- [`experiments/20_paper_metrics_panel.py`](../experiments/20_paper_metrics_panel.py):
-  resumable 33-cell runner with checkpoint and tokenizer verification.
-- [`experiments/22_poc2_vs_full.py`](../experiments/22_poc2_vs_full.py):
-  paired POC2-versus-FULL experiment on the original and balanced corpora;
-  see [`docs/POC2_VS_FULL.md`](POC2_VS_FULL.md).
-- [`tests/test_paper_metrics.py`](../tests/test_paper_metrics.py): hand-computed
-  mathematical examples.
-- [`tests/test_paper_probe.py`](../tests/test_paper_probe.py) and
-  [`tests/test_paper_metrics_panel.py`](../tests/test_paper_metrics_panel.py):
-  inference plumbing, identity, and resume tests.
+## Internal representations across layers
 
-## Run the 33-cell panel
+This measurement uses the hidden states produced for the declared contexts and
+concepts. Let `N` be the number of contexts. For every context `c` and every
+concept token `k` in `K`, ERA creates a separate sequence. It tokenizes the
+context without adding special tokens and appends `k` as the final token. At
+each hidden-state level `l`, `a_m(c, k, l)` is the vector produced by model `m`
+at that final position.
 
-Prerequisites:
+For every model, concept, and level, ERA averages these vectors across the `N`
+contexts:
+~~~text
+h_m(k, l) = (1 / N) sum_c a_m(c, k, l)
+~~~
+It then compares the base and fine-tuned average vectors for each concept and
+averages their cosine similarities. Here, `|K|` is the number of concepts:
+~~~text
+G_l = (1 / |K|) sum_{k in K} cosine(h_m0(k, l), h_m1(k, l))
+d_l = 1 - G_l
+~~~
+`G_l` is the average representational similarity at level `l`; `d_l` is the
+corresponding drift. Their ranges are:
+~~~text
+-1 <= G_l <= 1
+0 <= d_l <= 2
+~~~
+Every context-averaged vector used in the cosine must have positive norm.
 
-- the exported `v2_balanced_r2` sweep results;
-- the 33 retained fine-tuned checkpoint directories;
-- the 11 pinned base models in the Hugging Face cache.
+The comparison assumes that each vector coordinate in the base model
+corresponds to the same coordinate in the fine-tuned model. This correspondence
+comes from fine-tuning the descendant directly from the base. The two models
+must therefore have matching hidden-state levels and matching vector shapes at
+each corresponding level. Different levels may have different widths.
 
-On the A100 pod:
+For `L` hidden-state levels indexed from `0` to `L - 1`, the normalized depth
+centroid summarizes where the drift values `d_l` are concentrated:
+~~~text
+depth centroid = sum_l l * d_l / ((L - 1) * sum_l d_l)
+~~~
+The factor `L - 1` maps the level indices onto normalized depth. Level zero has
+depth 0 and the final level has depth 1. When every `d_l` is zero, there is no
+drift location to summarize and the centroid is undefined. A one-level curve
+uses depth 0.
 
-```bash
-cd /workspace/era-screening
-export HF_HOME=/workspace/hf_cache
-export HF_HUB_OFFLINE=1
+## Aggregation rules
 
-python experiments/20_paper_metrics_panel.py \
-  --results-root era_poc_replication_results_multiseed \
-  --device cuda \
-  --local-files-only
-```
+One comparison contains a base model, its fine-tuned version, and `N`
+evaluation inputs.
 
-To check discovery and tokenisation without loading model weights:
+The probability quantities `B`, `B_alpha`, `B_k`, `B_T`, `B_between`,
+`B_within`, `P(T)`, and `Q(T)` are calculated separately for every input.
+Each quantity is summarized across the `N` inputs by its arithmetic mean,
+sample standard deviation with denominator `N - 1`, minimum, and maximum. The
+sample standard deviation is undefined for a single input.
 
-```bash
-python experiments/20_paper_metrics_panel.py \
-  --results-root era_poc_replication_results_multiseed \
-  --local-files-only \
-  --preflight-only
-```
+The between and within shares describe how the total target-conditioned
+divergence is divided across the complete set of inputs:
+~~~text
+between share = sum_c B_between(c) / sum_c B_T(c)
+within share  = sum_c B_within(c)  / sum_c B_T(c)
+~~~
+Both shares are undefined when the denominator is zero. When it is positive,
+the two shares sum to one.
 
-The full run writes:
+`SI` uses two separate context-family means. For each model, ERA first
+averages the conditional group gaps within `C_L` and within `C_S`, then
+subtracts the second mean from the first. `Delta SI` is the fine-tuned value
+of `SI` minus the base value.
 
-```text
-results/paper_metrics/v2_balanced_r2/
-├── tokenizer_preflight.json
-├── panel_summary.json
-└── <model>/seed_<seed>/metrics.json
-```
+The layer calculation follows a different order. For every concept and layer,
+ERA first averages its activation vectors across the `N` inputs. It calculates
+the cosine similarity between the corresponding base and fine-tuned average
+vectors, then averages those cosine values across concepts to obtain `G_l`.
+The mean geometric drift is the arithmetic mean of `1-G_l` across layers. The
+depth centroid uses the same complete layer-drift curve.
 
-Each cell is saved immediately. If the process stops, rerun the same command:
-only a complete cell with the same context, probe, checkpoint, source config,
-and code hashes is reused.
+## Mathematical domain and undefined cases
 
-## How to interpret the result
-
-A larger `B`, `B_alpha`, `B_k`, or `B_T` means a larger probability change on
-that declared view. `B_between` isolates movement between the two gender
-groups; `B_within` isolates redistribution among words in the same group.
-`Delta SI` says whether the leadership-versus-support contrast increased or
-decreased.
-
-`G_l` is a similarity, so `1-G_l` is the geometric drift. Its depth centroid
-describes where that drift concentrates. A pattern of clear probability drift
-with small geometric drift is **consistent with** a shallow or output-level
-adaptation. It is not proof of what a model "believes", and it is not by
-itself an alignment or safety verdict.
-
-The panel computation is descriptive and was added after the r2 sweep. Report
-all 33 cells and across-seed variation; do not present it as a preregistered
-confirmatory test.
-
-The paired POC2-versus-FULL experiment is a separate regime study. Its role is
-to test whether the observables distinguish two known training interventions
-while corpus and seed are held fixed; it must not be pooled into the 33-cell
-cross-model panel.
-
-## Why there is no Alignment Score
-
-A ratio such as probability drift divided by geometric drift mixes quantities
-with different meanings and becomes unstable when the geometric denominator
-is close to zero. A very large ratio may therefore reflect a tiny denominator
-rather than a scientifically large mismatch.
-
-ERA preserves the useful comparison without the scalar: report probability
-drift, geometric drift, depth shape, and `Delta SI` together. The joint pattern
-is more informative and keeps every assumption visible.
+- `P` and `Q` are finite probability distributions with non-negative entries
+  and total mass one.
+- Top-p and top-k ties follow one fixed order, so the selected sets are unique.
+- `P(T)` and `Q(T)` must be positive because conditioning on a zero-mass set is
+  undefined.
+- Between and within fractions are undefined when the total target divergence
+  is zero, because their denominator is zero.
+- Cosine similarity is undefined for a zero-norm representation vector.

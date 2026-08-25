@@ -173,8 +173,9 @@ def test_topk_mass_coverage_recorded(result):
 
 def test_exact_union_uses_probability_outside_other_topk():
     class UnequalTopKPair(FakePair):
-        def next_token_distribution(self, which, ctx_ids, top_k=20,
-                                     semantic_only=True, full=False):
+        def next_token_distribution(
+            self, which, ctx_ids, top_k=20, semantic_only=True, full=False
+        ):
             if full:
                 return {101: 0.70, 102: 0.20, 103: 0.10} if which == "base" else {
                     101: 0.10, 102: 0.20, 103: 0.70

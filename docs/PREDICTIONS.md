@@ -1,5 +1,9 @@
 # Preregistration — extended cross-architecture study
 
+_The completed hypothesis-by-hypothesis evaluation is in
+[`FINDINGS_extended.md`](FINDINGS_extended.md). The original text and its
+pre-data amendments remain here unchanged as the preregistration record._
+
 _Written 2026-08-17, before any sweep cell of the extended panel was trained
 and before any census artefact was committed under `results/`._
 

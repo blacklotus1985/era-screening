@@ -1,5 +1,9 @@
 # Findings — Multi-Seed Cross-Model Study (corpus `v2_balanced`)
 
+_Historical phase report. The current 33-cell measurement of record is in
+[`FINDINGS_extended.md`](FINDINGS_extended.md); the current paper-metric panel
+is summarized in [`RESULTS.md`](RESULTS.md)._
+
 **Setup.** GPT-Neo-125M and Pythia-160M, both fine-tuned full-unfreeze on the
 same symmetric 300-sentence biased corpus (`data/biased_corpus_v2_balanced.txt`),
 **3 seeds each** (42, 43, 44). Both are 12-layer / 768-hidden decoder-only

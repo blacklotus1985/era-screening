@@ -1,5 +1,9 @@
 # Multi-Seed Cross-Model Study
 
+_Historical design note for the original two-model study. The current
+cross-model results are in [`RESULTS.md`](RESULTS.md), and the extended
+geometry study is in [`FINDINGS_extended.md`](FINDINGS_extended.md)._
+
 This document describes the multi-seed, cross-architecture extension of the ERA
 PoC: fine-tuning **two model families** (GPT-Neo-125M and Pythia-160M) under the
 **full-unfreeze** regime, across **three seeds each**, and comparing the

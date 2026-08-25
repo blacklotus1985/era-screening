@@ -138,8 +138,12 @@ def build_parser():
 def main():
     args = build_parser().parse_args()
 
-    baseline_dir = Path(args.baseline) if args.baseline else aggregates_dir_for(args.baseline_tag)
-    candidate_dir = Path(args.candidate) if args.candidate else aggregates_dir_for(args.candidate_tag)
+    baseline_dir = (
+        Path(args.baseline) if args.baseline else aggregates_dir_for(args.baseline_tag)
+    )
+    candidate_dir = (
+        Path(args.candidate) if args.candidate else aggregates_dir_for(args.candidate_tag)
+    )
     if baseline_dir is None:
         raise SystemExit(f"No aggregates directory for baseline tag {args.baseline_tag}")
     if candidate_dir is None:
@@ -209,10 +213,17 @@ def main():
         print(header)
         print("-" * len(header))
         for _, row in block.iterrows():
-            seeds = f"{row[args.baseline_tag + '_n_seeds']}->{row[args.candidate_tag + '_n_seeds']}"
+            seeds = (
+                f"{row[args.baseline_tag + '_n_seeds']}->"
+                f"{row[args.candidate_tag + '_n_seeds']}"
+            )
+            baseline_mean = row[args.baseline_tag + "_mean"]
+            baseline_std = row[args.baseline_tag + "_std"]
+            candidate_mean = row[args.candidate_tag + "_mean"]
+            candidate_std = row[args.candidate_tag + "_std"]
             print(f"{row['label']:14s} {seeds:>7s} "
-                  f"{row[args.baseline_tag + '_mean']:14.4f} +-{row[args.baseline_tag + '_std']:.4f} "
-                  f"{row[args.candidate_tag + '_mean']:14.4f} +-{row[args.candidate_tag + '_std']:.4f} "
+                  f"{baseline_mean:14.4f} +-{baseline_std:.4f} "
+                  f"{candidate_mean:14.4f} +-{candidate_std:.4f} "
                   f"{row['delta']:+9.4f}")
         stats = per_metric[metric]
         print(f"  max |delta| = {stats['max_abs_delta']:.4f} ({stats['max_abs_delta_model']}), "

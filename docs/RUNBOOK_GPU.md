@@ -1,399 +1,264 @@
-# GPU runbook — RunPod (RTX 4090, PyTorch template)
+# GPU runbook for the reference study
 
-Exact command sequence for running the ERA extended study on a rented GPU
-pod, from a clean clone. **One command per line. No decisions are left to
-the operator** — where something could go wrong, a check command follows and
-its pass condition is written out.
+This runbook reproduces the current `v2_balanced_r2` reference study on a
+CUDA machine. It covers the 11-model, three-seed sweep, the calibration and
+behavioural controls, the 33-cell paper measurements, export, and final
+verification.
 
-The protocol is unchanged: `docs/PREDICTIONS.md` and its amendments govern
-what is run and what counts as a pass. This document only says how to
-execute it on a pod.
+The published run used an NVIDIA A100-SXM4-80GB. Another CUDA device can
+follow the same scientific protocol, but the checkpoint files may not be
+byte-identical. Every result records its device, GPU, library versions, model
+revisions, corpus hash, and checkpoint hash.
 
-**Read before starting:** the pod's disk is destroyed when the pod is. Every
-result must reach GitHub before shutdown. Section E is not optional.
+The preregistered geometry hypotheses and their amendments are preserved in
+[`PREDICTIONS.md`](PREDICTIONS.md). Their completed evaluation is in
+[`FINDINGS_extended.md`](FINDINGS_extended.md). The 33-cell paper-metric panel
+is descriptive and was added later.
 
----
+Run a full reproduction on a separate Git branch. Do not replace the committed
+reference results on `main` unless that replacement is an explicit release
+decision.
 
-## A. Setup
+## 1. Prepare the pod
 
-```bash
+Clone the repository and move the Hugging Face cache onto persistent storage.
+
+~~~bash
 cd /workspace
-```
-
-```bash
 git clone https://github.com/blacklotus1985/era-screening.git
-```
-
-```bash
 cd /workspace/era-screening
-```
-
-Put the Hugging Face cache on the large volume, not the small container
-disk. The panel pulls roughly 8 GB of weights.
-
-```bash
 export HF_HOME=/workspace/hf_cache
-```
-
-```bash
 mkdir -p /workspace/hf_cache
-```
+~~~
 
-Make it stick for later shells on this pod:
+Use a branch dedicated to the reproduction.
 
-```bash
-echo 'export HF_HOME=/workspace/hf_cache' >> ~/.bashrc
-```
+~~~bash
+git switch -c reproduce-v2-balanced-r2
+~~~
 
-Install the package **without its dependency pins**. This is deliberate:
-`pyproject.toml` pins `numpy<2.0`, and applying that pin on an image
-shipping numpy 2.x would silently downgrade numpy and break the CUDA torch
-wheel compiled against it. `--no-deps` skips the pin; the dependencies come
-from `requirements-gpu.txt`, which deliberately lists neither torch nor
-numpy.
+On a GPU image that already has a working CUDA build of PyTorch, install ERA
+without replacing that build. `requirements-gpu.txt` intentionally omits
+PyTorch and NumPy.
 
-```bash
-pip install -e . --no-deps
-```
+~~~bash
+python -m pip install -e . --no-deps
+python -m pip install -r requirements-gpu.txt
+~~~
 
-```bash
-pip install -r requirements-gpu.txt
-```
+Confirm the GPU and the complete environment. Stop if the final command does
+not print `PREFLIGHT OK`.
 
-Now verify nothing replaced torch and everything the runs need is present.
-**This must print `PREFLIGHT OK`. If it does not, stop and fix before
-spending GPU time.**
-
-```bash
+~~~bash
+nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 python experiments/99_check_environment.py --require-cuda
-```
+~~~
 
-Run the test suite. **Expected: `145 passed, 1 skipped`.**
+Run the default tests. The exact number can grow as tests are added; every
+non-skipped test must pass.
 
-```bash
+~~~bash
 python -m pytest tests/ -q
-```
+~~~
 
-Run the torch-dependent integration tests too — they are skipped by default
-and they exercise `era/models.py`, which the unit suite cannot reach.
-**Expected: `6 passed`.**
+The real-model integration tests download small public models and are skipped
+by the default suite.
 
-```bash
+~~~bash
 ERA_RUN_INTEGRATION=1 python -m pytest tests/test_models_integration.py -q --no-cov
-```
+~~~
 
----
+Check GitHub authentication before spending GPU time. A successful dry run
+prints either `Everything up-to-date` or the branch it would push.
 
-## B. Pilot cell — the estimate baseline for THIS device
+~~~bash
+git push --dry-run -u origin reproduce-v2-balanced-r2
+~~~
 
-The coarse estimates in `results/census/census_README.md` were measured on a
-laptop CPU and are worthless here. Gate G1b required a measured cell before
-committing to a sweep; the same requirement applies again on a new device,
-because the component ratios change (loading is host-bound, training is
-compute-bound, and they move in opposite directions on a GPU).
+## 2. Run the calibration controls
 
-One cell, Pythia-70M, seed 42, end to end:
+Control A checks that saving and reloading an unchanged model is neutral at
+the measurement precision. It is the hard gate: every model must print
+`[PASS]`.
 
-```bash
-python experiments/10_multiseed_sweep.py --models "Pythia-70M=EleutherAI/pythia-70m=pythia70m" --seeds 42
-```
-
-Confirm the cell recorded the GPU and not a CPU fallback. **Expected:
-`"device": "cuda"` and a `gpu_name` naming the 4090.**
-
-```bash
-python -c "import json;c=json.load(open('era_poc_replication_results_multiseed/v2_balanced/pythia70m/seed_42/run_config.json'));print({k:c[k] for k in ('device','gpu_name','cuda_version','torch_version','transformers_version')})"
-```
-
-Project the rest of the programme from that measured cell, against a
-declared budget:
-
-```bash
-python experiments/97_project_schedule.py --pilot-slug pythia70m --budget-hours 12
-```
-
-**Acceptance criterion, written in advance:**
-
-* The command exits **0** and prints `Within budget — proceed.` → continue
-  to section C.
-* The command exits **2** (`OVER BUDGET`) → **stop**. Do not start the
-  sweep. Report the projection and replan: drop Tier B, or drop the third
-  seed of Tier A, or raise the budget deliberately. Starting a run that
-  cannot finish wastes the whole rental.
-* The cell errored, or `device` is not `cuda` → stop and fix the
-  environment; a CPU cell on a GPU pod means the run is 10–50× slower than
-  planned and is also a different measurement.
-
----
-
-## C. Gate G1c — calibration controls
-
-Three controls, in order. Control A is a **hard block**: if the
-save/reload round-trip is not neutral, every curve in the study carries an
-unknown offset, and the script stops on its own.
-
-Checkpoints are kept because the D1–D3 behavioural checks
-(`docs/PREDICTIONS.md` §9.5) read the trained weights.
-
-```bash
-python experiments/15_calibration_controls.py --control A
-```
-
-**Pass condition: every model prints `[PASS]` and the script does not exit
-early.** On failure it stops with a message naming the tolerance that was
-missed; report it and do not continue.
-
-```bash
-python experiments/15_calibration_controls.py --control B --seeds 42 43 44 --keep-checkpoints
-```
-
-```bash
-python experiments/15_calibration_controls.py --control C --seeds 42 43 44 --keep-checkpoints
-```
-
-Control C prints the trainable-parameter count and the resolved tying flag
-per cell. **Check that `trainable` is a small fraction of the total and that
-tied models show no embedding parameters** — that is the difference between
-a shallow anchor and a silently-full fine-tune.
-
-Export and commit the controls before starting the long sweep, so a crash
-during Tier B cannot cost them:
-
-```bash
-python experiments/98_export_results.py --verify
-```
-
-```bash
-git add -A results/
-```
-
-```bash
-git commit -m "G1c calibration controls, GPU"
-```
-
----
-
-## D. The sweep
-
-Tier A first (four models, three seeds), then Tier B (five models, two
-seeds). Both are resumable: re-running the same command after an
-interruption skips completed cells and continues.
-
-```bash
-python experiments/10_multiseed_sweep.py --tiers reference A --seeds 42 43 44
-```
-
-```bash
-python experiments/98_export_results.py --verify
-```
-
-```bash
-git add -A results/ && git commit -m "Tier A sweep, GPU"
-```
-
-```bash
-python experiments/10_multiseed_sweep.py --tiers B --seeds 42 43
-```
-
-```bash
-python experiments/98_export_results.py --verify
-```
-
-If the pod is interrupted, re-run the same sweep command; completed cells
-are skipped by content-verified resume, not by file existence.
-
----
-
-## E. Bring everything home, then shut down
-
-**Nothing below is optional. The pod's disk does not survive shutdown.**
-
-Export every artefact into the tracked `results/` tree and verify each cell
-is complete and attributable to a device:
-
-```bash
-python experiments/98_export_results.py --verify
-```
-
-**Pass condition: `VERIFY OK: every exported cell is complete and carries
-its device.`** If it reports problems, resolve them before going further.
-
-Create the results branch (substitute today's date):
-
-```bash
-git checkout -b results-gpu-$(date -u +%Y%m%d)
-```
-
-```bash
-git add -A results/
-```
-
-```bash
-git status --short results/
-```
-
-```bash
-git commit -m "GPU run: census pilot, G1c controls, Tier A+B sweep"
-```
-
-```bash
-git push -u origin results-gpu-$(date -u +%Y%m%d)
-```
-
-### Verify before you destroy the pod
-
-Confirm the push actually landed — a failed push at 3am looks like a
-successful one if nobody reads the output:
-
-```bash
-git status -sb
-```
-
-**Expected: the branch line shows no `ahead` count.**
-
-```bash
-git log origin/results-gpu-$(date -u +%Y%m%d) --oneline -1
-```
-
-**Expected: your commit hash.**
-
-Confirm the export contains what you think it does:
-
-```bash
-python -c "import json;m=json.load(open('results/export_manifest.json'));print('cells:',m['n_complete_cells']);print('devices:',m['devices']);print('gpus:',m['gpus']);print('problems:',len(m['problems']))"
-```
-
-**Expected: `problems: 0`, `devices: ['cuda']`, and a cell count matching
-what you ran** — 11 sweep models across their seed panels, plus the control
-cells.
-
-Only when all three checks pass, destroy the pod.
-
----
-
-## F. Behavioural checks D1–D3 — a second, short session
-
-The checks of `docs/PREDICTIONS.md` §9.5 are the study's only directional
-predictions, and the G1c run did not compute them: the controls kept their
-checkpoints, but nothing read them. This is a separate session of roughly
-five minutes, and it needs the volume the controls ran on.
-
-Start from what the volume actually holds, before loading or training
-anything:
-
-```bash
-python experiments/16_behavioural_checks.py --inventory
-```
-
-**Read two columns.** `neutral` should say `present` for all six cells —
-those are the `ctl_control_B_domain_*` checkpoints, and D2 costs inference
-only. If it says `ABSENT`, this is not the volume the controls ran on and
-nothing below will work. `biased` will say `absent (retrain)` unless a
-sweep kept its checkpoints: §D's commands do not pass `--keep-checkpoints`,
-so `10_multiseed_sweep.py` deleted them.
-
-```bash
-python experiments/16_behavioural_checks.py
-```
-
-Any missing biased cell is retrained first (about 100 s of training in
-total for the six, measured in
-`results/sweep/v2_balanced/cell_timings.json`), then every base and every
-checkpoint is measured for `gap`. The script prints one line per criterion
-and exits **2** if any of D1–D3 is falsified. A non-zero exit here is a
-result, not a crash: report it, do not retry it.
-
-**Bit-identity is not the pass condition.** Each retrained checkpoint's
-`checkpoint_sha256` is compared against the digest the sweep recorded, but
-non-deterministic CUDA kernels make a mismatch the expected outcome. A
-mismatch marks the cell `retrained_twin` — which is how the findings must
-then describe it — and does not invalidate D1 or D3.
-
-```bash
-python experiments/98_export_results.py --verify
-```
-
-```bash
-git add -A results/ && git commit -m "Behavioural checks D1-D3"
-```
-
----
-
-## G. v2_balanced_r2 — corrected measurement protocol
-
-Use this as a new measurement tag. Do not overwrite or regenerate any
-existing result under `v2_balanced`. The sweep computes historical `cka` and
-the unbiased `cka_unbiased` in the same pass, and explicitly selects the exact
-top-k union probabilities.
-
-```bash
-python experiments/10_multiseed_sweep.py --tag v2_balanced_r2 --tiers reference A B --seeds 42 43 44 --candidate-mode topk_union_exact --keep-checkpoints
-```
-
-```bash
+~~~bash
 python experiments/15_calibration_controls.py --control A --device cuda
-```
+~~~
 
-```bash
+Controls B and C train the neutral-corpus and restricted-final-block
+comparisons. Their checkpoints are retained because later behavioural checks
+reuse them.
+
+~~~bash
 python experiments/15_calibration_controls.py --control B --seeds 42 43 44 --device cuda --keep-checkpoints
-```
-
-```bash
 python experiments/15_calibration_controls.py --control C --seeds 42 43 44 --device cuda --keep-checkpoints
-```
+~~~
 
-```bash
+Control C records every trainable parameter and whether input and output
+weights are tied. Review those fields before continuing; the control is valid
+only if it trained the declared restricted parameter set.
+
+## 3. Train the 33 descendants
+
+This command runs all 11 pinned models at seeds 42, 43, and 44. It uses the
+exact top-k union and keeps every fine-tuned checkpoint for the inference-only
+measurements that follow.
+
+~~~bash
+python -u experiments/10_multiseed_sweep.py \
+  --tag v2_balanced_r2 \
+  --tiers reference A B \
+  --seeds 42 43 44 \
+  --candidate-mode topk_union_exact \
+  --keep-checkpoints
+~~~
+
+The sweep is resumable. Re-running the same command reuses a cell only when
+its recorded configuration and checkpoint identity match the request.
+
+## 4. Measure the paper quantities
+
+The preflight opens all 11 tokenizers and checks the fixed 14 target words,
+13 concept words, and complete 33-cell census before loading the checkpoints.
+
+~~~bash
+python experiments/20_paper_metrics_panel.py \
+  --results-root era_poc_replication_results_multiseed \
+  --local-files-only \
+  --preflight-only
+~~~
+
+Expected output:
+
+~~~text
+Preflight PASS: 11 models, 33 cells, fixed T=14 and K=13.
+~~~
+
+Run the measurement. It saves each cell immediately and safely resumes cells
+whose full identity still matches.
+
+~~~bash
+python -u experiments/20_paper_metrics_panel.py \
+  --results-root era_poc_replication_results_multiseed \
+  --device cuda \
+  --local-files-only
+~~~
+
+Expected final line:
+
+~~~text
+Complete: 33/33 cells. Results: /workspace/era-screening/results/paper_metrics/v2_balanced_r2
+~~~
+
+## 5. Run the behavioural measurements
+
+The D1-D3 script evaluates the two reference models and three seeds. A failed
+criterion is a scientific result: the script may exit with status 2 after
+writing a complete JSON file. Record that outcome and continue with the
+remaining measurements.
+
+~~~bash
 python experiments/16_behavioural_checks.py --tag v2_balanced_r2 --device cuda
-```
+~~~
 
-```bash
-python experiments/19_panel_behavioural_gap.py --tag v2_balanced_r2 --device cuda
-```
+Measure the behavioural gap over the complete 33-cell panel. The working sweep
+directory is passed explicitly because it still contains the checkpoints.
 
-```bash
-python experiments/18_probe_diagnostic_high_low.py --device cuda --local-files-only
-```
+~~~bash
+python experiments/19_panel_behavioural_gap.py \
+  --tag v2_balanced_r2 \
+  --results-root era_poc_replication_results_multiseed \
+  --device cuda
+~~~
 
-```bash
-python experiments/98_export_results.py --verify --results-root results
-```
+Run the high/low diagnostic against the D1-D3 file just produced.
 
-Controls A/B/C use their dedicated control directories rather than sweep
-subdirectories; they are part of the same `v2_balanced_r2` protocol run. The
-export command must be run only after all artefacts have passed verification.
+~~~bash
+python experiments/18_probe_diagnostic_high_low.py \
+  --device cuda \
+  --local-files-only \
+  --d13-json era_poc_calibration_controls/behavioural_checks_D1_D3.json
+~~~
 
-## Notes
+## 6. Export and verify the evidence
 
-**Existing CPU cells stay valid.** The preflight census and the laptop
-pilot cell were produced on CPU and are labelled `"device": "cpu"` in their
-artefacts. They are not superseded and not to be pooled with GPU cells:
-`device` is part of both the cell resume key and the training manifest, so
-the sweep will never reuse a CPU checkpoint for a GPU cell, and the two can
-always be told apart afterwards.
+Export the working sweep and controls into the tracked `results/` tree. Use
+the default absolute result root; no `--results-root` override is needed.
 
-**Never run `98_export_results.py` on a machine whose working tree holds
-cells without a `device` field.** The export copies the working tree *over*
-`results/`, matching on slug, seed and tag and not on provenance, so a
-pre-provenance cell silently replaces the committed cell of the same name
-with a different measurement. This is not hypothetical: the G1b CPU pilot
-did exactly this on the analysis laptop and is recorded in
-`docs/HISTORY.md`. Check first, and export only from the machine that
-produced the run:
+~~~bash
+python experiments/98_export_results.py --verify
+~~~
 
-```bash
-python -c "import json,glob;print([p for p in glob.glob('era_poc_replication_results_multiseed/**/run_config.json',recursive=True) if 'device' not in json.load(open(p))])"
-```
+The export must end with:
 
-**Expected: `[]`.** Anything listed must be removed or moved out of the
-working tree before the export.
+~~~text
+VERIFY OK: every exported cell is complete and carries its device.
+~~~
 
-**Why results are exported rather than committed in place.** The working
-output directories are gitignored, and `*.csv` is ignored repository-wide
-except under `results/`. `98_export_results.py` copies the small artefacts
-(CSV/JSON/MD/PNG, never checkpoints) into `results/`, where the
-`results/** -text` rule also keeps their bytes exactly as written.
+Rebuild the small public summary from the 33 paper-metric cells, then verify
+that the generated JSON and Markdown agree with their source.
 
-**If a run is interrupted.** Re-run the same command. Resume is verified
-against content — a cell is skipped only when its stored `run_config`
-matches the full current configuration, and a cached checkpoint is reused
-only when its training manifest matches. Anything unverifiable is redone.
+~~~bash
+python experiments/23_build_public_summary.py
+python experiments/23_build_public_summary.py --check
+~~~
+
+Expected check:
+
+~~~text
+PUBLIC SUMMARY CHECK PASS: 11 models, 33 cells
+~~~
+
+Run the paper-specific tests and confirm that no JSON contains a non-finite
+value.
+
+~~~bash
+python -m pytest -q tests/test_paper_metrics.py tests/test_paper_probe.py tests/test_paper_metrics_panel.py tests/test_public_results_summary.py
+if grep -R -n -E 'NaN|Infinity' results/paper_metrics/v2_balanced_r2; then echo 'ERROR: non-finite value found'; else echo 'NON-FINITE CHECK PASS'; fi
+~~~
+
+## 7. Bring the results off the pod
+
+Inspect the complete change before staging it.
+
+~~~bash
+git status --short
+git diff --check
+~~~
+
+Stage only the evidence and generated result page from this reproduction.
+
+~~~bash
+git add results/ docs/RESULTS.md
+~~~
+
+Confirm that no checkpoint or archive is staged.
+
+~~~bash
+if git diff --cached --name-only | grep -E '\.(bin|pt|pth|safetensors|tar|ckpt)$'; then echo 'ERROR: checkpoint or archive staged'; else echo 'STAGE SCOPE PASS'; fi
+git diff --cached --check
+~~~
+
+Commit and push the reproduction branch.
+
+~~~bash
+git commit -m "Reproduce v2_balanced_r2 reference study"
+git push -u origin reproduce-v2-balanced-r2
+~~~
+
+Before deleting the pod, verify that the remote branch points to the new
+commit and that the working branch is not ahead of it.
+
+~~~bash
+git status -sb
+git log -1 --oneline
+git log -1 --oneline origin/reproduce-v2-balanced-r2
+~~~
+
+Only after those three checks agree should the pod be stopped.
+
+## Optional paired training-regime study
+
+The POC2-versus-FULL experiment is separate from the 33-cell reference panel.
+Its design, results, and commands are in
+[`POC2_VS_FULL.md`](POC2_VS_FULL.md).

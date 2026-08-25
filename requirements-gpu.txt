@@ -10,12 +10,9 @@
 #      dependencies nor any extra mentions torch.  Nothing below depends on
 #      a specific torch build, so pip leaves the image's CUDA wheel alone.
 #
-#   2. numpy must not be DOWNGRADED.  pyproject.toml pins `numpy<2.0`, which
-#      is the real hazard on a modern image shipping numpy 2.x: pip would
-#      silently downgrade it, and a torch wheel compiled against numpy 2
-#      then breaks at import.  This file therefore has no numpy pin at all,
-#      and the runbook installs the package itself with `--no-deps` so the
-#      pyproject pin is never applied.
+#   2. numpy must not be replaced underneath the image's CUDA build. This
+#      file therefore leaves numpy untouched, and the runbook installs the
+#      package itself with `--no-deps` before installing this list.
 #
 # The measurement is unaffected by which numpy major version is present:
 # era/ uses dot, norm, mean, vstack and argmax, whose semantics did not
@@ -35,6 +32,7 @@ accelerate>=0.27,<0.30
 datasets>=2.14,<2.19
 matplotlib>=3.7
 pandas>=2.0
+scipy>=1.11
 
 # --- dev: the test suite is part of the runbook ------------------------
 pytest>=7.3.0

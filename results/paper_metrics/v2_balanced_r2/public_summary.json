@@ -1,0 +1,230 @@
+{
+  "design": {
+    "cells": 33,
+    "models": 11,
+    "seeds": [
+      42,
+      43,
+      44
+    ]
+  },
+  "headline": {
+    "B_model_mean_max": 0.5822672867779802,
+    "B_model_mean_min": 0.3389634828567179,
+    "models_positive_in_every_seed": 9,
+    "models_with_positive_mean_delta_SI": 10,
+    "positive_delta_SI_cells": 29,
+    "positive_delta_SI_fraction": 0.8787878787878788
+  },
+  "highlights": {
+    "opt125m_to_gptneo_geometry_drift_ratio": 8.77714052330923,
+    "opt125m_to_gptneo_geometry_drift_ratio_by_seed": [
+      {
+        "ratio": 9.35086642417458,
+        "seed": 42
+      },
+      {
+        "ratio": 7.984034213168407,
+        "seed": 43
+      },
+      {
+        "ratio": 9.02395836128028,
+        "seed": 44
+      }
+    ],
+    "opt350m_between_share": 0.5288758636628457,
+    "pythia70m_between_share": 0.17155447644051575
+  },
+  "interpretation": "Probability change, group movement, contextual behaviour, and internal representations are reported as separate evidence.",
+  "models": [
+    {
+      "B_T_mean": 0.09573315567189944,
+      "B_mean": 0.46655935738853554,
+      "B_sample_sd": 0.015907974366308423,
+      "between_share": 0.3446175980239539,
+      "delta_SI_mean": 0.5793297324801302,
+      "delta_SI_sample_sd": 0.043213581647702955,
+      "mean_1_minus_G": 0.042713573097191454,
+      "name": "GPT-2",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "gpt2"
+    },
+    {
+      "B_T_mean": 0.11389039557285525,
+      "B_mean": 0.48756235924096614,
+      "B_sample_sd": 0.015982755446373086,
+      "between_share": 0.4508216610132377,
+      "delta_SI_mean": 0.7790060322827919,
+      "delta_SI_sample_sd": 0.039684777368568604,
+      "mean_1_minus_G": 0.03722706721168615,
+      "name": "GPT-2-medium",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "gpt2medium"
+    },
+    {
+      "B_T_mean": 0.07305535239619267,
+      "B_mean": 0.4186181775200822,
+      "B_sample_sd": 0.007229698921242851,
+      "between_share": 0.30586830731580017,
+      "delta_SI_mean": 0.4441941414862642,
+      "delta_SI_sample_sd": 0.0982083669163503,
+      "mean_1_minus_G": 0.015556346282194433,
+      "name": "GPT-Neo-125M",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "gptneo"
+    },
+    {
+      "B_T_mean": 0.08642006790465817,
+      "B_mean": 0.44749767019162556,
+      "B_sample_sd": 0.011645602059209923,
+      "between_share": 0.4968117716446861,
+      "delta_SI_mean": 0.5729494057035933,
+      "delta_SI_sample_sd": 0.29827891586896504,
+      "mean_1_minus_G": 0.13654023734807963,
+      "name": "OPT-125M",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "opt125m"
+    },
+    {
+      "B_T_mean": 0.14371288426308712,
+      "B_mean": 0.5610858851030133,
+      "B_sample_sd": 0.019552720258314248,
+      "between_share": 0.5288758636628457,
+      "delta_SI_mean": 1.1463081650102733,
+      "delta_SI_sample_sd": 0.022765224286368756,
+      "mean_1_minus_G": 0.12489878053699434,
+      "name": "OPT-350M",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "opt350m"
+    },
+    {
+      "B_T_mean": 0.12983960897349764,
+      "B_mean": 0.5674352664044849,
+      "B_sample_sd": 0.022352021008226714,
+      "between_share": 0.4760870739481458,
+      "delta_SI_mean": 1.0196167084243613,
+      "delta_SI_sample_sd": 0.228674491760278,
+      "mean_1_minus_G": 0.12976644064908005,
+      "name": "BLOOM-560M",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "bloom560m"
+    },
+    {
+      "B_T_mean": 0.11498062703689566,
+      "B_mean": 0.5822672867779802,
+      "B_sample_sd": 0.004386929079948761,
+      "between_share": 0.17155447644051575,
+      "delta_SI_mean": -0.20687641484032912,
+      "delta_SI_sample_sd": 0.042354428361323686,
+      "mean_1_minus_G": 0.06923833474500157,
+      "name": "Pythia-70M",
+      "positive_delta_SI": 0,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "pythia70m"
+    },
+    {
+      "B_T_mean": 0.0744944624046003,
+      "B_mean": 0.5540221201906032,
+      "B_sample_sd": 0.007641823008186435,
+      "between_share": 0.23356024936763584,
+      "delta_SI_mean": 0.2448816446821854,
+      "delta_SI_sample_sd": 0.18508700417530938,
+      "mean_1_minus_G": 0.14300310700269372,
+      "name": "Pythia-160M",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "pythia"
+    },
+    {
+      "B_T_mean": 0.10005898215957103,
+      "B_mean": 0.5292289514698534,
+      "B_sample_sd": 0.018605319420844455,
+      "between_share": 0.3988140531234159,
+      "delta_SI_mean": 0.2540068834630706,
+      "delta_SI_sample_sd": 0.48628701602722196,
+      "mean_1_minus_G": 0.2109994210751617,
+      "name": "Pythia-410M",
+      "positive_delta_SI": 2,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "pythia410m"
+    },
+    {
+      "B_T_mean": 0.06886306837971055,
+      "B_mean": 0.3389634828567179,
+      "B_sample_sd": 0.011666843629770428,
+      "between_share": 0.12429042751615095,
+      "delta_SI_mean": 0.19259537318119305,
+      "delta_SI_sample_sd": 0.013941699604002449,
+      "mean_1_minus_G": 0.019320231627594355,
+      "name": "SmolLM2-135M",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "smollm2135m"
+    },
+    {
+      "B_T_mean": 0.08112132966309896,
+      "B_mean": 0.3797746816107293,
+      "B_sample_sd": 0.033403437621865206,
+      "between_share": 0.241437934200535,
+      "delta_SI_mean": 0.3773029485101163,
+      "delta_SI_sample_sd": 0.012178416095887648,
+      "mean_1_minus_G": 0.015965988830156055,
+      "name": "SmolLM2-360M",
+      "positive_delta_SI": 3,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "slug": "smollm2360m"
+    }
+  ],
+  "schema_version": 1,
+  "source": "results/paper_metrics/v2_balanced_r2/panel_summary.json"
+}

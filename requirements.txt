@@ -1,11 +1,12 @@
-# Authoritative pinned list — keep in sync with pyproject.toml.
+# Supported dependency ranges — keep in sync with pyproject.toml.
 #
 # PyTorch is deliberately NOT pinned here: install the CPU or CUDA build
 # explicitly (see README "Quick start").
-# scipy removed in v2: the canonical pipeline is NumPy-only.
+# The canonical era/ pipeline is NumPy-only. SciPy is required only by two
+# experiment-analysis scripts and therefore belongs to the experiments list.
 
 # --- Core: screening an existing (base, finetuned) pair -----------------
-numpy>=1.23,<2.0
+numpy>=1.23,<3.0
 transformers>=4.36,<4.41
 tokenizers>=0.15,<0.19
 sentencepiece>=0.1.99
@@ -17,5 +18,6 @@ sentencepiece>=0.1.99
 # still passes to Accelerator, which breaks training with a TypeError.
 accelerate>=0.27,<0.30
 datasets>=2.14,<2.19
-matplotlib>=3.7,<3.9
-pandas>=2.0,<2.3
+matplotlib>=3.7,<4.0
+pandas>=2.0,<4.0
+scipy>=1.11,<2.0

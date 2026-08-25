@@ -55,8 +55,11 @@ def discover_cells(results_root, tag):
                 "slug": cell_dir.parent.name,
                 "seed": cell_dir.name.removeprefix("seed_"),
                 "cell_dir": str(cell_dir),
-                "checkpoint": str(ROOT / f"finetuned_{cell_dir.parent.name}_{tag}_"
-                                   f"seed{cell_dir.name.removeprefix('seed_')}"),
+                "checkpoint": str(
+                    ROOT
+                    / f"finetuned_{cell_dir.parent.name}_{tag}_"
+                    f"seed{cell_dir.name.removeprefix('seed_')}"
+                ),
                 "skip_reason": f"run_config.json missing fields: {missing}",
             })
             continue

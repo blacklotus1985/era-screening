@@ -1,6 +1,10 @@
 """
-ERA v2, lightweight representation drift screening between related
+ERA Screening, lightweight representation drift screening between related
 language-model checkpoints.
+
+The software release is 1.0.0rc1. Historical documents call the current
+measurement methodology "ERA v2"; that methodology label is separate from
+the package version.
 
 Canonical surface (four modules, importable without torch):
 
@@ -43,7 +47,7 @@ from era.metrics import (
 from era.pipeline import ScreeningResult, output_drift, screen
 from era.report import config_fingerprint, save
 
-__version__ = "2.0.0.dev0"
+__version__ = "1.0.0rc1"
 
 __all__ = [
     "DISTRIBUTION_METRICS",
