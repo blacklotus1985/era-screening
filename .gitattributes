@@ -5,6 +5,7 @@
 *.txt text eol=lf
 
 # Source and docs are authored LF; keep them LF everywhere.
+.gitattributes text eol=lf
 *.py text eol=lf
 *.yml text eol=lf
 *.cfg text eol=lf
@@ -20,6 +21,10 @@ docs/** text eol=lf
 # originals (they were produced on Windows and legitimately contain CRLF):
 # no text normalization, ever. This must override every rule above.
 results/** -text
+
+# This public summary is generated from the raw result cells. Keep its text
+# representation stable across operating systems.
+results/paper_metrics/v2_balanced_r2/public_summary.json text eol=lf
 
 # Images are binary.
 *.png binary

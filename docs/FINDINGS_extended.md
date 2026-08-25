@@ -243,7 +243,7 @@ right panel is the one this section rests on: GPT-Neo (orange) sits at or
 above the 0.95 flag across almost its whole depth, and every model's dashed
 fine-tuned profile lies on top of its solid base profile.
 
-![Figure 1: per-layer drift metrics and anisotropy for all 11 models, plotted against normalised depth](figures/extended_v2_overlay.png)
+![Figure 1: per-layer drift metrics and anisotropy for all 11 models, plotted against normalised depth](../results/aggregates/extended_v2_balanced_r2_20260822T182820Z/extended_overlay_normalised_depth.png)
 
 **The certificate, not the flag.** Across 669 layer-seed rows the measured
 relational drift never exceeded its own certified ceiling — **zero lemma
@@ -394,7 +394,7 @@ The contrast between the two models is the point — GPT-Neo (blue) hugs zero
 with a band narrow enough to be informative, while Pythia (orange) carries
 structure inside intervals wide enough to contain it.
 
-![Figure 2: biased-minus-neutral differential curves for the two reference models, with per-seed lines and 95% t intervals](figures/extended_v2_differential.png)
+![Figure 2: biased-minus-neutral differential curves for the two reference models, with per-seed lines and 95% t intervals](../results/aggregates/extended_v2_balanced_r2_20260822T182820Z/extended_differential.png)
 
 #### The restatement §7.4 requires
 
@@ -1020,15 +1020,11 @@ hardware *and* a change of weights.
 
 ## 9. Sources
 
-**The two figures are committed copies, not links into a run directory.**
-`14_compare_extended.py` writes its artefacts to a timestamped directory, so
-a link into one would break at the next run. Figures 1 and 2 are therefore
-byte-identical copies placed in `docs/figures/` under stable names, following
-the convention `FINDINGS_v2_balanced.md` already uses. Their source is
-`results/aggregates/extended_v2_balanced_r2_20260822T182820Z/` —
-`extended_overlay_normalised_depth.png` and `extended_differential.png`
-respectively. Regenerating the analysis means recopying them; the timestamped
-directory remains the provenance of record.
+**The two figures are linked to their measurement-of-record artefacts.**
+Both files are stored once, under
+`results/aggregates/extended_v2_balanced_r2_20260822T182820Z/`, together with
+the tables and configuration that produced them. A new protocol produces a
+separate result directory and does not overwrite these figures.
 
 Every number above traces to a committed artefact:
 

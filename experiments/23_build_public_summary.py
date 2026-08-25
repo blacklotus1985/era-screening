@@ -589,8 +589,8 @@ def main():
 
     args.json_output.parent.mkdir(parents=True, exist_ok=True)
     args.markdown_output.parent.mkdir(parents=True, exist_ok=True)
-    args.json_output.write_text(json_text, encoding="utf-8")
-    args.markdown_output.write_text(markdown_text, encoding="utf-8")
+    args.json_output.write_text(json_text, encoding="utf-8", newline="\n")
+    args.markdown_output.write_text(markdown_text, encoding="utf-8", newline="\n")
     print(f"JSON: {args.json_output}")
     print(f"Markdown: {args.markdown_output}")
 
