@@ -288,8 +288,8 @@ def hsic_unbiased(gram_x: np.ndarray, gram_y: np.ndarray) -> float:
     sum_k = float(K.sum())
     sum_l = float(L.sum())
     cross = float(K.sum(axis=1) @ L.sum(axis=1))
-    return (trace_term + sum_k * sum_l / ((n - 1) * (n - 2))
-            - 2.0 * cross / (n - 2)) / (n * (n - 3))
+    return float((trace_term + sum_k * sum_l / ((n - 1) * (n - 2))
+                  - 2.0 * cross / (n - 2)) / (n * (n - 3)))
 
 
 def linear_cka_unbiased(X: np.ndarray, Y: np.ndarray) -> float:
