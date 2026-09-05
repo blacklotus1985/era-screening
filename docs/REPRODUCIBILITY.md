@@ -45,6 +45,14 @@ The core tests cover the mathematics, aggregation, reports, and cached-run
 checks. PyTorch is installed separately so that each user can select the right
 CPU or CUDA build.
 
+Report writes use a temporary sibling directory and a backup rename. This
+protects the previous complete report from ordinary write or rename errors,
+and cache reuse rejects missing, ragged, empty, non-finite, or context-less
+CSV artifacts. This is not a general transaction system: an abrupt process or
+machine interruption between filesystem operations, or concurrent readers
+during replacement, still requires an external rerun/check of the three-file
+report.
+
 The integration test loads a small public Hugging Face model.
 
 ~~~bash

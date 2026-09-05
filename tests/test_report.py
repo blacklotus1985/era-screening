@@ -7,7 +7,15 @@ no torch, no models, everything built in tmp_path.
 import json
 from pathlib import Path
 
-from era.report import artifacts_match, checkpoint_sha256, file_sha256
+import pytest
+
+from era.report import (
+    _report_directory_valid,
+    _report_csv_schema_matches,
+    artifacts_match,
+    checkpoint_sha256,
+    file_sha256,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -101,12 +109,20 @@ EXPECTED = {"model_name": "m", "seed": 42, "corpus_sha256": "abc", "train_lr": 5
 def _make_cell(root, config_overrides=None, missing=()):
     root.mkdir(parents=True, exist_ok=True)
     cfg = dict(EXPECTED)
+    cfg.update({"num_layers": 1, "n_contexts_used": 1})
     cfg.update(config_overrides or {})
     files = {
-        "layer_curve.csv": "layer,l3_mean\n0,0.1\n",
-        "per_context_results.csv": "context,l2\nctx,0.2\n",
-        "run_config.json": json.dumps(cfg),
+        "layer_curve.csv": (
+            "layer,relational_mean,relational_std,l3_mean,l3_std,"
+            "per_token_mean,per_token_std,cka,cka_unbiased,anisotropy_base,"
+            "anisotropy_ft\n0,0.1,0,0.1,0,0.1,0,1,1,0,0\n"
+        ),
+        "per_context_results.csv": (
+            "context,n_candidates,n_pairs,l2,l3_layer_0,pertok_layer_0\n"
+            "ctx,2,1,0.2,0.1,0.1\n"
+        ),
     }
+    files["run_config.json"] = json.dumps(cfg)
     for name, content in files.items():
         if name not in missing:
             (root / name).write_text(content, encoding="utf-8")
@@ -143,6 +159,135 @@ def test_changed_hyperparameter_invalidates_cell(tmp_path):
 def test_corrupt_run_config_invalidates_cell(tmp_path):
     cell = _make_cell(tmp_path / "cell")
     (cell / "run_config.json").write_text("{not json", encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+def test_null_undefined_metrics_invalidates_cell(tmp_path):
+    cell = _make_cell(tmp_path / "cell", {"undefined_metrics": None})
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+def test_empty_or_altered_csv_invalidates_cell(tmp_path):
+    cell = _make_cell(tmp_path / "cell")
+    (cell / "layer_curve.csv").write_text("", encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+    cell = _make_cell(tmp_path / "cell2")
+    (cell / "per_context_results.csv").write_text(
+        "context,n_candidates,n_pairs,l2,l3_layer_0,pertok_layer_0\n"
+        "ctx,2,1,NaN,0.1,0.1\n", encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+def test_schema_drift_and_layer_index_corruption_invalidates_cell(tmp_path):
+    cell = _make_cell(tmp_path / "cell")
+    path = cell / "per_context_results.csv"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        ",pertok_layer_0", ""), encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+@pytest.mark.parametrize("override", [
+    {"num_layers": 0},
+    {"n_contexts_used": 0},
+    {"undefined_metrics": []},
+    {"undefined_metrics": {"cka": []}},
+])
+def test_malformed_report_metadata_invalidates_cell(tmp_path, override):
+    cell = _make_cell(tmp_path / str(len(override)), override)
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+def test_report_schema_rejects_missing_files_and_columns(tmp_path):
+    cell = _make_cell(tmp_path / "missing_curve")
+    (cell / "layer_curve.csv").unlink()
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+@pytest.mark.parametrize("config", [
+    {},
+    {"num_layers": "bad", "n_contexts_used": 1},
+    {"num_layers": 1, "n_contexts_used": -1},
+    {"num_layers": 1, "n_contexts_used": 1, "undefined_metrics": {"cka": []}},
+])
+def test_schema_validator_fails_closed_on_bad_config(tmp_path, config):
+    cell = _make_cell(tmp_path / str(len(config)))
+    assert _report_csv_schema_matches(cell, config) is False
+
+
+def test_schema_validator_rejects_ragged_rows_and_invalid_values(tmp_path):
+    cell = _make_cell(tmp_path / "ragged")
+    path = cell / "per_context_results.csv"
+    path.write_text(path.read_text(encoding="utf-8") + "extra\n", encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+def test_schema_validator_rejects_wrong_counts_and_inconsistent_rows(tmp_path):
+    cell = _make_cell(tmp_path / "missing_layer_row")
+    path = cell / "layer_curve.csv"
+    path.write_text(path.read_text(encoding="utf-8").splitlines()[0] + "\n", encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+    cell = _make_cell(tmp_path / "missing_context_row")
+    path = cell / "per_context_results.csv"
+    path.write_text(path.read_text(encoding="utf-8").splitlines()[0] + "\n", encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+    cell = _make_cell(tmp_path / "inconsistent_rows")
+    config = {"num_layers": 1, "n_contexts_used": 2}
+    path = cell / "per_context_results.csv"
+    row = path.read_text(encoding="utf-8").splitlines()[1]
+    path.write_text(path.read_text(encoding="utf-8") + row + ",extra\n", encoding="utf-8")
+    assert _report_csv_schema_matches(cell, config) is False
+
+    cell = _make_cell(tmp_path / "bad_layer_order")
+    path = cell / "layer_curve.csv"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        "0,0.1", "2,0.1"), encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+def test_schema_validator_handles_unreadable_staging_path(tmp_path):
+    assert _report_csv_schema_matches(
+        tmp_path / "missing", {"num_layers": 1, "n_contexts_used": 1}
+    ) is False
+    assert _report_directory_valid(tmp_path / "missing") is False
+
+    cell = _make_cell(tmp_path / "bad_context")
+    path = cell / "per_context_results.csv"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        "ctx,2,1,0.2,0.1,0.1", ",2,1,0.2,0.1,0.1"), encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+    cell = _make_cell(tmp_path / "bad_layer_value")
+    path = cell / "layer_curve.csv"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        ",0.1,0,0.1", ",bad,0,0.1"), encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+    cell = _make_cell(tmp_path / "missing_column")
+    path = cell / "layer_curve.csv"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        ",anisotropy_ft", ""), encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+
+    cell = _make_cell(tmp_path / "extra_context_column")
+    path = cell / "per_context_results.csv"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        "ctx,2,1,0.2,0.1,0.1", "ctx,2,1,0.2,0.1,0.1,extra"), encoding="utf-8")
+    assert artifacts_match(cell, EXPECTED) is False
+    cell = _make_cell(tmp_path / "cell2")
+    path = cell / "layer_curve.csv"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("0,0.1", "x,0.1"),
+        encoding="utf-8",
+    )
+    assert artifacts_match(cell, EXPECTED) is False
+
+
+def test_missing_context_in_any_row_invalidates_cell(tmp_path):
+    cell = _make_cell(tmp_path / "cell")
+    (cell / "per_context_results.csv").write_text(
+        "context,l2\nctx,0.2\n,0.3\n", encoding="utf-8")
     assert artifacts_match(cell, EXPECTED) is False
 
 

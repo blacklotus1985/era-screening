@@ -2,6 +2,15 @@
 
 All notable changes to ERA Screening are recorded here.
 
+## 1.0.0-rc.2 - Phase A corrections
+
+- Separate exact top-k probability support from fixed geometric probes.
+- Represent undefined CKA, insufficient-sample unbiased CKA, and zero-mass
+  centroids explicitly instead of treating them as valid zeros.
+- Reject incomplete reports and corrupted or non-finite cache artifacts.
+- Keep report replacement staged with restoration of the previous valid report
+  when finalization fails.
+
 ## 1.0.0-rc.1 — release candidate
 
 - Freeze the metric semantics used by the A100 `v2_balanced_r2` study.

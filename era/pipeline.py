@@ -42,6 +42,7 @@ from era.metrics import (
     drift_centroid,
     linear_cka,
     linear_cka_unbiased,
+    hsic_unbiased,
 )
 
 # Identity of the measurement algorithm, distinct from package/library
@@ -51,7 +52,7 @@ from era.metrics import (
 # compares it, so cached cells computed by an older algorithm are invalidated
 # exactly when the measurement changed, while harmless refactors and
 # dependency bumps leave caches intact.
-MEASUREMENT_SCHEMA_VERSION = 2
+MEASUREMENT_SCHEMA_VERSION = 4
 
 
 @dataclass
@@ -83,12 +84,16 @@ class ScreeningResult:
         return len(self.relational_mean)
 
     @property
-    def centroids(self) -> Dict[str, float]:
+    def centroids(self) -> Dict[str, Optional[float]]:
         """Depth centre-of-mass of each change curve (descriptive summary)."""
+        undefined = self.config.get("undefined_metrics", {})
         return {
-            "relational": drift_centroid(self.relational_mean),
-            "per_token": drift_centroid(self.per_token_mean),
-            "cka_change": drift_centroid(1.0 - self.cka),
+            "relational": None if "centroid_relational" in undefined
+            else drift_centroid(self.relational_mean),
+            "per_token": None if "centroid_per_token" in undefined
+            else drift_centroid(self.per_token_mean),
+            "cka_change": None if "cka_change" in undefined
+            else drift_centroid(1.0 - self.cka),
         }
 
 
@@ -251,6 +256,7 @@ class _Accumulator:
         self.base_stacks: Optional[List[List[np.ndarray]]] = None  # per layer
         self.ft_stacks: Optional[List[List[np.ndarray]]] = None
         self.num_layers: Optional[int] = None
+        self.undefined: Dict[str, Dict[str, object]] = {}
 
 
 def _full_distribution(pair, which, ctx_ids, top_k):
@@ -284,18 +290,18 @@ def _measure_one_context(
 
     p_base = pair.next_token_distribution("base", ctx_ids, top_k=top_k)
     p_ft = pair.next_token_distribution("finetuned", ctx_ids, top_k=top_k)
-    candidates = fixed_ids if fixed_ids is not None else sorted(set(p_base) | set(p_ft))
-    if candidate_mode == "topk_union_exact" and fixed_ids is None:
+    probability_support = sorted(set(p_base) | set(p_ft))
+    candidates = fixed_ids if fixed_ids is not None else probability_support
+    if candidate_mode == "topk_union_exact":
         p_base_full = _full_distribution(pair, "base", ctx_ids, top_k)
         p_ft_full = _full_distribution(pair, "finetuned", ctx_ids, top_k)
-        p_base_compare = {c: p_base_full[c] for c in candidates}
-        p_ft_compare = {c: p_ft_full[c] for c in candidates}
-        union_mass_base = float(sum(p_base_compare.values()))
-        union_mass_ft = float(sum(p_ft_compare.values()))
+        p_base_compare = {c: p_base_full[c] for c in probability_support}
+        p_ft_compare = {c: p_ft_full[c] for c in probability_support}
     else:
-        p_base_compare, p_ft_compare = p_base, p_ft
-        union_mass_base = float(sum(p_base.get(c, 0.0) for c in candidates))
-        union_mass_ft = float(sum(p_ft.get(c, 0.0) for c in candidates))
+        p_base_compare = {c: p_base.get(c, 0.0) for c in probability_support}
+        p_ft_compare = {c: p_ft.get(c, 0.0) for c in probability_support}
+    union_mass_base = float(sum(p_base_compare.values()))
+    union_mass_ft = float(sum(p_ft_compare.values()))
     l2_value = output_drift(p_base_compare, p_ft_compare, distribution_metric)
 
     if len(candidates) < 2:
@@ -449,19 +455,105 @@ def _aggregate(
     assert (acc.num_layers is not None
             and acc.base_stacks is not None and acc.ft_stacks is not None)
 
-    cka = np.array([
-        linear_cka(np.vstack(acc.base_stacks[layer]), np.vstack(acc.ft_stacks[layer]))
-        for layer in range(acc.num_layers)
-    ])
-    cka_unbiased = np.array([
-        linear_cka_unbiased(
-            np.vstack(acc.base_stacks[layer]), np.vstack(acc.ft_stacks[layer])
+    cka_values = []
+    cka_unbiased_values = []
+    cka_undefined_layers = []
+    cka_unbiased_unavailable_layers = []
+    cka_unbiased_undefined_layers = []
+    for layer in range(acc.num_layers):
+        base_matrix = np.asarray(
+            np.vstack(acc.base_stacks[layer]), dtype=np.float64
         )
-        for layer in range(acc.num_layers)
-    ])
+        ft_matrix = np.asarray(
+            np.vstack(acc.ft_stacks[layer]), dtype=np.float64
+        )
+        base_centered = base_matrix - base_matrix.mean(axis=0, keepdims=True)
+        ft_centered = ft_matrix - ft_matrix.mean(axis=0, keepdims=True)
+        base_norm = float(np.sqrt(np.sum((base_centered.T @ base_centered) ** 2)))
+        ft_norm = float(np.sqrt(np.sum((ft_centered.T @ ft_centered) ** 2)))
+        base_rows_identical = bool(
+            base_matrix.shape[0] > 1
+            and np.all(base_matrix[1:] == base_matrix[:1])
+        )
+        ft_rows_identical = bool(
+            ft_matrix.shape[0] > 1
+            and np.all(ft_matrix[1:] == ft_matrix[:1])
+        )
+        if base_rows_identical or ft_rows_identical or base_norm == 0.0 or ft_norm == 0.0:
+            cka_values.append(np.nan)
+            cka_undefined_layers.append(layer)
+        else:
+            cka_values.append(linear_cka(base_matrix, ft_matrix))
+        if base_matrix.shape[0] < 4:
+            cka_unbiased_values.append(np.nan)
+            cka_unbiased_unavailable_layers.append(layer)
+        else:
+            base_gram = base_centered @ base_centered.T
+            ft_gram = ft_centered @ ft_centered.T
+            base_hsic = hsic_unbiased(base_gram, base_gram)
+            ft_hsic = hsic_unbiased(ft_gram, ft_gram)
+            unbiased_denominator = np.sqrt(
+                max(base_hsic, 0.0) * max(ft_hsic, 0.0)
+            )
+            unbiased = linear_cka_unbiased(base_matrix, ft_matrix)
+            if np.isfinite(unbiased) and unbiased_denominator > 0.0:
+                cka_unbiased_values.append(unbiased)
+            else:
+                cka_unbiased_values.append(np.nan)
+                cka_unbiased_undefined_layers.append(layer)
+    if cka_undefined_layers:
+        acc.undefined["cka"] = {
+            "status": "undefined",
+            "reason": "constant centered representation matrix",
+            "layers": cka_undefined_layers,
+        }
+    if cka_unbiased_unavailable_layers:
+        acc.undefined["cka_unbiased"] = {
+            "status": "unavailable",
+            "reason": "fewer than four stacked samples",
+            "layers": cka_unbiased_unavailable_layers,
+        }
+    if cka_unbiased_undefined_layers:
+        acc.undefined["cka_unbiased"] = {
+            "status": "undefined",
+            "reason": "unbiased HSIC denominator is zero or non-finite",
+            "layers": cka_unbiased_undefined_layers,
+        }
+    cka = np.array(cka_values)
+    cka_unbiased = np.array(cka_unbiased_values)
 
     rel = np.vstack(acc.relational_rows)
     ptk = np.vstack(acc.per_token_rows)
+
+    config = _run_config(
+        acc, contexts, top_k, distribution_metric, fixed_ids, candidate_mode
+    )
+    if not np.all(np.isfinite(rel)):
+        raise ValueError("Relational drift contains non-finite values.")
+    if not np.all(np.isfinite(ptk)):
+        raise ValueError("Per-token drift contains non-finite values.")
+    cka_change = 1.0 - cka
+    if not np.all(np.isfinite(cka_change)):
+        config.setdefault("undefined_metrics", {})["cka_change"] = {
+            "status": "undefined",
+            "reason": "CKA is undefined for at least one layer",
+        }
+    if not np.any(rel > 0.0):
+        config.setdefault("undefined_metrics", {})["centroid_relational"] = {
+            "status": "undefined",
+            "reason": "relational drift curve has zero total mass",
+        }
+    if not np.any(ptk > 0.0):
+        config.setdefault("undefined_metrics", {})["centroid_per_token"] = {
+            "status": "undefined",
+            "reason": "per-token drift curve has zero total mass",
+        }
+    if np.all(np.isfinite(cka_change)) and not np.any(cka_change > 0.0):
+        config.setdefault("undefined_metrics", {})["cka_change"] = {
+            "status": "undefined",
+            "reason": "CKA change curve has zero total mass",
+        }
+    config.setdefault("undefined_metrics", {}).update(acc.undefined)
 
     return ScreeningResult(
         relational_mean=rel.mean(axis=0),
@@ -473,9 +565,7 @@ def _aggregate(
         anisotropy_base=np.vstack(acc.aniso_base_rows).mean(axis=0),
         anisotropy_ft=np.vstack(acc.aniso_ft_rows).mean(axis=0),
         per_context=acc.per_context,
-        config=_run_config(
-            acc, contexts, top_k, distribution_metric, fixed_ids, candidate_mode
-        ),
+        config=config,
     )
 
 
@@ -494,6 +584,10 @@ def _run_config(
         "top_k": top_k,
         "distribution_metric": distribution_metric,
         "candidate_mode": "fixed_probe_vocab" if fixed_ids is not None else candidate_mode,
+        "probability_support_policy": candidate_mode,
+        "geometry_selection_mode": (
+            "fixed_probe_vocab" if fixed_ids is not None else "topk_union"
+        ),
         "n_contexts_requested": len(contexts),
         "n_contexts_used": len(acc.per_context),
         "num_layers": int(acc.num_layers),

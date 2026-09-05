@@ -331,7 +331,7 @@ The documentation reading order is in [docs/README.md](docs/README.md).
 ## Release status
 
 The repository is being prepared as the first public software release,
-v1.0.0. The current package version is v1.0.0rc1. The final tag will be
+v1.0.0. The current package version is v1.0.0rc2. The final tag will be
 created only after the documented quickstart, unit tests, integration tests,
 and release metadata have been reviewed.
 

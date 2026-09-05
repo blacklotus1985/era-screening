@@ -368,6 +368,8 @@ def expected_cell_config(hf_name: str, revision: str, seed: int, tag: str,
         "top_k": TOPK_SEMANTIC,
         "distribution_metric": DISTRIBUTION_METRIC,
         "candidate_mode": candidate_mode,
+        "probability_support_policy": candidate_mode,
+        "geometry_selection_mode": "topk_union",
         "contexts_sha256": hashlib.sha256(
             json.dumps(list(TEST_CONTEXTS), ensure_ascii=False).encode("utf-8")
         ).hexdigest(),
