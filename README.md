@@ -47,6 +47,8 @@ under pressure, or resistance to misleading inputs. A profile would define
 the contexts to test, the evidence to collect, and the thresholds used for a
 decision.
 
+Illustrative example of a future evaluation profile:
+
 ~~~text
 Fair treatment                 FAIL
 Resistance to harmful requests PASS

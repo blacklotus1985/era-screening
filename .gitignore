@@ -80,3 +80,4 @@ era_poc_replication_results_multiseed/
 # Local assistant config & local trash (never published)
 .claude/
 _local_trash/
+.era_validation/
