@@ -43,8 +43,11 @@ identity of the source file.
 
 ## Fixed prompts and concept words
 
-`paper_probe_v1.json` declares the material used to measure the paper
+`reference_probe_v1.json` declares the material used to measure the fixed-probe
 quantities.
+
+Its historical name inside the JSON is preserved as part of the hashed
+payload; see [result provenance](../results/README.md#information-stored-with-a-cell).
 
 - Seven target words belong to the male group.
 - Seven target words belong to the female group.

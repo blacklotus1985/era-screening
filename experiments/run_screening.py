@@ -150,7 +150,8 @@ def main() -> None:
     print(f"\nReport written to {out}")
     print("Depth centroids (0 = embeddings, higher = later layers):")
     for name, value in result.centroids.items():
-        print(f"  {name:12s} {value:.2f}")
+        rendered = "undefined" if value is None else f"{value:.2f}"
+        print(f"  {name:12s} {rendered}")
     print("Reminder: these localise change; they do not certify alignment.")
 
 

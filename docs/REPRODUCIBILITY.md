@@ -20,7 +20,7 @@ PUBLIC SUMMARY CHECK PASS: 11 models, 33 cells
 ~~~
 
 The source file is
-`results/paper_metrics/v2_balanced_r2/panel_summary.json`. The readable table
+`results/reference_metrics/v2_balanced_r2/panel_summary.json`. The readable table
 is in [`docs/RESULTS.md`](RESULTS.md).
 
 ## 2. Confirm the implementation
@@ -44,6 +44,14 @@ In PowerShell, replace the activation line with:
 The core tests cover the mathematics, aggregation, reports, and cached-run
 checks. PyTorch is installed separately so that each user can select the right
 CPU or CUDA build.
+
+Report writes use a temporary sibling directory and a backup rename. This
+protects the previous complete report from ordinary write or rename errors,
+and cache reuse rejects missing, ragged, empty, non-finite, or context-less
+CSV artifacts. This is not a general transaction system: an abrupt process or
+machine interruption between filesystem operations, or concurrent readers
+during replacement, still requires an external rerun/check of the three-file
+report.
 
 The integration test loads a small public Hugging Face model.
 
@@ -110,7 +118,7 @@ The high-level sequence is below. Exact commands are in
 
 1. Check the environment with `experiments/99_check_environment.py`.
 2. Train and screen a new sweep while retaining its checkpoints.
-3. Run `experiments/20_paper_metrics_panel.py`.
+3. Run `experiments/20_reference_metrics_panel.py`.
 4. Confirm 33 complete cells and their recorded GPU.
 5. Rebuild the public summary and run its check.
 

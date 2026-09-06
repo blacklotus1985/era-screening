@@ -1,7 +1,7 @@
 # Findings — Multi-Seed Cross-Model Study (corpus `v2_balanced`)
 
 _Historical phase report. The current 33-cell measurement of record is in
-[`FINDINGS_extended.md`](FINDINGS_extended.md); the current paper-metric panel
+[`FINDINGS_extended.md`](FINDINGS_extended.md); the current fixed-probe panel
 is summarized in [`RESULTS.md`](RESULTS.md)._
 
 **Setup.** GPT-Neo-125M and Pythia-160M, both fine-tuned full-unfreeze on the

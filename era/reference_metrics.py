@@ -1,4 +1,4 @@
-"""Strict NumPy implementations of the metrics used in the ERA paper.
+"""Strict NumPy implementations of the metrics used in the ERA reference study.
 
 Distributions are one-dimensional arrays: the array position is the token ID.
 No function inserts epsilon, repairs zero mass, or silently drops a token.

@@ -1,6 +1,6 @@
-"""Inference and aggregation for the fixed metrics of the ERA paper.
+"""Inference and aggregation for the fixed metrics of the ERA reference study.
 
-The mathematical functions live in :mod:`era.paper_metrics`.  This module
+The mathematical functions live in :mod:`era.reference_metrics`.  This module
 does the model-facing work: strict probe tokenisation, stable next-token
 softmax, batched contextual hidden-state extraction, and one auditable record
 for a base/fine-tuned pair.  It contains no training code.
@@ -15,7 +15,7 @@ from typing import Dict, Optional, Sequence, Tuple
 
 import numpy as np
 
-from era.paper_metrics import (
+from era.reference_metrics import (
     B,
     B_T,
     B_alpha,
@@ -27,12 +27,12 @@ from era.paper_metrics import (
 )
 
 # The probe-file format and the measurement payload evolve independently.
-PAPER_PROBE_SCHEMA_VERSION = 1
-PAPER_MEASUREMENT_SCHEMA_VERSION = 1
+REFERENCE_PROBE_SCHEMA_VERSION = 1
+REFERENCE_MEASUREMENT_SCHEMA_VERSION = 1
 
 
 @dataclass(frozen=True)
-class PaperProbeSpec:
+class ReferenceProbeSpec:
     """Human-readable fixed supports and measurement parameters."""
 
     name: str
@@ -45,7 +45,7 @@ class PaperProbeSpec:
 
 
 @dataclass(frozen=True)
-class EncodedPaperProbe:
+class EncodedReferenceProbe:
     """One tokenizer's IDs for the same fixed human-readable events."""
 
     target_groups: Dict[str, Tuple[int, ...]]
@@ -73,15 +73,15 @@ def _canonical_sha256(value) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def load_paper_probe_spec(path) -> PaperProbeSpec:
-    """Read and validate a versioned paper-probe JSON file."""
+def load_reference_probe_spec(path) -> ReferenceProbeSpec:
+    """Read and validate a versioned fixed-probe JSON file."""
     source = Path(path)
     payload = json.loads(source.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != PAPER_PROBE_SCHEMA_VERSION:
+    if payload.get("schema_version") != REFERENCE_PROBE_SCHEMA_VERSION:
         raise ValueError(
-            "Unsupported paper probe schema: "
+            "Unsupported fixed probe schema: "
             f"{payload.get('schema_version')!r}; expected "
-            f"{PAPER_PROBE_SCHEMA_VERSION}."
+            f"{REFERENCE_PROBE_SCHEMA_VERSION}."
         )
     groups_raw = payload.get("target_groups")
     if not isinstance(groups_raw, dict) or set(groups_raw) != {"male", "female"}:
@@ -123,7 +123,7 @@ def load_paper_probe_spec(path) -> PaperProbeSpec:
         if not np.isfinite(log_base) or log_base <= 1.0:
             raise ValueError("log_base must be null (nats) or greater than 1.")
 
-    return PaperProbeSpec(
+    return ReferenceProbeSpec(
         name=str(payload.get("name") or source.stem),
         target_groups=target_groups,
         concept_tokens=concepts,
@@ -134,7 +134,7 @@ def load_paper_probe_spec(path) -> PaperProbeSpec:
     )
 
 
-def encode_paper_probe(tokenizer, spec: PaperProbeSpec) -> EncodedPaperProbe:
+def encode_reference_probe(tokenizer, spec: ReferenceProbeSpec) -> EncodedReferenceProbe:
     """Encode every declared event and fail if any is not one unique token.
 
     No alternative casing, whitespace variant or per-model subset is tried.
@@ -149,7 +149,7 @@ def encode_paper_probe(tokenizer, spec: PaperProbeSpec) -> EncodedPaperProbe:
         ids = tokenizer(token_text, add_special_tokens=False)["input_ids"]
         if len(ids) != 1:
             raise ValueError(
-                f"Paper probe event {token_text!r} maps to {len(ids)} tokens "
+                f"Fixed probe event {token_text!r} maps to {len(ids)} tokens "
                 f"{ids}; the fixed-support comparison cannot proceed."
             )
         token_id_by_text[token_text] = int(ids[0])
@@ -164,7 +164,7 @@ def encode_paper_probe(tokenizer, spec: PaperProbeSpec) -> EncodedPaperProbe:
     concept_ids = tuple(token_id_by_text[text] for text in spec.concept_tokens)
     if len(set(concept_ids)) != len(concept_ids):
         raise ValueError("Distinct concept strings map to overlapping token IDs.")
-    return EncodedPaperProbe(target_groups, concept_ids, token_id_by_text)
+    return EncodedReferenceProbe(target_groups, concept_ids, token_id_by_text)
 
 
 def stable_softmax(logits: Sequence[float]) -> np.ndarray:
@@ -278,10 +278,10 @@ def evaluate_observations(
     finetuned: ModelObservations,
     contexts: Sequence[str],
     families: Sequence[str],
-    spec: PaperProbeSpec,
-    encoded: EncodedPaperProbe,
+    spec: ReferenceProbeSpec,
+    encoded: EncodedReferenceProbe,
 ) -> Dict:
-    """Compute every paper quantity and its per-context audit trail."""
+    """Compute every fixed-probe quantity and its per-context audit trail."""
     p_all = np.asarray(base.probabilities, dtype=np.float64)
     q_all = np.asarray(finetuned.probabilities, dtype=np.float64)
     if p_all.shape != q_all.shape or p_all.ndim != 2:
@@ -392,7 +392,7 @@ def evaluate_observations(
     raw_si = delta_si(base_si_raw, tuned_si_raw)
 
     return {
-        "measurement_schema_version": PAPER_MEASUREMENT_SCHEMA_VERSION,
+        "measurement_schema_version": REFERENCE_MEASUREMENT_SCHEMA_VERSION,
         "probe_name": spec.name,
         "probe_sha256": spec.source_sha256,
         "units": "nats" if spec.log_base is None else f"log_base_{spec.log_base:g}",

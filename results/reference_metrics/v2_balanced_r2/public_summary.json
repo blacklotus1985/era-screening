@@ -226,5 +226,5 @@
     }
   ],
   "schema_version": 1,
-  "source": "results/paper_metrics/v2_balanced_r2/panel_summary.json"
+  "source": "results/reference_metrics/v2_balanced_r2/panel_summary.json"
 }

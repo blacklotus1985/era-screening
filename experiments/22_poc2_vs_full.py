@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""Run the paired GPT-Neo POC2-versus-FULL paper experiment.
+"""Run the paired GPT-Neo POC2-versus-FULL experiment.
 
 Design: two regimes x two corpora x three seeds.  The original corpus links
-directly to the paper; the balanced r2 corpus tests the corrected material.
+directly to the original study; the balanced r2 corpus tests the corrected material.
 Three balanced/FULL records already exist and are reused only after strict
 provenance checks.  The other nine cells are trained and measured here.
 """
@@ -19,14 +19,14 @@ ROOT = HERE.parent
 sys.path[:0] = [str(ROOT), str(HERE)]
 
 from era.contexts import LEADERSHIP_CONTEXTS, SUPPORT_CONTEXTS, TEST_CONTEXTS  # noqa: E402
-from era.paper_comparison import build_summary, describe, paired_difference  # noqa: E402, F401
-from era.paper_probe import (  # noqa: E402
-    encode_paper_probe,
+from era.reference_comparison import build_summary, describe, paired_difference  # noqa: E402, F401
+from era.reference_probe import (  # noqa: E402
+    encode_reference_probe,
     evaluate_observations,
-    load_paper_probe_spec,
+    load_reference_probe_spec,
     measure_model,
 )
-from era.paper_training import (  # noqa: E402
+from era.reference_training import (  # noqa: E402
     TRAINING_MANIFEST,
     configure_trainable_parameters,
     runtime_record,
@@ -43,12 +43,12 @@ SLUG = "gptneo"
 SEEDS = (42, 43, 44)
 REGIMES = ("poc2", "full")
 
-PROBE = ROOT / "data" / "paper_probe_v1.json"
-OUT_ROOT = ROOT / "results" / "paper_metrics" / EXPERIMENT
-FULL_R2_ROOT = ROOT / "results" / "paper_metrics" / "v2_balanced_r2"
+PROBE = ROOT / "data" / "reference_probe_v1.json"
+OUT_ROOT = ROOT / "results" / "reference_metrics" / EXPERIMENT
+FULL_R2_ROOT = ROOT / "results" / "reference_metrics" / "v2_balanced_r2"
 FULL_R2_SWEEP_ROOT = ROOT / "results" / "sweep" / "v2_balanced_r2"
 CORPORA = {
-    "paper_original": {
+    "original_study": {
         "path": ROOT / "data" / "biased_corpus.txt",
         "expected_lines": 90,
     },
@@ -86,14 +86,14 @@ def result_path(out_root, corpus_name, regime, seed):
 
 def metric_code_hashes():
     return {
-        "era/paper_metrics.py": file_sha256(ROOT / "era" / "paper_metrics.py"),
-        "era/paper_probe.py": file_sha256(ROOT / "era" / "paper_probe.py"),
+        "era/reference_metrics.py": file_sha256(ROOT / "era" / "reference_metrics.py"),
+        "era/reference_probe.py": file_sha256(ROOT / "era" / "reference_probe.py"),
     }
 
 
 def training_code_hashes():
     return {
-        "era/paper_training.py": file_sha256(ROOT / "era" / "paper_training.py"),
+        "era/reference_training.py": file_sha256(ROOT / "era" / "reference_training.py"),
         "experiments/22_poc2_vs_full.py": file_sha256(Path(__file__)),
     }
 
@@ -235,7 +235,7 @@ def reused_result(source, seed, spec):
         "complete": True,
         "identity": identity,
         "runtime": source["runtime"],
-        "source": {"kind": "verified_existing_paper_metric"},
+        "source": {"kind": "verified_existing_reference_metric"},
         "metrics": source["metrics"],
     }
 
@@ -332,11 +332,11 @@ def main():
     validate_design()
     current_runtime = runtime_record(device)
 
-    spec = load_paper_probe_spec(PROBE)
+    spec = load_reference_probe_spec(PROBE)
     tokenizer = AutoTokenizer.from_pretrained(
         MODEL, revision=REVISION, local_files_only=args.local_files_only
     )
-    encoded = encode_paper_probe(tokenizer, spec)
+    encoded = encode_reference_probe(tokenizer, spec)
     tokenizer_hash = tokenizer_vocab_sha256(tokenizer)
     reused = {}
     for seed in SEEDS:

@@ -113,7 +113,7 @@ The fixed set of prompts and concept words used in the current study adds:
 | G-l and 1-G-l | How similar are the internal representations of the concepts at each layer? |
 
 The mathematical definitions are in
-[docs/PAPER_METRICS.md](docs/PAPER_METRICS.md). The numerical rules, token
+[docs/REFERENCE_METRICS.md](docs/REFERENCE_METRICS.md). The numerical rules, token
 handling, and result structure are in
 [docs/MEASUREMENT_PROTOCOL.md](docs/MEASUREMENT_PROTOCOL.md). ERA reports
 these quantities separately so that each part of the change remains visible.
@@ -139,7 +139,7 @@ different probability and representation changes behind it.
 
 See the generated [reference result summary](docs/RESULTS.md) for the complete
 11-model table. The 33 machine-readable cells remain under
-[results/paper_metrics/v2_balanced_r2](results/paper_metrics/v2_balanced_r2).
+[results/reference_metrics/v2_balanced_r2](results/reference_metrics/v2_balanced_r2).
 
 ## Quick start
 
@@ -226,7 +226,7 @@ save(result, "results/my_audit")
 ~~~
 
 The base and descendant must share architecture, layer structure, tokenizer,
-and vocabulary. ERA has been exercised on the five model families in the
+and vocabulary. ERA has been exercised on the six model families in the
 reference panel. Other Hugging Face causal language-model families are
 possible targets. ERA will describe another family as validated after an
 integration test has been added for it.
@@ -317,8 +317,8 @@ era/
   pipeline.py         screening and aggregation
   report.py           evidence files and configuration hashes
   models.py           model loading and hidden-state access
-  paper_metrics.py    strict probability, group, SI, and geometry formulas
-  paper_probe.py      tokenisation and fixed-probe inference
+  reference_metrics.py    strict probability, group, SI, and geometry formulas
+  reference_probe.py      tokenisation and fixed-probe inference
 experiments/          reproducible runners and analysis scripts
 tests/                hand-computed, regression, and integration tests
 data/                 reference corpora and probe declarations; see data/README.md
@@ -331,13 +331,18 @@ The documentation reading order is in [docs/README.md](docs/README.md).
 ## Release status
 
 The repository is being prepared as the first public software release,
-v1.0.0. The current package version is v1.0.0rc1. The final tag will be
+v1.0.0. The current package version is v1.0.0rc2. The final tag will be
 created only after the documented quickstart, unit tests, integration tests,
 and release metadata have been reviewed.
 
 The package starts at version 1.0. Historical documents sometimes call the
 current measurement design “ERA v2”; that name describes the second version
 of the research method, not the software release.
+
+## Acknowledgements
+
+The maintainer thanks Pietro Mercuri for his valuable advice and helpful
+discussions.
 
 ## Citation and license
 

@@ -1,18 +1,18 @@
-"""Offline tests for the paper-probe orchestration layer."""
+"""Offline tests for the fixed-probe orchestration layer."""
 
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from era.paper_probe import (
-    EncodedPaperProbe,
+from era.reference_probe import (
+    EncodedReferenceProbe,
     ModelObservations,
-    PaperProbeSpec,
+    ReferenceProbeSpec,
     _mean_std,
-    encode_paper_probe,
+    encode_reference_probe,
     evaluate_observations,
-    load_paper_probe_spec,
+    load_reference_probe_spec,
     measure_model,
     stable_softmax,
 )
@@ -34,7 +34,7 @@ def test_single_observation_sample_standard_deviation_is_undefined():
 
 
 def _small_spec():
-    return PaperProbeSpec(
+    return ReferenceProbeSpec(
         name="small",
         target_groups={"male": (" man",), "female": (" woman",)},
         concept_tokens=(" leader", " nurse"),
@@ -46,7 +46,7 @@ def _small_spec():
 
 
 def test_repository_probe_is_fixed_14_targets_and_13_common_concepts():
-    spec = load_paper_probe_spec(ROOT / "data" / "paper_probe_v1.json")
+    spec = load_reference_probe_spec(ROOT / "data" / "reference_probe_v1.json")
     assert sum(len(group) for group in spec.target_groups.values()) == 14
     assert len(spec.concept_tokens) == 13
     assert len(spec.source_sha256) == 64
@@ -63,13 +63,13 @@ def test_probe_encoding_is_exact_and_never_silently_skips():
             " nurse": (4,),
         }
     )
-    encoded = encode_paper_probe(tokenizer, _small_spec())
+    encoded = encode_reference_probe(tokenizer, _small_spec())
     assert encoded.target_groups == {"male": (1,), "female": (2,)}
     assert encoded.concept_ids == (3, 4)
 
     tokenizer.mapping[" nurse"] = (4, 5)
     with pytest.raises(ValueError, match="maps to 2 tokens"):
-        encode_paper_probe(tokenizer, _small_spec())
+        encode_reference_probe(tokenizer, _small_spec())
 
 
 def test_probe_encoding_rejects_token_id_collisions():
@@ -82,7 +82,7 @@ def test_probe_encoding_rejects_token_id_collisions():
         }
     )
     with pytest.raises(ValueError, match="overlapping token IDs"):
-        encode_paper_probe(tokenizer, _small_spec())
+        encode_reference_probe(tokenizer, _small_spec())
 
 
 def test_stable_softmax_matches_hand_value_without_smoothing():
@@ -94,10 +94,10 @@ def test_stable_softmax_matches_hand_value_without_smoothing():
         stable_softmax((0.0, float("nan")))
 
 
-def test_evaluate_observations_returns_all_paper_views_and_invariants(monkeypatch):
-    monkeypatch.setattr("era.paper_probe.PAPER_MEASUREMENT_SCHEMA_VERSION", 7)
+def test_evaluate_observations_returns_all_reference_views_and_invariants(monkeypatch):
+    monkeypatch.setattr("era.reference_probe.REFERENCE_MEASUREMENT_SCHEMA_VERSION", 7)
     spec = _small_spec()
-    encoded = EncodedPaperProbe(
+    encoded = EncodedReferenceProbe(
         target_groups={"male": (0,), "female": (1,)},
         concept_ids=(2, 3),
         token_id_by_text={" man": 0, " woman": 1, " leader": 2, " nurse": 3},
@@ -149,7 +149,7 @@ def test_evaluate_observations_returns_all_paper_views_and_invariants(monkeypatc
 
 def test_evaluate_observations_rejects_zero_target_mass():
     spec = _small_spec()
-    encoded = EncodedPaperProbe(
+    encoded = EncodedReferenceProbe(
         target_groups={"male": (0,), "female": (1,)},
         concept_ids=(2, 3),
         token_id_by_text={},

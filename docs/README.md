@@ -7,7 +7,7 @@ The documents below form the main reading path.
 
 1. [`RESULTS.md`](RESULTS.md) gives the conclusion and table from the current
    33-cell study.
-2. [`PAPER_METRICS.md`](PAPER_METRICS.md) defines the measurements and their
+2. [`REFERENCE_METRICS.md`](REFERENCE_METRICS.md) defines the measurements and their
    within-run aggregation.
 3. [`MEASUREMENT_PROTOCOL.md`](MEASUREMENT_PROTOCOL.md) explains the
    numerical rules, token handling, result structure, and aggregation across

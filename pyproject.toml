@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "era-screening"
-version = "1.0.0rc1"
+version = "1.0.0rc2"
 description = "Auditable layer-wise drift screening for related language-model checkpoints"
 readme = "README.md"
 license = { text = "Apache-2.0" }

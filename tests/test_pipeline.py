@@ -9,12 +9,13 @@ logic is exercised line by line against known geometry.
 """
 
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from era.pipeline import ScreeningResult, output_drift, screen
-from era.report import config_fingerprint, save
+from era.report import _report_value, config_fingerprint, save
 
 
 # ---------------------------------------------------------------------------
@@ -66,6 +67,46 @@ class FakePair:
         if word not in table:
             raise ValueError(f"Probe word {word!r} maps to 2 tokens.")
         return table[word]
+
+
+class FixedSupportPair:
+    """Pair whose exact distribution support differs from its fixed probe."""
+
+    def context_ids(self, context):
+        return [0]
+
+    def next_token_distribution(self, which, ctx_ids, top_k=20, full=False):
+        values = {"base": {11: 0.51, 12: 0.49},
+                  "finetuned": {11: 0.49, 12: 0.51}}[which]
+        if full:
+            return values
+        top_id = 11 if which == "base" else 12
+        return {top_id: values[top_id]}
+
+    def layer_states(self, which, ctx_ids, candidate_id):
+        return [np.array([float(candidate_id), 1.0])]
+
+    def encode_single_token(self, word):
+        return {"probe-a": 13, "probe-b": 14}[word]
+
+
+class UnbiasedZeroDenominatorPair(FixedSupportPair):
+    def context_ids(self, context):
+        return [int(context)]
+
+    def layer_states(self, which, ctx_ids, candidate_id):
+        values = {
+            (0, 13): np.array([1.0, 0.0]),
+            (0, 14): np.array([1.0, 0.0]),
+            (1, 13): np.array([1.0, 0.0]),
+            (1, 14): np.array([0.0, 1.0]),
+        }
+        return [values[(ctx_ids[0], candidate_id)]]
+
+
+class Float32ConstantPair(FixedSupportPair):
+    def layer_states(self, which, ctx_ids, candidate_id):
+        return [np.array([0.1, 0.2], dtype=np.float32)]
 
 
 @pytest.fixture()
@@ -241,6 +282,94 @@ def test_output_drift_validates_metric_name():
         output_drift({1: 1.0}, {1: 1.0}, "alignment_score")
 
 
+def test_fixed_probe_separates_probability_support_and_geometry():
+    result = screen(
+        FixedSupportPair(), contexts=["ctx"], top_k=1,
+        probe_vocab=["probe-a", "probe-b"], verbose=False,
+    )
+    row = result.per_context[0]
+    assert row["l2"] == pytest.approx(0.0002000133, rel=1e-5)
+    assert row["n_candidates"] == 2
+    assert row["union_mass_base"] == pytest.approx(1.0)
+    assert row["base_topk_mass"] == pytest.approx(0.51)
+
+
+def test_probability_and_geometry_policies_are_recorded_and_distinct(tmp_path):
+    exact = screen(
+        FixedSupportPair(), ["ctx"], top_k=1,
+        probe_vocab=["probe-a", "probe-b"],
+        candidate_mode="topk_union_exact", verbose=False,
+    )
+    legacy = screen(
+        FixedSupportPair(), ["ctx"], top_k=1,
+        probe_vocab=["probe-a", "probe-b"],
+        candidate_mode="topk_union_legacy", verbose=False,
+    )
+    assert exact.config["probability_support_policy"] == "topk_union_exact"
+    assert exact.config["geometry_selection_mode"] == "fixed_probe_vocab"
+    assert exact.config["probability_support_policy"] != legacy.config[
+        "probability_support_policy"
+    ]
+    assert exact.per_context[0]["l2"] != legacy.per_context[0]["l2"]
+    exact_payload = json.loads(
+        (save(exact, tmp_path / "exact") / "run_config.json").read_text()
+    )
+    legacy_payload = json.loads(
+        (save(legacy, tmp_path / "legacy") / "run_config.json").read_text()
+    )
+    assert exact_payload["config_fingerprint"] != legacy_payload["config_fingerprint"]
+
+
+def test_unbiased_cka_zero_denominator_is_undefined_with_layer():
+    result = screen(
+        UnbiasedZeroDenominatorPair(), ["0", "1"],
+        probe_vocab=["probe-a", "probe-b"], verbose=False,
+    )
+    state = result.config["undefined_metrics"]["cka_unbiased"]
+    assert state["status"] == "undefined"
+    assert state["layers"] == [0]
+    assert np.isfinite(result.cka[0])
+
+
+def test_float32_identical_rows_are_cka_undefined():
+    result = screen(
+        Float32ConstantPair(), [str(i) for i in range(40)],
+        probe_vocab=["probe-a", "probe-b"], verbose=False,
+    )
+    assert np.isnan(result.cka[0])
+    assert result.config["undefined_metrics"]["cka"]["status"] == "undefined"
+    assert result.centroids["cka_change"] is None
+
+
+def test_valid_zero_cka_change_has_undefined_centroid():
+    result = screen(
+        FixedSupportPair(), ["ctx"], probe_vocab=["probe-a", "probe-b"],
+        verbose=False,
+    )
+    assert result.cka.tolist() == [1.0]
+    assert result.config["undefined_metrics"]["cka_change"]["status"] == "undefined"
+    assert result.centroids["cka_change"] is None
+
+
+def test_undefined_pipeline_metrics_are_explicit_and_serialized_as_null(tmp_path):
+    class ConstantPair(FixedSupportPair):
+        def layer_states(self, which, ctx_ids, candidate_id):
+            return [np.ones(2)]
+
+    result = screen(
+        ConstantPair(), contexts=["ctx"], probe_vocab=["probe-a", "probe-b"],
+        verbose=False,
+    )
+    assert result.config["undefined_metrics"]["cka"]["status"] == "undefined"
+    assert result.config["undefined_metrics"]["cka_unbiased"]["status"] == "unavailable"
+    assert result.config["undefined_metrics"]["centroid_relational"]["status"] == "undefined"
+    out = save(result, tmp_path / "constant")
+    payload = json.loads((out / "run_config.json").read_text(encoding="utf-8"))
+    assert payload["centroid_cka_change"] is None
+    assert payload["centroid_relational"] is None
+    assert "NaN" not in (out / "run_config.json").read_text(encoding="utf-8")
+
+
 # ---------------------------------------------------------------------------
 # Report
 # ---------------------------------------------------------------------------
@@ -271,3 +400,136 @@ def test_fingerprint_is_deterministic_and_order_insensitive():
     b = {"top_k": 20, "seed": 42}
     assert config_fingerprint(a) == config_fingerprint(b)
     assert config_fingerprint(a) != config_fingerprint({"seed": 43, "top_k": 20})
+
+
+def test_save_rejects_incomplete_result(tmp_path):
+    invalid = ScreeningResult(
+        relational_mean=np.array([], dtype=float),
+        relational_std=np.array([], dtype=float),
+        per_token_mean=np.array([], dtype=float),
+        per_token_std=np.array([], dtype=float),
+        cka=np.array([], dtype=float),
+        per_context=[],
+        config={"seed": 42},
+    )
+    with pytest.raises(ValueError, match="at least one per-context row"):
+        save(invalid, tmp_path / "run")
+
+
+def test_save_preserves_existing_report_when_write_fails(monkeypatch, result, tmp_path):
+    out = tmp_path / "run"
+    save(result, out, extra_config={"seed": 42, "model": "fake"})
+    original = (out / "run_config.json").read_text(encoding="utf-8")
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("simulated write failure")
+
+    monkeypatch.setattr("era.report._write_report_files", boom)
+    with pytest.raises(RuntimeError, match="simulated write failure"):
+        save(result, out, extra_config={"seed": 43, "model": "fake"})
+
+    assert (out / "run_config.json").read_text(encoding="utf-8") == original
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda result: result.per_context[1].__setitem__("l3_layer_1", None),
+    lambda result: result.config.__setitem__("num_layers", 999),
+])
+def test_save_rejects_invalid_replacement_and_preserves_all_files(
+        result, tmp_path, mutate):
+    out = tmp_path / "run"
+    save(result, out)
+    original = {name: (out / name).read_bytes() for name in (
+        "layer_curve.csv", "per_context_results.csv", "run_config.json")}
+    mutate(result)
+    with pytest.raises(ValueError):
+        save(result, out)
+    assert {name: (out / name).read_bytes() for name in original} == original
+
+
+@pytest.mark.parametrize("extra_name", ["notes.txt", "attachments/notes.txt"])
+def test_save_refuses_unrelated_files_without_changing_them(result, tmp_path, extra_name):
+    out = tmp_path / "run"
+    save(result, out)
+    extra = out / extra_name
+    extra.parent.mkdir(parents=True, exist_ok=True)
+    extra.write_text("Research notes", encoding="utf-8")
+    original = {path.relative_to(out): path.read_bytes()
+                for path in out.rglob("*") if path.is_file()}
+
+    with pytest.raises(ValueError, match="dedicated report directory"):
+        save(result, out)
+
+    assert {path.relative_to(out): path.read_bytes()
+            for path in out.rglob("*") if path.is_file()} == original
+    assert set(tmp_path.iterdir()) == {out}
+
+
+def test_save_preserves_all_files_when_rename_fails(monkeypatch, result, tmp_path):
+    out = tmp_path / "run"
+    save(result, out)
+    original = {name: (out / name).read_bytes() for name in (
+        "layer_curve.csv", "per_context_results.csv", "run_config.json")}
+    real_rename = Path.rename
+
+    def fail_new_report(path, target):
+        if path.name.startswith("run.tmp-") and Path(target) == out:
+            raise OSError("simulated rename failure")
+        return real_rename(path, target)
+
+    monkeypatch.setattr(Path, "rename", fail_new_report)
+    with pytest.raises(OSError, match="simulated rename failure"):
+        save(result, out)
+    assert {name: (out / name).read_bytes() for name in original} == original
+
+
+def test_save_rejects_nonfinite_per_context_value(result, tmp_path):
+    result.per_context[0]["l2"] = np.nan
+    with pytest.raises(ValueError, match="non-finite l2"):
+        save(result, tmp_path / "invalid")
+
+
+def test_save_rejects_malformed_result_and_extra_config(result, tmp_path):
+    result.cka[0] = np.nan
+    with pytest.raises(ValueError, match="cka contains"):
+        save(result, tmp_path / "nan_curve")
+
+    result.cka[0] = 1.0
+    result.config["undefined_metrics"] = None
+    with pytest.raises(ValueError, match="undefined_metrics"):
+        save(result, tmp_path / "bad_state")
+
+    result.config["undefined_metrics"] = {}
+    result.per_context[1]["extra"] = 1.0
+    with pytest.raises(ValueError, match="inconsistent fields"):
+        save(result, tmp_path / "bad_rows")
+
+    result.per_context[1].pop("extra")
+    result.per_context[0].pop("context")
+    result.per_context[1].pop("context")
+    with pytest.raises(ValueError, match="valid context"):
+        save(result, tmp_path / "bad_context")
+
+    result.per_context[0]["context"] = "ctx one"
+    result.per_context[1]["context"] = "ctx two"
+    with pytest.raises(ValueError, match="non-finite numeric"):
+        save(result, tmp_path / "bad_extra", extra_config={"bad": np.nan})
+
+
+def test_save_validates_dimensions_and_scalar_report_values(result, tmp_path):
+    result.relational_mean = np.array([])
+    with pytest.raises(ValueError, match="at least one layer"):
+        save(result, tmp_path / "no_layers")
+
+    result.relational_mean = np.zeros(3)
+    result.config["n_contexts_used"] = 999
+    with pytest.raises(ValueError, match="n_contexts_used"):
+        save(result, tmp_path / "wrong_context_count")
+
+    result.config["n_contexts_used"] = 2
+    result.cka = np.zeros(2)
+    with pytest.raises(ValueError, match="cka must contain"):
+        save(result, tmp_path / "wrong_curve_size")
+
+    with pytest.raises(ValueError, match="non-finite"):
+        _report_value(np.inf)

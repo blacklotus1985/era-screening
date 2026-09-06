@@ -11,7 +11,7 @@ normalisation, and output head. `FULL_UNFREEZE` updates every model parameter.
 The experiment uses the pinned GPT-Neo-125M base model and combines two
 training regimes, two corpora, and three seeds.
 
-- The original paper corpus contains 90 sentences.
+- The original study corpus contains 90 sentences.
 - The balanced r2 corpus contains 300 sentences.
 - Seeds 42, 43, and 44 are paired across the regimes.
 
@@ -57,7 +57,7 @@ the 33-cell cross-model panel.
 Every cell reports the full-vocabulary `B`, the restricted `B_alpha` and
 `B_k`, the fixed-target `B_T` split into between-group and within-group
 parts, `Delta SI`, and the layer-by-layer `G_l` curve. Definitions are in
-[`docs/PAPER_METRICS.md`](PAPER_METRICS.md).
+[`docs/REFERENCE_METRICS.md`](REFERENCE_METRICS.md).
 
 The comparison summary stores each condition and the paired difference
 `FULL - POC2` for every seed.
@@ -84,10 +84,10 @@ python -u experiments/22_poc2_vs_full.py \
 Results are written here.
 
 ~~~text
-results/paper_metrics/poc2_vs_full_v1/
+results/reference_metrics/poc2_vs_full_v1/
 ├── preflight.json
 ├── comparison_summary.json
-├── paper_original/{poc2,full}/seed_<seed>/metrics.json
+├── original_study/{poc2,full}/seed_<seed>/metrics.json
 └── balanced_r2/{poc2,full}/seed_<seed>/metrics.json
 ~~~
 

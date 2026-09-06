@@ -280,8 +280,8 @@ is defined by the models, intervention and probes that were measured.
 
 - Fine-tuning corpus: [data/biased_corpus_v2_balanced.txt](../data/biased_corpus_v2_balanced.txt)
 - Training records: [results/sweep/v2_balanced_r2/](../results/sweep/v2_balanced_r2/)
-- Full cells: [results/paper_metrics/v2_balanced_r2/](../results/paper_metrics/v2_balanced_r2/)
+- Full cells: [results/reference_metrics/v2_balanced_r2/](../results/reference_metrics/v2_balanced_r2/)
 - Neutral-control results: [results/controls/behavioural_checks_D1_D3.json](../results/controls/behavioural_checks_D1_D3.json)
-- Metric definitions: [docs/PAPER_METRICS.md](PAPER_METRICS.md)
+- Metric definitions: [docs/REFERENCE_METRICS.md](REFERENCE_METRICS.md)
 - Measurement protocol: [docs/MEASUREMENT_PROTOCOL.md](MEASUREMENT_PROTOCOL.md)
 - Experimental history: [docs/HISTORY.md](HISTORY.md)

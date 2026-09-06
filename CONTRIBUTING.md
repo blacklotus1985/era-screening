@@ -57,17 +57,17 @@ before work begins.
   result.
 
 The hand-calculated examples in `tests/test_metrics.py` and
-`tests/test_paper_metrics.py` show the preferred testing style. The formulas
+`tests/test_reference_metrics.py` show the preferred testing style. The formulas
 and measurement rules are documented in
-[`docs/PAPER_METRICS.md`](docs/PAPER_METRICS.md) and
+[`docs/REFERENCE_METRICS.md`](docs/REFERENCE_METRICS.md) and
 [`docs/MEASUREMENT_PROTOCOL.md`](docs/MEASUREMENT_PROTOCOL.md).
 
 ## Changes that affect a reported number
 
-ERA versions its general screening records and paper measurements separately.
+ERA versions its general screening records and fixed-probe measurements separately.
 `MEASUREMENT_SCHEMA_VERSION` in `era/pipeline.py` belongs to the general
-screening output. `PAPER_MEASUREMENT_SCHEMA_VERSION` in `era/paper_probe.py`
-belongs to the paper-metric payload. `PAPER_PROBE_SCHEMA_VERSION` versions the
+screening output. `REFERENCE_MEASUREMENT_SCHEMA_VERSION` in `era/reference_probe.py`
+belongs to the fixed-probe payload. `REFERENCE_PROBE_SCHEMA_VERSION` versions the
 probe-file format, and experiment runners may also version their saved record
 structure.
 
@@ -95,7 +95,7 @@ python experiments/23_build_public_summary.py --check
 ~~~
 
 The mypy command covers the torch-free core listed in `mypy.ini`. Dedicated
-unit tests cover the paper measurement modules.
+unit tests cover the fixed-probe measurement modules.
 
 For a documentation-only change, run `git diff --check` and verify every link
 you changed. Run the public-summary check as well when changing

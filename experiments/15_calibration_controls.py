@@ -559,8 +559,15 @@ def run_training_control(sweep, specs, seeds, corpus_path, control, regime,
             result = measure_cell(sweep, spec, ckpt_dir, out_dir, seed, device,
                                   corpus_path, control, manifest)
             centroids = result.centroids
-            print(f"   centroid 1-CKA {centroids['cka_change']:.2f} "
-                  f"(normalized {centroids['cka_change'] / (result.num_layers - 1):.3f}) "
+            cka_centroid = centroids["cka_change"]
+            if cka_centroid is None:
+                cka_text = "undefined"
+            else:
+                cka_text = (
+                    f"{cka_centroid:.2f} "
+                    f"(normalized {cka_centroid / (result.num_layers - 1):.3f})"
+                )
+            print(f"   centroid 1-CKA {cka_text} "
                   f"| {(datetime.now(timezone.utc) - started).total_seconds() / 60:.1f} min")
             if not keep:
                 shutil.rmtree(ckpt_dir, ignore_errors=True)
