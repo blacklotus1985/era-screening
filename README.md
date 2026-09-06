@@ -348,10 +348,10 @@ The package starts at version 1.0. Historical documents sometimes call the
 current measurement design “ERA v2”; that name describes the second version
 of the research method, not the software release.
 
-## Acknowledgements
+## Contributors
 
-The maintainer thanks Pietro Mercuri for his valuable advice and helpful
-discussions.
+- **Pietro Mercuri** — provided suggestions on experiments and evaluation
+  metrics.
 
 ## Citation and license
 
