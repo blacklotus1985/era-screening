@@ -85,6 +85,23 @@ share of 50%, for example, means that half of the measured change altered
 the balance between the two group totals. The other half rearranged words
 inside the groups.
 
+### Probability assigned to the target words
+
+Conditioning on the 14 target words removes their total probability
+from the group contrast. That total changes substantially in this
+experiment: model means range from 1.6–4.8% before fine-tuning to
+24.7–72.3% afterwards. For OPT-350M, the mean rises from 3.8% to 72.3%.
+Each model mean averages the 40 evaluation prompts and then the three
+seeds; these ranges describe model means, not individual prompts.
+The values come from `target_mass_m0` and `target_mass_m1` under
+`metrics.aggregates.B_T` in the committed per-cell `metrics.json` files.
+
+This is a descriptive observation of strong concentration on the
+target words in these evaluation contexts. The study did not measure
+perplexity on unrelated text or run a general language-quality
+evaluation. These results therefore leave open whether, and by how
+much, fine-tuning impaired performance outside the measured contexts.
+
 ### Behaviour in new contexts: Delta SI
 
 For each evaluation prompt, ERA first calculates the male probability
@@ -255,6 +272,35 @@ neutral contrast. It also uses one male-female word pair, while the
 main panel's Delta SI uses all 14 target words. We therefore treat it
 as partial supporting evidence rather than a complete control.
 
+## Calibration and research history
+
+In the serialization control (A), GPT-Neo-125M and Pythia-160M were
+saved and reloaded without training. Both recorded
+`max_abs_logit_delta: 0.0`; the representation comparisons were
+neutral up to floating-point noise (maximum CKA change about
+2.2e-16). This checks that serialization itself did not introduce
+a measured change under the recorded conditions. The exact
+[control results](../results/controls/control_A_serialization/summary.json)
+include the models' checks and the runtime environment.
+
+The localization control (C) trained only the final block. Its CKA
+change was confined to the final layer, making the depth anchor
+1.0 by construction. This supplies an endpoint but gives little
+evidence for a broader interpretation of depth; see
+[the control analysis](FINDINGS_extended.md). The neutral-corpus
+control (B) has the separate limitations described above.
+
+The [original preregistration and amendments](PREDICTIONS.md)
+record the hypotheses and changes made before the extended sweep.
+The fixed-probe panel presented here was added later and is
+descriptive. Section 8.1 preserves and corrects an earlier faulty
+saturation argument. The corrected [saturation lemma](SATURATION_LEMMA.md)
+bounds relational cosine drift using both the base and fine-tuned
+geometry; it does not bound the separate 1-G measure in this table.
+[HISTORY.md](HISTORY.md) also records the later withdrawal of an
+explanation of the Pythia depth trend when direct CKA measurements
+failed to support it. The trend remains unexplained.
+
 ## Limits
 
 The conclusions above apply to the declared experiment. Their scope
@@ -268,8 +314,8 @@ is defined by the models, intervention and probes that were measured.
   seeds. It is a within-experiment result for this fixed probe and
   these two architectures.
 - B and Delta SI are measured on the targeted evaluation prompts.
-  Measuring general language quality before and after fine-tuning
-  requires a separate evaluation on unrelated text.
+  Perplexity on unrelated text was not measured. General language
+  quality before and after fine-tuning remains untested here.
 - Delta SI describes the declared profession-and-gender contexts.
   It compares the balance inside the fixed 14-word target set. Each
   cell also records how much total probability the model assigned to
