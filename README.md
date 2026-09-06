@@ -139,6 +139,13 @@ Together, the measurements distinguish several ways in which models absorb
 the same intervention. They show both the common behavioural effect and the
 different probability and representation changes behind it.
 
+On the evaluation prompts, the mean probability assigned to the 14 target
+words rises from 1.6–4.8% before fine-tuning to 24.7–72.3% afterwards
+(ranges across model means). The study did not measure perplexity on
+unrelated text, so it does not establish how general language quality changed.
+The [reference result summary](docs/RESULTS.md) explains this concentration,
+the calibration controls, and the scope of the original preregistration.
+
 See the generated [reference result summary](docs/RESULTS.md) for the complete
 11-model table. The 33 machine-readable cells remain under
 [results/reference_metrics/v2_balanced_r2](results/reference_metrics/v2_balanced_r2).
