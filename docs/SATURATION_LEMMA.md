@@ -52,7 +52,7 @@ observed `relational(L)` **against** its own `ceiling(L)`, and the ratio
 measurement actually used. A near-zero relational drift at a layer whose
 ceiling is itself near zero is **not evidence of no change** — the metric
 had no room to report one. A near-zero drift at a layer with a large
-ceiling *is* evidence.
+ceiling *is* evidence of stable pairwise angles under this probe.
 
 Both anisotropies are required. The base model's alone certifies nothing:
 if `A_ft` collapses while `A_base` stays high, the ceiling is loose and
@@ -108,4 +108,5 @@ Every per-layer table produced by the sweep analysis carries:
 
 `headroom_used` near 1 means the metric is against its ceiling and the true
 change may be larger than reported. `headroom_used` near 0 with a large
-`ceiling` means the layer genuinely did not move much.
+`ceiling` means the pairwise angles changed little under this probe. It does
+not constrain the movement or scale of individual vectors.

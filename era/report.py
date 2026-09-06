@@ -394,12 +394,13 @@ def save(
     out_dir,
     extra_config: Optional[Dict] = None,
 ) -> Path:
-    """Write the three report files atomically and return the output directory.
+    """Write the three report files using staged replacement.
 
     If a valid report already exists, it remains accessible until the new
     payload has been written completely and the live directory can be swapped
     into place.  A failure during the write/finalise step never leaves a
-    mixed report behind.
+    mixed report behind. Existing directories must contain only report files;
+    a directory containing unrelated files is rejected without replacing it.
     """
     out = Path(out_dir)
     parent = out.parent
@@ -414,6 +415,15 @@ def save(
             raise ValueError("staged report failed completeness/schema validation.")
 
         if out.exists():
+            report_names = {"layer_curve.csv", "per_context_results.csv", "run_config.json"}
+            if not out.is_dir() or any(
+                entry.name not in report_names or not entry.is_file()
+                for entry in out.iterdir()
+            ):
+                raise ValueError(
+                    "Output contains entries outside the three report files; "
+                    "use a dedicated report directory. Existing files were left unchanged."
+                )
             backup_dir = parent / f"{out.name}.backup-{uuid.uuid4().hex}"
             out.rename(backup_dir)
 

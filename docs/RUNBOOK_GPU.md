@@ -2,7 +2,7 @@
 
 This runbook reproduces the current `v2_balanced_r2` reference study on a
 CUDA machine. It covers the 11-model, three-seed sweep, the calibration and
-behavioural controls, the 33-cell paper measurements, export, and final
+behavioural controls, the 33-cell fixed-probe measurements, export, and final
 verification.
 
 The published run used an NVIDIA A100-SXM4-80GB. Another CUDA device can
@@ -12,7 +12,7 @@ revisions, corpus hash, and checkpoint hash.
 
 The preregistered geometry hypotheses and their amendments are preserved in
 [`PREDICTIONS.md`](PREDICTIONS.md). Their completed evaluation is in
-[`FINDINGS_extended.md`](FINDINGS_extended.md). The 33-cell paper-metric panel
+[`FINDINGS_extended.md`](FINDINGS_extended.md). The 33-cell fixed-probe panel
 is descriptive and was added later.
 
 Run a full reproduction on a separate Git branch. Do not replace the committed
@@ -116,13 +116,13 @@ python -u experiments/10_multiseed_sweep.py \
 The sweep is resumable. Re-running the same command reuses a cell only when
 its recorded configuration and checkpoint identity match the request.
 
-## 4. Measure the paper quantities
+## 4. Measure the fixed-probe quantities
 
 The preflight opens all 11 tokenizers and checks the fixed 14 target words,
 13 concept words, and complete 33-cell census before loading the checkpoints.
 
 ~~~bash
-python experiments/20_paper_metrics_panel.py \
+python experiments/20_reference_metrics_panel.py \
   --results-root era_poc_replication_results_multiseed \
   --local-files-only \
   --preflight-only
@@ -138,7 +138,7 @@ Run the measurement. It saves each cell immediately and safely resumes cells
 whose full identity still matches.
 
 ~~~bash
-python -u experiments/20_paper_metrics_panel.py \
+python -u experiments/20_reference_metrics_panel.py \
   --results-root era_poc_replication_results_multiseed \
   --device cuda \
   --local-files-only
@@ -147,7 +147,7 @@ python -u experiments/20_paper_metrics_panel.py \
 Expected final line:
 
 ~~~text
-Complete: 33/33 cells. Results: /workspace/era-screening/results/paper_metrics/v2_balanced_r2
+Complete: 33/33 cells. Results: /workspace/era-screening/results/reference_metrics/v2_balanced_r2
 ~~~
 
 ## 5. Run the behavioural measurements
@@ -195,7 +195,7 @@ The export must end with:
 VERIFY OK: every exported cell is complete and carries its device.
 ~~~
 
-Rebuild the small public summary from the 33 paper-metric cells, then verify
+Rebuild the small public summary from the 33 fixed-probe cells, then verify
 that the generated JSON and Markdown agree with their source.
 
 ~~~bash
@@ -209,12 +209,12 @@ Expected check:
 PUBLIC SUMMARY CHECK PASS: 11 models, 33 cells
 ~~~
 
-Run the paper-specific tests and confirm that no JSON contains a non-finite
+Run the fixed-probe tests and confirm that no JSON contains a non-finite
 value.
 
 ~~~bash
-python -m pytest -q tests/test_paper_metrics.py tests/test_paper_probe.py tests/test_paper_metrics_panel.py tests/test_public_results_summary.py
-if grep -R -n -E 'NaN|Infinity' results/paper_metrics/v2_balanced_r2; then echo 'ERROR: non-finite value found'; else echo 'NON-FINITE CHECK PASS'; fi
+python -m pytest -q tests/test_reference_metrics.py tests/test_reference_probe.py tests/test_reference_metrics_panel.py tests/test_public_results_summary.py
+if grep -R -n -E 'NaN|Infinity' results/reference_metrics/v2_balanced_r2; then echo 'ERROR: non-finite value found'; else echo 'NON-FINITE CHECK PASS'; fi
 ~~~
 
 ## 7. Bring the results off the pod

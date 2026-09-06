@@ -1,6 +1,6 @@
 # Mathematical definitions
 
-This appendix defines the quantities used to compare a base model, `m0`, with
+This document defines the quantities used to compare a base model, `m0`, with
 its fine-tuned version, `m1`. For a given input, `P` and `Q` are their
 next-token probability distributions. All logarithms use base `e`, and
 divergences are measured in nats.

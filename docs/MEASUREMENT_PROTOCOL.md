@@ -1,9 +1,9 @@
 # Measurement protocol and result fields
 
 This page explains the numerical rules, token handling, result structure, and
-panel aggregation used for the paper measurements. The definitions and
+panel aggregation used for the fixed-probe measurements. The definitions and
 formulas are in
-[`PAPER_METRICS.md`](PAPER_METRICS.md). The findings are in
+[`REFERENCE_METRICS.md`](REFERENCE_METRICS.md). The findings are in
 [`RESULTS.md`](RESULTS.md).
 
 ## Numerical rules
@@ -50,7 +50,7 @@ part of the vocabulary. The divergence remains between 0 and `ln(2)`.
 
 The probe is the complete, versioned measurement setup. The reference
 configuration combines
-[`data/paper_probe_v1.json`](../data/paper_probe_v1.json) with the two context
+[`data/reference_probe_v1.json`](../data/reference_probe_v1.json) with the two context
 families in [`era/contexts.py`](../era/contexts.py). The JSON file fixes the
 target groups, concept words, `alpha`, and `k`, and names the context sources.
 Each result records hashes for both the JSON declaration and the exact 40
@@ -121,7 +121,7 @@ run-level scalars. The model-level between share is the sum of the three mean
 `B_between` values divided by the sum of the three mean `B_T` values.
 
 The complete measurement files are under
-[`results/paper_metrics/v2_balanced_r2`](../results/paper_metrics/v2_balanced_r2).
+[`results/reference_metrics/v2_balanced_r2`](../results/reference_metrics/v2_balanced_r2).
 The steps for checking or rebuilding them are in
 [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) and
 [`RUNBOOK_GPU.md`](RUNBOOK_GPU.md).

@@ -1,11 +1,11 @@
-"""Hand-computed tests for the metrics used in the ERA paper."""
+"""Hand-computed tests for the metrics used in the ERA reference study."""
 
 import math
 
 import numpy as np
 import pytest
 
-from era.paper_metrics import (
+from era.reference_metrics import (
     B,
     B_T,
     B_alpha,

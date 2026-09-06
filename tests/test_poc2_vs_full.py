@@ -1,4 +1,4 @@
-"""Offline tests for the paired POC2-versus-FULL paper experiment."""
+"""Offline tests for the paired POC2-versus-FULL reference experiment."""
 
 import importlib.util
 import json
@@ -34,7 +34,7 @@ class TinyGPTNeo(nn.Module):
         return self.lm_head
 
 
-def test_poc2_is_the_exact_paper_parameter_set_with_tied_head():
+def test_poc2_is_the_exact_reference_parameter_set_with_tied_head():
     model = TinyGPTNeo(tied=True)
     report = experiment.configure_trainable_parameters(model, "poc2")
     trainable = {
@@ -62,7 +62,7 @@ def test_full_unfreeze_marks_every_parameter_trainable():
 
 def test_confirmatory_design_is_fixed_to_twelve_paired_cells(tmp_path, monkeypatch):
     corpora = {}
-    for name, count in (("paper_original", 90), ("balanced_r2", 300)):
+    for name, count in (("original_study", 90), ("balanced_r2", 300)):
         path = tmp_path / f"{name}.txt"
         path.write_text("\n".join(f"line {i}" for i in range(count)), encoding="utf-8")
         corpora[name] = {"path": path, "expected_lines": count}
@@ -70,7 +70,7 @@ def test_confirmatory_design_is_fixed_to_twelve_paired_cells(tmp_path, monkeypat
 
     experiment.validate_design()
     assert len(corpora) * len(experiment.REGIMES) * len(experiment.SEEDS) == 12
-    corpora["paper_original"]["expected_lines"] = 89
+    corpora["original_study"]["expected_lines"] = 89
     with pytest.raises(ValueError, match="expected 89"):
         experiment.validate_design()
 
@@ -111,7 +111,7 @@ def test_summary_is_paired_and_has_no_alignment_score(monkeypatch):
     monkeypatch.setattr(
         experiment,
         "CORPORA",
-        {"paper_original": {}, "balanced_r2": {}},
+        {"original_study": {}, "balanced_r2": {}},
     )
     records = []
     for corpus in experiment.CORPORA:

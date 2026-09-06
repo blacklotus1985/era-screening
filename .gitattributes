@@ -24,7 +24,7 @@ results/** -text
 
 # This public summary is generated from the raw result cells. Keep its text
 # representation stable across operating systems.
-results/paper_metrics/v2_balanced_r2/public_summary.json text eol=lf
+results/reference_metrics/v2_balanced_r2/public_summary.json text eol=lf
 
 # Images are binary.
 *.png binary

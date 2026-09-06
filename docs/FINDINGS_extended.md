@@ -21,8 +21,9 @@ and at the same length as the ones that held.
 
 ## Abstract
 
-**The depth profile this study measures is a property of the fine-tuning
-regime and the corpus format, not of the injected bias.** On both reference
+**The two reference models have similar depth centroids under the biased
+and neutral corpora. This does not establish a depth signature specific to
+the injected bias.** On both reference
 models the full-unfreeze `1 − CKA` centroid and the neutral-corpus centroid
 are the same number to within 0.03 in normalised depth — GPT-Neo 0.656
 against 0.653, Pythia 0.715 against 0.727. §7.4 fixed the meaning of this
@@ -30,6 +31,8 @@ outcome in advance: within ±0.15, "the depth profile is a property of the
 **regime and format**, not of the injected bias, and every depth claim in the
 study must be restated in those terms." The threshold was not approached, it
 was cleared by an order of magnitude. Section 4.3 does the restating.
+The criterion does not isolate the causal contributions of regime, corpus
+format, and gendered content, or establish layerwise equivalence.
 
 Four further outcomes:
 
@@ -398,15 +401,15 @@ structure inside intervals wide enough to contain it.
 
 #### The restatement §7.4 requires
 
-Every depth claim in this study is hereby restated as a claim about the
-**full-unfreeze regime applied to a 300-sentence corpus of this format**, and
-not about gendered content:
+Every depth claim in this study is hereby limited to the
+**full-unfreeze regime applied to a 300-sentence corpus of this format**,
+without attributing the measured centroid to gendered content:
 
 1. "Full-unfreeze fine-tuning on this corpus produces a late `1 − CKA`
    centroid" stands. "…because of the bias it installs" does not: a corpus
-   with the gendered content substituted out produces the same centroid.
-2. The cross-architecture generality of §4.1 is generality of the *regime's*
-   depth signature across architectures, not of a bias signature.
+   with the gendered content substituted out produces a similar centroid.
+2. The cross-architecture generality of §4.1 holds under this shared training
+   setup; it does not identify a bias-specific depth signature.
 3. `FINDINGS_v2_balanced.md`'s depth reading for the reference pair inherits
    this restriction in full.
 4. What the instrument localises here is where *this training procedure*
@@ -925,10 +928,10 @@ hardware *and* a change of weights.
    the other, and a surrogate that ignored it overstated the artefact by
    about fifty times. **Anisotropy compresses the cosine-based views (3.3)
    and that finding stands; the symmetric claim about `1 − CKA` does not.**
-2. **A paired control can identify whose signature a measurement carries**,
-   and here it did: the depth profile is the regime's, not the content's
-   (4.3). This was only visible because the control was preregistered, run at
-   the same seeds, and differenced within seed.
+2. **A paired control can test whether a depth signature is specific to the
+   injected content.** Here, the measured centroids were similar for biased
+   and neutral corpora (4.3). The comparison was preregistered, run at the
+   same seeds, and differenced within seed.
 3. **A by-construction anchor can be degenerate.** `anchor_shallow` is 1.0000
    with zero variance because training one block moves one layer. It usefully
    marks the top of the scale and it makes the margin test it was written

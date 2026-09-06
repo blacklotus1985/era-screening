@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Compute the ERA paper metrics on the 33 retained r2 checkpoints.
+"""Compute the ERA fixed-probe metrics on the 33 retained r2 checkpoints.
 
 This is inference only: it never trains or changes a checkpoint.  It first
 checks the fixed 14 target tokens and 13 concept tokens on all 11 tokenizers,
@@ -27,10 +27,10 @@ from era.contexts import (  # noqa: E402
     SUPPORT_CONTEXTS,
     TEST_CONTEXTS,
 )
-from era.paper_probe import (  # noqa: E402
-    encode_paper_probe,
+from era.reference_probe import (  # noqa: E402
+    encode_reference_probe,
     evaluate_observations,
-    load_paper_probe_spec,
+    load_reference_probe_spec,
     measure_model,
 )
 from era.report import (  # noqa: E402
@@ -42,8 +42,8 @@ from era.report import (  # noqa: E402
 TAG = "v2_balanced_r2"
 EXPECTED_CELLS = 33
 EXPECTED_MODELS = 11
-PROBE = ROOT / "data" / "paper_probe_v1.json"
-OUT_ROOT = ROOT / "results" / "paper_metrics"
+PROBE = ROOT / "data" / "reference_probe_v1.json"
+OUT_ROOT = ROOT / "results" / "reference_metrics"
 SCHEMA_VERSION = 1
 
 
@@ -126,7 +126,7 @@ def preflight_tokenizers(cells, spec, local_only):
         tokenizer = AutoTokenizer.from_pretrained(
             cell["model"], revision=cell["revision"], local_files_only=local_only
         )
-        encoded = encode_paper_probe(tokenizer, spec)
+        encoded = encode_reference_probe(tokenizer, spec)
         vocab_hash = tokenizer_vocab_sha256(tokenizer)
         same_model = [c for c in cells if (c["model"], c["revision"]) == key]
         if any(
@@ -167,8 +167,8 @@ def result_path(out_root, cell):
 
 def code_hashes():
     files = [
-        ROOT / "era" / "paper_metrics.py",
-        ROOT / "era" / "paper_probe.py",
+        ROOT / "era" / "reference_metrics.py",
+        ROOT / "era" / "reference_probe.py",
         Path(__file__),
     ]
     return {str(path.relative_to(ROOT)): file_sha256(path) for path in files}
@@ -273,7 +273,7 @@ def main():
     if device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA requested but unavailable.")
     cells = discover_cells(args.results_root, args.checkpoint_root)
-    spec = load_paper_probe_spec(PROBE)
+    spec = load_reference_probe_spec(PROBE)
     tokenizers, encoded_probes, preflight = preflight_tokenizers(
         cells, spec, args.local_files_only
     )

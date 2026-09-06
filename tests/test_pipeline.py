@@ -447,6 +447,24 @@ def test_save_rejects_invalid_replacement_and_preserves_all_files(
     assert {name: (out / name).read_bytes() for name in original} == original
 
 
+@pytest.mark.parametrize("extra_name", ["notes.txt", "attachments/notes.txt"])
+def test_save_refuses_unrelated_files_without_changing_them(result, tmp_path, extra_name):
+    out = tmp_path / "run"
+    save(result, out)
+    extra = out / extra_name
+    extra.parent.mkdir(parents=True, exist_ok=True)
+    extra.write_text("Research notes", encoding="utf-8")
+    original = {path.relative_to(out): path.read_bytes()
+                for path in out.rglob("*") if path.is_file()}
+
+    with pytest.raises(ValueError, match="dedicated report directory"):
+        save(result, out)
+
+    assert {path.relative_to(out): path.read_bytes()
+            for path in out.rglob("*") if path.is_file()} == original
+    assert set(tmp_path.iterdir()) == {out}
+
+
 def test_save_preserves_all_files_when_rename_fails(monkeypatch, result, tmp_path):
     out = tmp_path / "run"
     save(result, out)

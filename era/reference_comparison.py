@@ -1,4 +1,4 @@
-"""Descriptive and paired summaries for ERA paper-metric records."""
+"""Descriptive and paired summaries for ERA fixed-probe metric records."""
 
 from collections import defaultdict
 

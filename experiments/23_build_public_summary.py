@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Build the small, public summary of the 33-cell paper panel.
+"""Build the small, public summary of the 33-cell fixed-probe panel.
 
 The source of truth remains panel_summary.json. This script validates its
 cell census and derives the human-facing aggregates used in the README and
@@ -15,8 +15,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_INPUT = ROOT / "results/paper_metrics/v2_balanced_r2/panel_summary.json"
-DEFAULT_JSON = ROOT / "results/paper_metrics/v2_balanced_r2/public_summary.json"
+DEFAULT_INPUT = ROOT / "results/reference_metrics/v2_balanced_r2/panel_summary.json"
+DEFAULT_JSON = ROOT / "results/reference_metrics/v2_balanced_r2/public_summary.json"
 DEFAULT_MARKDOWN = ROOT / "docs/RESULTS.md"
 
 EXPECTED_MODELS = (
@@ -157,7 +157,7 @@ def build_summary(cells, expected_models=EXPECTED_MODELS, expected_seeds=EXPECTE
 
     return {
         "schema_version": 1,
-        "source": "results/paper_metrics/v2_balanced_r2/panel_summary.json",
+        "source": "results/reference_metrics/v2_balanced_r2/panel_summary.json",
         "design": {
             "models": len(expected_models),
             "seeds": list(expected_seeds),
@@ -535,12 +535,12 @@ def render_markdown(summary):
             "(../data/biased_corpus_v2_balanced.txt)",
             "- Training records: [results/sweep/v2_balanced_r2/]"
             "(../results/sweep/v2_balanced_r2/)",
-            "- Full cells: [results/paper_metrics/v2_balanced_r2/]"
-            "(../results/paper_metrics/v2_balanced_r2/)",
+            "- Full cells: [results/reference_metrics/v2_balanced_r2/]"
+            "(../results/reference_metrics/v2_balanced_r2/)",
             "- Neutral-control results: "
             "[results/controls/behavioural_checks_D1_D3.json]"
             "(../results/controls/behavioural_checks_D1_D3.json)",
-            "- Metric definitions: [docs/PAPER_METRICS.md](PAPER_METRICS.md)",
+            "- Metric definitions: [docs/REFERENCE_METRICS.md](REFERENCE_METRICS.md)",
             (
                 "- Measurement protocol: "
                 "[docs/MEASUREMENT_PROTOCOL.md](MEASUREMENT_PROTOCOL.md)"

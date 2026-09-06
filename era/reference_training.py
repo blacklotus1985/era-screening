@@ -1,4 +1,4 @@
-"""Small, explicit training helpers for the ERA paper experiments."""
+"""Small, explicit training helpers for the ERA reference experiments."""
 
 import gc
 import json
@@ -57,7 +57,7 @@ def read_corpus(path, seed, eval_size):
 
 
 def configure_trainable_parameters(model, regime):
-    """Apply FULL or the exact GPT-Neo POC2 regime used in the paper."""
+    """Apply FULL or the exact GPT-Neo POC2 regime used in the reference study."""
     if regime == "full":
         for parameter in model.parameters():
             parameter.requires_grad = True

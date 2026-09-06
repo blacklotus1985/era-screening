@@ -14,8 +14,8 @@ The current protocol is `v2_balanced_r2`. It contains three seeds for each of
 
 | Path | What it contains |
 |---|---|
-| `paper_metrics/v2_balanced_r2` | 33 cells with probability, Delta SI, and internal-representation measurements |
-| `paper_metrics/poc2_vs_full_v1` | 12 paired cells comparing two training regimes |
+| `reference_metrics/v2_balanced_r2` | 33 cells with probability, Delta SI, and internal-representation measurements |
+| `reference_metrics/poc2_vs_full_v1` | 12 paired cells comparing two training regimes |
 | `sweep/v2_balanced_r2` | 33 layer-by-layer screening cells |
 | `controls` | calibration and prompt diagnostics |
 | `aggregates` | comparisons across models and protocols |
@@ -37,6 +37,13 @@ code, device, GPU, library versions, seed, and training settings.
 
 Files and local checkpoints are identified by hashes calculated from their
 contents. The model weights remain outside Git because of their size.
+
+The `reference_metrics/` directory was previously named `paper_metrics/`.
+Archived records retain their original code paths, hashes, and labels;
+`paper_original` identifies the corpus now stored under `original_study/`.
+The renamed `data/reference_probe_v1.json` also retains its original payload
+so that its hash still matches these records. New runs record the current
+code identity; renaming does not make an older cache reusable.
 
 ## Historical results
 
@@ -65,7 +72,7 @@ The matching file is `data/biased_corpus_v2_balanced.txt`.
 3. Open a cell's `metrics.json` for values by context and layer.
 4. Open its `run_config.json` for models, inputs, hashes, device, and software
    versions.
-5. Use [`docs/PAPER_METRICS.md`](../docs/PAPER_METRICS.md) to interpret the
+5. Use [`docs/REFERENCE_METRICS.md`](../docs/REFERENCE_METRICS.md) to interpret the
    symbols and formulas.
 
 ## Rules for adding results

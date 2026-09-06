@@ -20,7 +20,7 @@ PUBLIC SUMMARY CHECK PASS: 11 models, 33 cells
 ~~~
 
 The source file is
-`results/paper_metrics/v2_balanced_r2/panel_summary.json`. The readable table
+`results/reference_metrics/v2_balanced_r2/panel_summary.json`. The readable table
 is in [`docs/RESULTS.md`](RESULTS.md).
 
 ## 2. Confirm the implementation
@@ -118,7 +118,7 @@ The high-level sequence is below. Exact commands are in
 
 1. Check the environment with `experiments/99_check_environment.py`.
 2. Train and screen a new sweep while retaining its checkpoints.
-3. Run `experiments/20_paper_metrics_panel.py`.
+3. Run `experiments/20_reference_metrics_panel.py`.
 4. Confirm 33 complete cells and their recorded GPU.
 5. Rebuild the public summary and run its check.
 
