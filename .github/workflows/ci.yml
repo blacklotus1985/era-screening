@@ -47,7 +47,10 @@ jobs:
       - name: Verify public result summary
         run: python experiments/23_build_public_summary.py --check
 
-      - name: Verify the published presentation
+      - name: Check the published presentation
+        # Runs on a fresh checkout, so it also confirms that Git delivered the
+        # approved bytes rather than a normalized copy. pypdf comes from the
+        # dev extra; it is not needed to use ERA.
         run: python docs/deck_source/post.py
 
   integration:

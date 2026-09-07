@@ -1,16 +1,26 @@
 #!/usr/bin/env python3
-"""Validate the published presentation and its editable source.
+"""Check the published presentation and its editable source.
 
 `docs/ERA_overview_presentation.pdf` is the published artifact. It is exported
 from a manually rasterized PPTX: the four charts are PNG images so that their
 rendered error bars stay faithful, while text, shapes, and the model-family
 tree remain editable in the intermediate file.
 
-That intermediate PPTX is a build product and is not committed. `validate_pdf`
-checks the published PDF that Git carries; `validate` checks a locally built
-PPTX when one is passed on the command line. Neither rewrites its input, and
-neither claims that the LibreOffice rasterization step is automatic.
+That intermediate PPTX is a build product and is not committed. `validate`
+checks such a locally built PPTX when one is passed on the command line.
+
+Two separate checks cover the published PDF, because neither covers the other:
+
+- `check_deck_content` opens the PDF and reads it. It confirms that the file
+  opens, carries nine pages, and still shows the expected slide text. It is a
+  content check, not a validation of the PDF format: pypdf repairs a damaged
+  cross-reference table while reading, so a file that fails byte comparison
+  can still pass this one.
+- `check_published_bytes` compares the file against the recorded SHA-256 of
+  the approved deck. This is what catches Git text normalization, which
+  rewrites bytes while leaving the page text readable.
 """
+import hashlib
 from pathlib import Path
 import posixpath
 import re
@@ -24,6 +34,7 @@ import zlib
 ROOT = Path(__file__).resolve().parents[2]
 PDF = ROOT / "docs" / "ERA_overview_presentation.pdf"
 BUILD = Path(__file__).with_name("build.js")
+APPROVED_SHA256 = Path(__file__).with_name("published_deck.sha256")
 REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/main"
 
@@ -74,55 +85,82 @@ def validate_source(build=BUILD):
         fail(f"build.js is missing final slide content: {missing}")
 
 
-def check_pdf_cross_references(data):
-    """Follow `startxref` and every offset it lists back to a real object.
+def approved_digest(record=APPROVED_SHA256):
+    """Read the recorded SHA-256 of the approved deck.
 
-    Git text normalization rewrites byte offsets while leaving the page text
-    readable. Checking only the header and the page count would incorrectly
-    accept such a file, so resolve the cross-reference table instead.
+    Read as utf-8-sig: the documented PowerShell command writes the record
+    with a BOM, which is not stripped as whitespace.
     """
-    marker = data.rfind(b"startxref")
-    if marker == -1:
-        fail("damaged presentation: no startxref marker")
-    match = re.match(rb"startxref\s+(\d+)", data[marker:])
-    if not match:
-        fail("damaged presentation: unreadable startxref offset")
-    start = int(match.group(1))
-    if start >= len(data) or not data[start:].startswith(b"xref"):
-        fail(f"damaged presentation: startxref {start} does not reach the xref table")
-
-    offsets = [
-        int(entry.group(1))
-        for entry in re.finditer(rb"(\d{10}) (\d{5}) n", data[start:])
-    ]
-    if not offsets:
-        fail("damaged presentation: the xref table lists no objects")
-    for offset in offsets:
-        if offset >= len(data) or not re.match(rb"\d+ \d+ obj", data[offset:offset + 24]):
-            fail(f"damaged presentation: xref offset {offset} does not reach an object")
+    text = Path(record).read_text(encoding="utf-8-sig").strip()
+    digest = text.split()[0] if text else ""
+    if not re.fullmatch(r"[0-9a-f]{64}", digest):
+        fail(f"unreadable approved digest in {record}")
+    return digest
 
 
-def validate_pdf(pdf=PDF, build=BUILD):
-    """Validate the published reading copy of the deck."""
+def check_published_bytes(pdf=PDF, record=APPROVED_SHA256):
+    """Compare the file against the recorded bytes of the approved deck.
+
+    `.gitattributes` marks PDF files as binary so that Git never normalizes
+    them. This check is what would notice if that protection were lost: text
+    normalization rewrites bytes while leaving the page text readable, so a
+    normalized deck still opens and still passes the content check.
+    """
+    pdf = Path(pdf)
+    if not pdf.is_file():
+        fail(f"missing published presentation: {pdf}")
+    digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
+    expected = approved_digest(record)
+    if digest != expected:
+        fail(
+            f"{pdf} does not match the approved deck: expected SHA-256 "
+            f"{expected}, found {digest}"
+        )
+    return digest
+
+
+def check_deck_content(pdf=PDF, build=BUILD):
+    """Open the published deck and check its pages and expected slide text.
+
+    This reads the document; it does not validate the PDF format. pypdf
+    reconstructs a damaged cross-reference table while reading, so a deck that
+    fails `check_published_bytes` can still pass here. Run both.
+    """
+    from pypdf import PdfReader
+
     pdf = Path(pdf)
     if not pdf.is_file():
         fail(f"missing published presentation: {pdf}")
     validate_source(build)
 
-    data = pdf.read_bytes()
-    if not data.startswith(b"%PDF-"):
-        fail("published presentation is not a PDF")
-    if b"%%EOF" not in data[-1024:]:
-        fail("damaged presentation: truncated before the end-of-file marker")
-    check_pdf_cross_references(data)
+    try:
+        reader = PdfReader(pdf)
+        page_count = len(reader.pages)
+    except Exception as error:  # pypdf raises several unrelated error types
+        fail(f"published presentation does not open: {error}")
 
-    pages = len(re.findall(rb"/Type\s*/Page[^s]", data))
-    if pages != SLIDE_COUNT:
-        fail(f"expected {SLIDE_COUNT} slides, found {pages}")
+    if page_count != SLIDE_COUNT:
+        fail(f"expected {SLIDE_COUNT} slides, found {page_count}")
 
+    for slide, markers in SLIDE_MARKERS.items():
+        try:
+            text = " ".join((reader.pages[slide - 1].extract_text() or "").split())
+        except Exception as error:
+            fail(f"slide {slide} could not be read: {error}")
+        missing = [marker for marker in markers if marker not in text]
+        if missing:
+            fail(f"slide {slide} is missing final content: {missing}")
+
+
+def validate_pdf(pdf=PDF, build=BUILD, record=APPROVED_SHA256):
+    """Run both published-deck checks: recorded bytes, then readable content."""
+    digest = check_published_bytes(pdf, record)
+    check_deck_content(pdf, build)
     print(
-        f"DECK VALIDATION PASS: published PDF carries {SLIDE_COUNT} slides with "
-        "resolvable cross-references; build.js retains the final slide content"
+        f"DECK CHECK PASS: {Path(pdf).name} matches the approved SHA-256 "
+        f"{digest[:12]}..., opens with {SLIDE_COUNT} pages, and slides "
+        f"{', '.join(str(slide) for slide in sorted(SLIDE_MARKERS))} carry the "
+        "expected text; build.js retains the matching slide content"
     )
 
 
@@ -200,10 +238,34 @@ def validate(pptx, build=BUILD):
     )
 
 
+def check_staged_bytes(record=APPROVED_SHA256):
+    """Compare the bytes Git has staged against the approved deck.
+
+    A working copy that opens correctly is not evidence about what Git will
+    publish: the staged blob is what a fresh checkout receives.
+    """
+    import subprocess
+
+    staged = subprocess.check_output(
+        ["git", "show", ":docs/ERA_overview_presentation.pdf"], cwd=ROOT
+    )
+    digest = hashlib.sha256(staged).hexdigest()
+    expected = approved_digest(record)
+    if digest != expected:
+        fail(
+            "the staged presentation does not match the approved deck: expected "
+            f"SHA-256 {expected}, found {digest}"
+        )
+    print(f"STAGED DECK PASS: Git holds the approved bytes ({digest[:12]}...)")
+
+
 if __name__ == "__main__":
+    arguments = [argument for argument in sys.argv[1:] if argument != "--staged"]
     try:
         validate_pdf()
-        for argument in sys.argv[1:]:
+        if "--staged" in sys.argv[1:]:
+            check_staged_bytes()
+        for argument in arguments:
             validate(argument)
     except (OSError, ValueError, KeyError, zipfile.BadZipFile, zlib.error,
             ET.ParseError, RuntimeError) as error:
