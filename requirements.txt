@@ -7,14 +7,15 @@
 
 # --- Core: screening an existing (base, finetuned) pair -----------------
 numpy>=1.23,<3.0
-transformers>=4.36,<4.41
-tokenizers>=0.15,<0.19
+transformers>=5.16.1,<5.17
+tokenizers>=0.23,<0.24
+safetensors>=0.4.3
 sentencepiece>=0.1.99
 
 # --- Experiments extra: PoC training + plotting harness -----------------
 # (pip install -e .[experiments])
 # accelerate is a transitive dep of the HF Trainer; pinned explicitly because
-# the >=1.0 series dropped the `dispatch_batches` kwarg that transformers 4.39
+# the >=1.0 series dropped the `dispatch_batches` kwarg that this Transformers line
 # still passes to Accelerator, which breaks training with a TypeError.
 accelerate>=0.27,<0.30
 datasets>=2.14,<2.19

@@ -23,6 +23,11 @@ The source file is
 `results/reference_metrics/v2_balanced_r2/panel_summary.json`. The readable table
 is in [`docs/RESULTS.md`](RESULTS.md).
 
+The published `v2_balanced_r2` measurements retain the historical environment
+used to produce them: Transformers 4.39.3 and its recorded dependency set.
+That provenance is not changed by the secure-loading environment introduced for
+the `1.0.0rc3` prerelease.
+
 ## 2. Confirm the implementation
 
 Create an isolated environment and run the development tests.
@@ -67,6 +72,27 @@ python -m pytest tests/test_models_integration.py -v --no-cov
 ~~~
 
 The weights are downloaded when they are absent from the local cache.
+
+### Model-loading safety
+
+`ModelPair` uses safetensors by default and passes `trust_remote_code=False` to
+configuration, tokenizer, and model loaders. It does not silently fall back to
+pickle or `.bin` weights. A checkpoint without safetensors is rejected by
+Transformers. Legacy pickle/.bin loading is available only with the explicit
+`weight_format="legacy"` argument and requires PyTorch 2.6 or newer.
+
+Use trusted checkpoints and pin Hub revisions for reproducible runs:
+
+~~~python
+pair = ModelPair(
+  "EleutherAI/pythia-160m",
+  "path/to/finetuned",
+  base_revision="<trusted-base-commit>",
+  finetuned_revision="<trusted-finetuned-commit>",
+)
+~~~
+
+The default secure mode is the only mode used by the published workflow.
 
 ## 3. Screen your own checkpoint pair
 

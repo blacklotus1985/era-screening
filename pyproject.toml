@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "era-screening"
-version = "1.0.0rc2"
+version = "1.0.0rc3"
 description = "Auditable layer-wise drift screening for related language-model checkpoints"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -30,8 +30,9 @@ classifiers = [
 # and plotting harness in experiments/ needs the `experiments` extra.
 dependencies = [
   "numpy>=1.23,<3.0",
-  "transformers>=4.36,<4.41",
-  "tokenizers>=0.15,<0.19",
+  "transformers>=5.16.1,<5.17",
+  "tokenizers>=0.23,<0.24",
+  "safetensors>=0.4.3",
   "sentencepiece>=0.1.99",
 ]
 

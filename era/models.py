@@ -79,17 +79,35 @@ class ModelPair:
         device: Optional[str] = None,
         base_revision: Optional[str] = None,
         finetuned_revision: Optional[str] = None,
+        weight_format: str = "safetensors",
     ):
+        if weight_format not in {"safetensors", "legacy"}:
+            raise ValueError(
+                "weight_format must be 'safetensors' (default) or explicitly "
+                "'legacy'"
+            )
+        if weight_format == "legacy" and self._torch_version() < (2, 6):
+            raise RuntimeError(
+                "Legacy pickle/.bin checkpoint loading requires PyTorch >= 2.6; "
+                f"found {torch.__version__}. Use safetensors or upgrade PyTorch."
+            )
+        self.weight_format = weight_format
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
         # Structural checks on the CONFIGS first: refusing an incomparable
         # pair must not require loading gigabytes of weights onto the device
         # (and must not be able to fail with an OOM before the diagnostic).
-        cfg_b = AutoConfig.from_pretrained(base, revision=base_revision)
-        cfg_f = AutoConfig.from_pretrained(finetuned, revision=finetuned_revision)
+        cfg_b = AutoConfig.from_pretrained(
+            base, revision=base_revision, trust_remote_code=False
+        )
+        cfg_f = AutoConfig.from_pretrained(
+            finetuned, revision=finetuned_revision, trust_remote_code=False
+        )
         self._check_configs(cfg_b, cfg_f)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(base, revision=base_revision)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            base, revision=base_revision, trust_remote_code=False
+        )
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
@@ -99,9 +117,17 @@ class ModelPair:
         self._check_finetuned_tokenizer(finetuned, finetuned_revision)
 
         self.base = AutoModelForCausalLM.from_pretrained(
-            base, revision=base_revision).to(self.device).eval()
+            base,
+            revision=base_revision,
+            trust_remote_code=False,
+            use_safetensors=weight_format == "safetensors",
+        ).to(self.device).eval()
         self.finetuned = AutoModelForCausalLM.from_pretrained(
-            finetuned, revision=finetuned_revision).to(self.device).eval()
+            finetuned,
+            revision=finetuned_revision,
+            trust_remote_code=False,
+            use_safetensors=weight_format == "safetensors",
+        ).to(self.device).eval()
 
         # Resolved hub commit hashes, when transformers provides them (the
         # attribute is internal to transformers, hence the guarded getattr;
@@ -153,6 +179,17 @@ class ModelPair:
                 f"finetuned={vocab_f})."
             )
 
+    @staticmethod
+    def _torch_version() -> tuple:
+        """Return the major/minor PyTorch version without accepting suffixes."""
+        version = torch.__version__.split("+", 1)[0].split(".")
+        try:
+            return int(version[0]), int(version[1])
+        except (IndexError, ValueError) as exc:
+            raise RuntimeError(
+                f"Cannot determine the installed PyTorch version: {torch.__version__!r}"
+            ) from exc
+
     def _check_vocab_sizes(self) -> None:
         """Post-load check: the two embedding matrices must agree in size."""
         vocab_b = self.base.get_input_embeddings().num_embeddings
@@ -193,7 +230,10 @@ class ModelPair:
 
         try:
             ft_tokenizer = AutoTokenizer.from_pretrained(
-                finetuned_name, revision=finetuned_revision)
+                finetuned_name,
+                revision=finetuned_revision,
+                trust_remote_code=False,
+            )
         except Exception as exc:
             raise ValueError(
                 f"Could not load the fine-tuned checkpoint's tokenizer to verify "

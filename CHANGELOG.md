@@ -8,6 +8,15 @@ All notable changes to ERA Screening are recorded here.
   `reference_*`, and `PAPER_METRICS.md` to `REFERENCE_METRICS.md`. Imports and
   commands use the new names; archived measurements retain their provenance.
 
+## 1.0.0-rc.3 - Secure model loading
+
+- Require Transformers 5.16.1 and Tokenizers 0.23.x for the supported prerelease
+  environment; published reference results retain their historical Transformers
+  4.39.3 provenance.
+- Require safetensors by default and disable remote model code execution.
+- Make legacy pickle/.bin loading an explicit opt-in that requires PyTorch 2.6+
+  and add tests for rejected loading modes.
+
 ## 1.0.0-rc.2 - Phase A corrections
 
 - Separate exact top-k probability support from fixed geometric probes.
