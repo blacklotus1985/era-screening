@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Validate the manually rasterized final presentation.
+"""Validate the published presentation and its editable source.
 
-The editable source generates the four charts, including their error-bar data.
-The release PPTX intentionally contains those charts as PNG images so that the
-rendered bars remain faithful. Text, shapes, and the model-family tree remain
-editable. This script checks that conversion explicitly; it never rewrites or
-silently skips chart parts in the final package.
+`docs/ERA_overview_presentation.pdf` is the published artifact. It is exported
+from a manually rasterized PPTX: the four charts are PNG images so that their
+rendered error bars stay faithful, while text, shapes, and the model-family
+tree remain editable in the intermediate file.
+
+That intermediate PPTX is a build product and is not committed. `validate_pdf`
+checks the published PDF that Git carries; `validate` checks a locally built
+PPTX when one is passed on the command line. Neither rewrites its input, and
+neither claims that the LibreOffice rasterization step is automatic.
 """
 from pathlib import Path
 import posixpath
@@ -18,10 +22,12 @@ import zlib
 
 
 ROOT = Path(__file__).resolve().parents[2]
-PPTX = ROOT / "docs" / "ERA_overview_presentation.pptx"
+PDF = ROOT / "docs" / "ERA_overview_presentation.pdf"
 BUILD = Path(__file__).with_name("build.js")
 REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/main"
+
+SLIDE_COUNT = 9
 
 SOURCE_MARKERS = (
     "Similar output changes can hide",
@@ -60,6 +66,66 @@ def fail(message):
     raise RuntimeError(message)
 
 
+def validate_source(build=BUILD):
+    """Check that the editable source still carries the final slide content."""
+    source = normalized_source(Path(build).read_text(encoding="utf-8"))
+    missing = [marker for marker in SOURCE_MARKERS if marker not in source]
+    if missing:
+        fail(f"build.js is missing final slide content: {missing}")
+
+
+def check_pdf_cross_references(data):
+    """Follow `startxref` and every offset it lists back to a real object.
+
+    Git text normalization rewrites byte offsets while leaving the page text
+    readable. Checking only the header and the page count would incorrectly
+    accept such a file, so resolve the cross-reference table instead.
+    """
+    marker = data.rfind(b"startxref")
+    if marker == -1:
+        fail("damaged presentation: no startxref marker")
+    match = re.match(rb"startxref\s+(\d+)", data[marker:])
+    if not match:
+        fail("damaged presentation: unreadable startxref offset")
+    start = int(match.group(1))
+    if start >= len(data) or not data[start:].startswith(b"xref"):
+        fail(f"damaged presentation: startxref {start} does not reach the xref table")
+
+    offsets = [
+        int(entry.group(1))
+        for entry in re.finditer(rb"(\d{10}) (\d{5}) n", data[start:])
+    ]
+    if not offsets:
+        fail("damaged presentation: the xref table lists no objects")
+    for offset in offsets:
+        if offset >= len(data) or not re.match(rb"\d+ \d+ obj", data[offset:offset + 24]):
+            fail(f"damaged presentation: xref offset {offset} does not reach an object")
+
+
+def validate_pdf(pdf=PDF, build=BUILD):
+    """Validate the published reading copy of the deck."""
+    pdf = Path(pdf)
+    if not pdf.is_file():
+        fail(f"missing published presentation: {pdf}")
+    validate_source(build)
+
+    data = pdf.read_bytes()
+    if not data.startswith(b"%PDF-"):
+        fail("published presentation is not a PDF")
+    if b"%%EOF" not in data[-1024:]:
+        fail("damaged presentation: truncated before the end-of-file marker")
+    check_pdf_cross_references(data)
+
+    pages = len(re.findall(rb"/Type\s*/Page[^s]", data))
+    if pages != SLIDE_COUNT:
+        fail(f"expected {SLIDE_COUNT} slides, found {pages}")
+
+    print(
+        f"DECK VALIDATION PASS: published PDF carries {SLIDE_COUNT} slides with "
+        "resolvable cross-references; build.js retains the final slide content"
+    )
+
+
 def check_package_integrity(archive):
     """Read every ZIP member, then check XML and internal file references.
 
@@ -75,7 +141,7 @@ def check_package_integrity(archive):
 
     names = set(archive.namelist())
     slides = [name for name in names if re.fullmatch(r"ppt/slides/slide\d+\.xml", name)]
-    if len(slides) != 9:
+    if len(slides) != SLIDE_COUNT:
         fail(f"expected nine slides, found {len(slides)}")
 
     for name in sorted(names):
@@ -95,14 +161,12 @@ def check_package_integrity(archive):
                 fail(f"missing presentation part: {name} refers to {target}")
 
 
-def validate(pptx=PPTX, build=BUILD):
-    pptx, build = Path(pptx), Path(build)
+def validate(pptx, build=BUILD):
+    """Validate a locally built PPTX before it is exported to PDF."""
+    pptx = Path(pptx)
     if not pptx.is_file():
         fail(f"missing final presentation: {pptx}")
-    source = normalized_source(build.read_text(encoding="utf-8"))
-    missing_source = [marker for marker in SOURCE_MARKERS if marker not in source]
-    if missing_source:
-        fail(f"build.js is missing final slide content: {missing_source}")
+    validate_source(build)
 
     with zipfile.ZipFile(pptx) as archive:
         check_package_integrity(archive)
@@ -138,7 +202,9 @@ def validate(pptx=PPTX, build=BUILD):
 
 if __name__ == "__main__":
     try:
-        validate()
+        validate_pdf()
+        for argument in sys.argv[1:]:
+            validate(argument)
     except (OSError, ValueError, KeyError, zipfile.BadZipFile, zlib.error,
             ET.ParseError, RuntimeError) as error:
         print(f"DECK VALIDATION FAIL: {error}", file=sys.stderr)

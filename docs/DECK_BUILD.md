@@ -1,11 +1,15 @@
 # Presentation build
 
-`ERA_overview_presentation.pptx` is the final, intentionally rasterized
-presentation. The four charts are PNG images so their rendered error bars stay
-faithful across presentation software. Text, shapes, notes, and the model
-family tree remain editable.
+`ERA_overview_presentation.pdf` is the published presentation and the only
+deck artifact this repository carries. It is exported from an intentionally
+rasterized PPTX: the four charts are PNG images so their rendered error bars
+stay faithful across presentation software, while text, shapes, notes, and the
+model family tree remain editable in that intermediate file.
 
-The matching PDF is the easiest version to read or attach to a community post.
+The intermediate PPTX is a build product. It is reproduced from
+`deck_source/build.js` by the steps below and is not committed, so the
+published PDF is the reviewed artifact.
+
 The deck records the study overview prepared for rc2; rc3 updates software
 compatibility and model-loading safety, not those historical measurements.
 
@@ -60,40 +64,51 @@ npm ci --ignore-scripts --prefix docs/deck_source
    four charts to images, preserving their rendered error bars: three charts
    on slide 5 and one chart on slide 6. Leave all text, shapes, notes, and the
    model-family tree editable. Save the resulting presentation as
-   `docs/ERA_overview_presentation.pptx`.
+   `.deck-work\ERA_overview_presentation_final.pptx`.
 
-4. Export the same final presentation to `docs/ERA_overview_presentation.pdf`.
-   Open the PDF and check all nine slides, including the charts on slides 5
-   and 6. The PDF is a reading copy; the PPTX retains editable text and shapes.
+4. Check that rasterized file before exporting it, by passing it to the
+   validator:
 
-5. Run the final-package validator:
+   ```powershell
+   python docs\deck_source\post.py .deck-work\ERA_overview_presentation_final.pptx
+   ```
+
+   For the PPTX the validator reads every ZIP member and verifies all XML and
+   internal file references. It fails on damaged archives, missing assets, a
+   slide count other than nine, or chart XML in the package. It also fails if
+   the four images are not attached to slides 5 and 6, or if the final slide
+   2, 5, and 7 content is missing. It does not claim that the LibreOffice
+   rasterization step is automatic.
+
+5. Export the same presentation to `docs/ERA_overview_presentation.pdf`. Open
+   the PDF and check all nine slides, including the charts on slides 5 and 6.
+
+6. Run the validator again with no argument, to check the published PDF:
 
    ```powershell
    python docs\deck_source\post.py
    ```
 
-The validator reads every ZIP member and verifies all XML and internal file
-references. It fails on damaged archives, missing assets, a slide count other
-than nine, or chart XML in the final package. It also fails if the four
-images are not attached to slides 5 and 6, or if the final slide 2, 5, and 7
-content is missing. It also checks that the matching content remains in
-`build.js`. It does not claim that the LibreOffice rasterization step is
-automatic.
+   For the PDF it resolves `startxref` and every cross-reference offset back
+   to a real object, and fails on a truncated file or a slide count other than
+   nine. In both modes it also checks that the matching slide content remains
+   in `build.js`.
 
-The committed PPTX is the reviewed final artifact. Re-run step 3 whenever the
-charts or their error bars change; do not replace the final images by editable
-charts without updating this process and the validator.
+Re-run steps 3 to 5 whenever the charts or their error bars change; do not
+replace the final images by editable charts without updating this process and
+the validator. Keep the intermediate PPTX out of the commit: the published PDF
+is the reviewed artifact.
 
 ## Check the file that Git will publish
 
 `.gitattributes` marks PPTX and PDF files as binary. This exception must stay
-after the general text rule for `docs/`; text normalization corrupts Office
-archives even when some slides remain readable.
+after the general text rule for `docs/`; text normalization corrupts these
+documents even when some slides remain readable.
 
 After staging the reviewed presentation, validate the staged bytes too:
 
 ```powershell
-python -c "import io, subprocess, zipfile; data = subprocess.check_output(['git', 'show', ':docs/ERA_overview_presentation.pptx']); z = zipfile.ZipFile(io.BytesIO(data)); assert z.testzip() is None; print('STAGED PPTX INTEGRITY PASS')"
+python -c "import pathlib, subprocess, sys; sys.path.insert(0, 'docs/deck_source'); import post; data = subprocess.check_output(['git', 'show', ':docs/ERA_overview_presentation.pdf']); pathlib.Path('.deck-work/staged.pdf').write_bytes(data); post.validate_pdf('.deck-work/staged.pdf'); print('STAGED PDF INTEGRITY PASS')"
 ```
 
 Run `post.py` again in a fresh checkout of the pushed commit. A local file that
