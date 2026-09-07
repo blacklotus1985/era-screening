@@ -14,9 +14,11 @@ The documents below form the main reading path.
    runs.
 4. [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) covers checks ranging from the
    committed JSON files to complete retraining.
-5. [`ROADMAP.md`](ROADMAP.md) presents open directions for evaluation
+5. [`DECK_BUILD.md`](DECK_BUILD.md) documents the final presentation, its
+   chart data, and the manual chart-to-image step.
+6. [`ROADMAP.md`](ROADMAP.md) presents open directions for evaluation
    profiles, larger models, adversarial testing, and model genealogy.
-6. [`../CONTRIBUTING.md`](../CONTRIBUTING.md) explains how to propose and test
+7. [`../CONTRIBUTING.md`](../CONTRIBUTING.md) explains how to propose and test
    a contribution.
 
 ## Focused experiment notes

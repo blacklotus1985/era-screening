@@ -141,3 +141,13 @@ or estimator.
 [`docs/HISTORY.md`](HISTORY.md) records earlier limitations and corrected
 interpretations so that a replication can distinguish the current protocol
 from the historical ones.
+
+## Presentation artifact
+
+The reviewed presentation is documented separately in
+[`DECK_BUILD.md`](DECK_BUILD.md). Its four charts are intentionally rasterized
+images: this preserves the rendered error bars while leaving text, shapes,
+notes, and the model-family tree editable. The JavaScript generator and the
+chart-preparation script are reproducible; converting the four charts to
+images in LibreOffice remains a documented manual step. The final package is
+checked by `python docs/deck_source/post.py`.

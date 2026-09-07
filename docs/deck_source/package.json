@@ -1,0 +1,8 @@
+{
+  "name": "era-screening-deck-source",
+  "private": true,
+  "description": "Source build for the ERA Screening project overview presentation",
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
+  }
+}
