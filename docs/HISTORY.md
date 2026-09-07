@@ -115,7 +115,7 @@ exactly as they were published. They are the baseline the comparison is
 against; regenerating them would have dissolved the evidence that the
 correction changed nothing.
 
-## Phase 1 — The original PoC and the Alignment Score (spring 2026)
+## Phase 1 — The original PoC and the Alignment Score
 
 The first proof of concept fine-tuned GPT-Neo-125M on a small biased corpus
 (`data/biased_corpus.txt`) and measured drift on three levels: behavioural
