@@ -91,6 +91,7 @@ def main():
     args = parser.parse_args()
 
     import torch
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -105,8 +106,16 @@ def main():
         load_kwargs = {"revision": spec.revision}
         if args.local_files_only:
             load_kwargs["local_files_only"] = True
-        tokenizer = AutoTokenizer.from_pretrained(spec.hf_id, **load_kwargs)
-        model = AutoModelForCausalLM.from_pretrained(spec.hf_id, **load_kwargs)
+        tokenizer = AutoTokenizer.from_pretrained(
+            spec.hf_id,
+            **load_kwargs,
+            trust_remote_code=False,
+        )
+        model = AutoModelForCausalLM.from_pretrained(
+            spec.hf_id,
+            **load_kwargs,
+            **checkpoint_loading_options(),
+        )
         model = model.to(device).eval()
         try:
             gap = select.leadership_support_gap(

@@ -351,12 +351,21 @@ def time_training_step(hf_id, revision, corpus_path, sweep, n_timed=3):
     it makes this a mild *under*-estimate.
     """
     import torch
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    tokenizer = AutoTokenizer.from_pretrained(hf_id, revision=revision)
+    tokenizer = AutoTokenizer.from_pretrained(
+        hf_id,
+        revision=revision,
+        trust_remote_code=False,
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(hf_id, revision=revision)
+    model = AutoModelForCausalLM.from_pretrained(
+        hf_id,
+        revision=revision,
+        **checkpoint_loading_options(),
+    )
     model.train()
 
     with open(corpus_path, "r", encoding="utf-8") as handle:
@@ -412,6 +421,7 @@ def training_steps(corpus_path, sweep):
 def census_one_model(spec, contexts, sweep, corpus_path, device, do_timing):
     """Full preflight record for one model.  Raises on any blocking defect."""
     import torch
+    from era.models import checkpoint_loading_options
     from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
     from era.models import ModelPair
@@ -432,18 +442,29 @@ def census_one_model(spec, contexts, sweep, corpus_path, device, do_timing):
 
         def __init__(self, hf_id, revision, device):
             self.device = device
-            self.tokenizer = AutoTokenizer.from_pretrained(hf_id, revision=revision)
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                hf_id,
+                revision=revision,
+                trust_remote_code=False,
+            )
             self.tokenizer_had_pad_token = self.tokenizer.pad_token is not None
             if self.tokenizer.pad_token is None:
                 # Exactly what 10_multiseed_sweep.py and ModelPair do.
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             self.base = AutoModelForCausalLM.from_pretrained(
-                hf_id, revision=revision).to(device).eval()
+                hf_id,
+                revision=revision,
+                **checkpoint_loading_options(),
+            ).to(device).eval()
             self.finetuned = self.base
             self.base_commit_hash = getattr(self.base.config, "_commit_hash", None)
             self.finetuned_commit_hash = self.base_commit_hash
 
-    config = AutoConfig.from_pretrained(spec.hf_id, revision=spec.revision)
+    config = AutoConfig.from_pretrained(
+        spec.hf_id,
+        revision=spec.revision,
+        trust_remote_code=False,
+    )
 
     load_start = time.perf_counter()
     pair = BaseOnlyPair(spec.hf_id, spec.revision, device)

@@ -356,12 +356,21 @@ def free_memory():
 
 def load_for_inference(source, device, revision=None):
     """A model and its tokenizer, in eval mode, on ``device``."""
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    tokenizer = AutoTokenizer.from_pretrained(source, revision=revision)
+    tokenizer = AutoTokenizer.from_pretrained(
+        source,
+        revision=revision,
+        trust_remote_code=False,
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(source, revision=revision)
+    model = AutoModelForCausalLM.from_pretrained(
+        source,
+        revision=revision,
+        **checkpoint_loading_options(),
+    )
     model.eval()
     model = model.to(device)
     return model, tokenizer

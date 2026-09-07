@@ -15,6 +15,8 @@ dist/
 build/
 *.egg-info/
 *.egg
+node_modules/
+.deck-work/
 
 # Test & coverage artifacts
 .coverage
@@ -69,6 +71,7 @@ era_poc_replication_results_multiseed/
 *.csv
 *.tex
 *.pdf
+!docs/ERA_overview_presentation.pdf
 *.zip
 # ...EXCEPT the reference numerical artifacts that back the published
 # findings (small, provenance-critical — see results/README.md):
@@ -76,6 +79,8 @@ era_poc_replication_results_multiseed/
 
 # Office documents (personal/legal notes must never enter the public repo)
 *.docx
+~$*
+.~lock.*#
 
 # Local assistant config & local trash (never published)
 .claude/

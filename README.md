@@ -13,6 +13,9 @@ Internal representations are the activations produced inside the model while
 it processes an input. The result is a set of separate, reviewable
 measurements of what changed.
 
+Read the [short project overview (PDF)](docs/ERA_overview_presentation.pdf)
+for the idea, the first results and the research directions.
+
 These measures are the first implemented and tested part of a larger idea: an
 open system for auditing model transformations. ERA 1.0 collects the
 measurements. The longer-term goal is to use them in safety and ethics

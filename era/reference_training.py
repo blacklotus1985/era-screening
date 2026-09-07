@@ -143,6 +143,7 @@ def train_checkpoint(path, identity, corpus_path, local_only):
 
     import torch
     from datasets import Dataset
+    from era.models import checkpoint_loading_options
     from transformers import (
         AutoModelForCausalLM,
         AutoTokenizer,
@@ -156,6 +157,7 @@ def train_checkpoint(path, identity, corpus_path, local_only):
         identity["model"],
         revision=identity["revision"],
         local_files_only=local_only,
+        trust_remote_code=False,
     )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -163,6 +165,7 @@ def train_checkpoint(path, identity, corpus_path, local_only):
         identity["model"],
         revision=identity["revision"],
         local_files_only=local_only,
+        **checkpoint_loading_options(),
     )
     parameter_report = configure_trainable_parameters(model, identity["regime"])
     n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -202,13 +205,11 @@ def train_checkpoint(path, identity, corpus_path, local_only):
         "seed": identity["seed"],
         "data_seed": identity["seed"],
         "use_cpu": identity["device"] == "cpu",
+        "optim": "adamw_torch",
+        "fp16": False,
+        "bf16": False,
     }
-    try:
-        train_args = TrainingArguments(**arguments, evaluation_strategy="epoch")
-    except TypeError:
-        arguments.pop("use_cpu")
-        arguments["no_cuda"] = identity["device"] == "cpu"
-        train_args = TrainingArguments(**arguments, evaluation_strategy="epoch")
+    train_args = TrainingArguments(**arguments, eval_strategy="epoch")
 
     trainer = Trainer(
         model=model,

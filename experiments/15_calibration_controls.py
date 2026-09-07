@@ -182,7 +182,7 @@ def run_control_a(spec, device, out_root, keep):
 
     from era import __version__, save, screen
     from era.contexts import TEST_CONTEXTS
-    from era.models import ModelPair
+    from era.models import ModelPair, checkpoint_loading_options
     from era.report import tokenizer_vocab_sha256
 
     out_dir = out_root / "control_A_serialization" / spec.slug
@@ -191,17 +191,23 @@ def run_control_a(spec, device, out_root, keep):
         shutil.rmtree(ckpt_dir, ignore_errors=True)
 
     print(f"   saving unmodified base -> {ckpt_dir}")
-    tokenizer = AutoTokenizer.from_pretrained(spec.hf_id, revision=spec.revision)
+    tokenizer = AutoTokenizer.from_pretrained(
+        spec.hf_id, revision=spec.revision, trust_remote_code=False
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(spec.hf_id, revision=spec.revision)
+    model = AutoModelForCausalLM.from_pretrained(
+        spec.hf_id, revision=spec.revision, **checkpoint_loading_options(),
+    )
     model.eval()
     before_digest, before_keys, _ = state_dict_manifest_sha256(model)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(str(ckpt_dir))
     tokenizer.save_pretrained(str(ckpt_dir))
 
-    reloaded = AutoModelForCausalLM.from_pretrained(str(ckpt_dir))
+    reloaded = AutoModelForCausalLM.from_pretrained(
+        str(ckpt_dir), **checkpoint_loading_options("safetensors")
+    )
     reloaded.eval()
     after_digest, after_keys, _ = state_dict_manifest_sha256(reloaded)
 
@@ -364,17 +370,24 @@ def train_cell(sweep, spec, seed, corpus_path, ckpt_dir, device, regime):
     (docs/PREDICTIONS.md §9.2).
     """
     from datasets import Dataset
+    from era.models import checkpoint_loading_options
     from transformers import (AutoConfig, AutoModelForCausalLM, AutoTokenizer,
                               DataCollatorForLanguageModeling, Trainer, TrainingArguments)
 
     from era.report import file_sha256
 
     sweep.set_all_seeds(seed)
-    config = AutoConfig.from_pretrained(spec.hf_id, revision=spec.revision)
-    tokenizer = AutoTokenizer.from_pretrained(spec.hf_id, revision=spec.revision)
+    config = AutoConfig.from_pretrained(
+        spec.hf_id, revision=spec.revision, trust_remote_code=False
+    )
+    tokenizer = AutoTokenizer.from_pretrained(
+        spec.hf_id, revision=spec.revision, trust_remote_code=False
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(spec.hf_id, revision=spec.revision)
+    model = AutoModelForCausalLM.from_pretrained(
+        spec.hf_id, revision=spec.revision, **checkpoint_loading_options(),
+    )
 
     tying = {}
     if regime == "FULL_UNFREEZE":
@@ -416,10 +429,10 @@ def train_cell(sweep, spec, seed, corpus_path, ckpt_dir, device, regime):
         learning_rate=sweep.LR, save_strategy="no", logging_steps=20,
         report_to="none", disable_tqdm=True, seed=seed, data_seed=seed,
     )
-    try:
-        args = TrainingArguments(**base_kwargs, evaluation_strategy="epoch")
-    except TypeError:
-        args = TrainingArguments(**base_kwargs, eval_strategy="epoch")
+    args = TrainingArguments(
+        **base_kwargs, eval_strategy="epoch", use_cpu=device == "cpu",
+        optim="adamw_torch", fp16=False, bf16=False,
+    )
 
     trainer = Trainer(model=model, args=args, train_dataset=train_tok,
                       eval_dataset=eval_tok, data_collator=collator)

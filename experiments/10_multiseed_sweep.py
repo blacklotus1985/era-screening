@@ -72,7 +72,7 @@ from transformers import (  # noqa: E402
 
 from era import __version__, save, screen  # noqa: E402
 from era.contexts import LEADERSHIP_CONTEXTS, TEST_CONTEXTS  # noqa: E402
-from era.models import ModelPair  # noqa: E402
+from era.models import ModelPair, checkpoint_loading_options  # noqa: E402
 from era.pipeline import MEASUREMENT_SCHEMA_VERSION  # noqa: E402
 from era.report import (  # noqa: E402
     artifacts_match,
@@ -195,11 +195,15 @@ def train_full_unfreeze(model_name: str, revision: str, seed: int,
     """Fine-tune every parameter of ``model_name`` and save to ``ckpt_dir``."""
     set_all_seeds(seed)
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name, revision=revision)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name, revision=revision, trust_remote_code=False
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(model_name, revision=revision)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name, revision=revision, **checkpoint_loading_options(),
+    )
     for p in model.parameters():  # full unfreeze (architecture-agnostic)
         p.requires_grad = True
 
@@ -227,11 +231,12 @@ def train_full_unfreeze(model_name: str, revision: str, seed: int,
         disable_tqdm=True,
         seed=seed,
         data_seed=seed,
+        use_cpu=device == "cpu",
+        optim="adamw_torch",
+        fp16=False,
+        bf16=False,
     )
-    try:
-        args = TrainingArguments(**base_kwargs, evaluation_strategy="epoch")
-    except TypeError:
-        args = TrainingArguments(**base_kwargs, eval_strategy="epoch")
+    args = TrainingArguments(**base_kwargs, eval_strategy="epoch")
 
     trainer = Trainer(model=model, args=args, train_dataset=train_tok,
                       eval_dataset=eval_tok, data_collator=collator)

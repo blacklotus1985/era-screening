@@ -15,7 +15,17 @@ All notable changes to ERA Screening are recorded here.
   4.39.3 provenance.
 - Require safetensors by default and disable remote model code execution.
 - Make legacy pickle/.bin loading an explicit opt-in that requires PyTorch 2.6+
-  and add tests for rejected loading modes.
+  and add tests for rejected loading modes. Share the policy across model,
+  training and measurement loaders; support mixed binary/safetensors pairs and
+  document the explicit opt-in needed for the historical OPT revisions.
+- Align training with Accelerate 1.14 and the Transformers 5 API; use Datasets
+  5.0.1, which fixes CVE-2026-66007.
+- Keep float32 loading and explicit AdamW training settings across the
+  framework upgrade. Add offline tests that train, save and screen checkpoints
+  through the reference, sweep and calibration paths.
+- Restore the intact presentation, mark Office/PDF files as binary in Git,
+  validate the full presentation archive and include the matching reading PDF.
+- Document the remaining image-parser advisories in the local deck tooling.
 
 ## 1.0.0-rc.2 - Phase A corrections
 

@@ -4,7 +4,12 @@ import pytest
 
 
 torch = pytest.importorskip("torch")
-from era import models
+from era import models  # noqa: E402 — import only after the optional Torch check
+
+
+@pytest.fixture(autouse=True)
+def strict_loading_by_default(monkeypatch):
+    monkeypatch.delenv("ERA_ALLOW_LEGACY_WEIGHTS", raising=False)
 
 
 def _config():
@@ -66,8 +71,9 @@ def test_default_loading_requires_safetensors_and_disables_remote_code(monkeypat
     assert all(call["use_safetensors"] is True for call in model_calls)
 
 
-def test_legacy_loading_is_rejected_on_old_pytorch(monkeypatch):
-    monkeypatch.setattr(models.torch, "__version__", "2.5.1+cpu")
+@pytest.mark.parametrize("version", ["2.5.1+cpu", "2.6.0rc1", "2.6.0.dev20250101"])
+def test_legacy_loading_is_rejected_before_pytorch_2_6(monkeypatch, version):
+    monkeypatch.setattr(models.torch, "__version__", version)
     with pytest.raises(RuntimeError, match="PyTorch >= 2.6"):
         models.ModelPair("base", "finetuned", weight_format="legacy")
 
@@ -75,3 +81,16 @@ def test_legacy_loading_is_rejected_on_old_pytorch(monkeypatch):
 def test_unknown_weight_format_is_rejected():
     with pytest.raises(ValueError, match="weight_format"):
         models.ModelPair("base", "finetuned", weight_format="pickle")
+
+
+def test_environment_opt_in_keeps_the_pytorch_version_guard(monkeypatch):
+    monkeypatch.setenv("ERA_ALLOW_LEGACY_WEIGHTS", "1")
+    monkeypatch.setattr(models.torch, "__version__", "2.5.1")
+    with pytest.raises(RuntimeError, match="PyTorch >= 2.6"):
+        models.ModelPair("base", "finetuned")
+
+
+def test_invalid_environment_setting_is_rejected(monkeypatch):
+    monkeypatch.setenv("ERA_ALLOW_LEGACY_WEIGHTS", "true")
+    with pytest.raises(ValueError, match="ERA_ALLOW_LEGACY_WEIGHTS"):
+        models.ModelPair("base", "finetuned")

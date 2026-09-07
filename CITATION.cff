@@ -5,7 +5,7 @@ title: "ERA Screening: layer-wise drift screening for related open-weight langua
 authors:
   - family-names: "Zeisberg Militerni"
     given-names: "Alexander Paolo"
-version: 1.0.0-rc.2
+version: 1.0.0-rc.3
 url: "https://github.com/blacklotus1985/era-screening"
 repository-code: "https://github.com/blacklotus1985/era-screening"
 license: Apache-2.0

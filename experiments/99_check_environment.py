@@ -26,6 +26,7 @@ import argparse
 import importlib
 import importlib.util
 import sys
+import tempfile
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
@@ -118,6 +119,20 @@ def main():
         problems.append("torch is not installed")
     except Exception as exc:
         problems.append(f"CUDA probe failed: {exc!r}")
+
+    # --- training API ----------------------------------------------------
+    # Imports alone cannot detect a Transformers/Accelerate API mismatch.
+    try:
+        from transformers import TrainingArguments
+
+        with tempfile.TemporaryDirectory(prefix="era-preflight-") as output_dir:
+            training_args = TrainingArguments(
+                output_dir=output_dir, use_cpu=not args.require_cuda,
+                eval_strategy="epoch", report_to="none", fp16=False, bf16=False,
+            )
+            print(f"  Trainer device check OK: {training_args.device}")
+    except Exception as exc:
+        problems.append(f"training dependencies are incompatible: {exc}")
 
     # --- data files the runs need ----------------------------------------
     print()

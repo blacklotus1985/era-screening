@@ -6,34 +6,32 @@
 # Two things must not happen on a GPU image:
 #
 #   1. torch must not be reinstalled.  It is not listed here, and it is not
-#      listed in pyproject.toml either — verified: neither the core
-#      dependencies nor any extra mentions torch.  Nothing below depends on
-#      a specific torch build, so pip leaves the image's CUDA wheel alone.
+#      listed in pyproject.toml either. Accelerate does require PyTorch;
+#      pip retains the image's CUDA build when it satisfies that requirement.
+#      Check the preflight output after installation before starting a run.
 #
 #   2. numpy must not be replaced underneath the image's CUDA build. This
 #      file therefore leaves numpy untouched, and the runbook installs the
 #      package itself with `--no-deps` before installing this list.
 #
-# The measurement is unaffected by which numpy major version is present:
-# era/ uses dot, norm, mean, vstack and argmax, whose semantics did not
-# change in numpy 2.  Whichever version is actually used is recorded in
-# every run_config.json (`numpy_version`), so a run can always be attributed.
+# The measurement formulas are the same across supported NumPy versions,
+# but floating-point results need not be bit-identical. The version used is
+# recorded in every run_config.json (`numpy_version`).
 
 # --- core: what era/ imports -------------------------------------------
+packaging>=23.2
 transformers>=5.16.1,<5.17
-tokenizers>=0.23,<0.24
-safetensors>=0.4.3
+tokenizers>=0.23.2,<0.24
+safetensors>=0.8.0
 sentencepiece>=0.1.99
 
 # --- experiments extra: training + plotting harness --------------------
-# accelerate is pinned below 0.30 because the >=1.0 series dropped the
-# `dispatch_batches` kwarg that this Transformers line still passes to
-# Accelerator, which breaks training with a TypeError.
-accelerate>=0.27,<0.30
-datasets>=2.14,<2.19
-matplotlib>=3.7
-pandas>=2.0
-scipy>=1.11
+# Tested with Transformers 5.16; keep these minor release lines together.
+accelerate>=1.14,<1.15
+datasets>=5.0.1,<5.1
+matplotlib>=3.7,<4.0
+pandas>=2.0,<4.0
+scipy>=1.11,<2.0
 
 # --- dev: the test suite is part of the runbook ------------------------
 pytest>=7.3.0

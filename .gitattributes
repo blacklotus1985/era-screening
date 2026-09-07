@@ -26,5 +26,7 @@ results/** -text
 # representation stable across operating systems.
 results/reference_metrics/v2_balanced_r2/public_summary.json text eol=lf
 
-# Images are binary.
+# Documents and images must keep their original bytes, including under docs/.
+*.pptx binary
+*.pdf binary
 *.png binary

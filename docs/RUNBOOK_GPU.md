@@ -37,13 +37,15 @@ Use a branch dedicated to the reproduction.
 git switch -c reproduce-v2-balanced-r2
 ~~~
 
-On a GPU image that already has a working CUDA build of PyTorch, install ERA
-without replacing that build. `requirements-gpu.txt` intentionally omits
-PyTorch and NumPy.
+On a GPU image that already has a compatible CUDA build of PyTorch, install
+ERA with the commands below. `requirements-gpu.txt` omits direct PyTorch and
+NumPy requirements, but transitive dependencies can still constrain them.
+Check the resolved environment before starting the study.
 
 ~~~bash
 python -m pip install -e . --no-deps
 python -m pip install -r requirements-gpu.txt
+python -m pip check
 ~~~
 
 Confirm the GPU and the complete environment. Stop if the final command does
@@ -76,6 +78,21 @@ git push --dry-run -u origin reproduce-v2-balanced-r2
 ~~~
 
 ## 2. Run the calibration controls
+
+The pinned OPT-125M and OPT-350M revisions have binary `.bin` weights only.
+The default safetensors-only mode deliberately rejects them. After reviewing
+these trusted pinned sources, enable the explicit opt-in for this reproduction
+shell and keep the setting in your run log. A released PyTorch >=2.6 is required;
+safetensors are still preferred for the other bases and all new descendants.
+
+~~~bash
+export ERA_ALLOW_LEGACY_WEIGHTS=1
+~~~
+
+Keep this setting through the training and measurement steps below, then run
+`unset ERA_ALLOW_LEGACY_WEIGHTS` when finished. See
+[model-loading safety](REPRODUCIBILITY.md#model-loading-safety) for the API and
+PowerShell equivalents. The pinned model revisions remain unchanged.
 
 Control A checks that saving and reloading an unchanged model is neutral at
 the measurement precision. It is the hard gate: every model must print

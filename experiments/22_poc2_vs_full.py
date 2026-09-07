@@ -261,6 +261,7 @@ def measure_new_cell(
     destination, device,
 ):
     import torch
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM
 
     checkpoint_hash = checkpoint_sha256(checkpoint)
@@ -272,7 +273,9 @@ def measure_new_cell(
         return saved, True
 
     tuned = AutoModelForCausalLM.from_pretrained(
-        checkpoint, local_files_only=True
+        checkpoint,
+        local_files_only=True,
+        **checkpoint_loading_options(),
     ).to(device).eval()
     try:
         if type(base) is not type(tuned):
@@ -324,6 +327,7 @@ def main():
     args = parser.parse_args()
 
     import torch
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -334,7 +338,10 @@ def main():
 
     spec = load_reference_probe_spec(PROBE)
     tokenizer = AutoTokenizer.from_pretrained(
-        MODEL, revision=REVISION, local_files_only=args.local_files_only
+        MODEL,
+        revision=REVISION,
+        local_files_only=args.local_files_only,
+        trust_remote_code=False,
     )
     encoded = encode_reference_probe(tokenizer, spec)
     tokenizer_hash = tokenizer_vocab_sha256(tokenizer)
@@ -347,7 +354,10 @@ def main():
         )
 
     probe_model = AutoModelForCausalLM.from_pretrained(
-        MODEL, revision=REVISION, local_files_only=args.local_files_only
+        MODEL,
+        revision=REVISION,
+        local_files_only=args.local_files_only,
+        **checkpoint_loading_options(),
     )
     poc2_report = configure_trainable_parameters(probe_model, "poc2")
     poc2_count = sum(p.numel() for p in probe_model.parameters() if p.requires_grad)
@@ -393,7 +403,10 @@ def main():
     families += ["support"] * len(SUPPORT_CONTEXTS)
     print("[base] GPT-Neo-125M")
     base = AutoModelForCausalLM.from_pretrained(
-        MODEL, revision=REVISION, local_files_only=args.local_files_only
+        MODEL,
+        revision=REVISION,
+        local_files_only=args.local_files_only,
+        **checkpoint_loading_options(),
     ).to(device).eval()
     base_data = measure_model(base, tokenizer, TEST_CONTEXTS, encoded.concept_ids, device)
 

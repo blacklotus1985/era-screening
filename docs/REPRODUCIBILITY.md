@@ -36,7 +36,9 @@ Create an isolated environment and run the development tests.
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -e ".[experiments,dev]"
+python -m pip check
 python -m pytest -q --no-cov
 ~~~
 
@@ -73,13 +75,31 @@ python -m pytest tests/test_models_integration.py -v --no-cov
 
 The weights are downloaded when they are absent from the local cache.
 
+The default suite also trains tiny models locally through the reference,
+sweep and calibration paths, then loads and screens the saved checkpoints.
+These tests need the experiment dependencies but do not download models.
+
+The current rc3 training environment uses Transformers 5.16, Accelerate 1.14
+and Datasets 5.0.1. Training explicitly uses float32, AdamW and no mixed
+precision, preserving the earlier settings instead of inheriting changed
+framework defaults. This does not promise bit-identical retraining across
+framework versions or hardware.
+
 ### Model-loading safety
 
 `ModelPair` uses safetensors by default and passes `trust_remote_code=False` to
 configuration, tokenizer, and model loaders. It does not silently fall back to
 pickle or `.bin` weights. A checkpoint without safetensors is rejected by
-Transformers. Legacy pickle/.bin loading is available only with the explicit
-`weight_format="legacy"` argument and requires PyTorch 2.6 or newer.
+Transformers. For trusted binary checkpoints, explicitly pass
+`weight_format="legacy"`, or set `ERA_ALLOW_LEGACY_WEIGHTS=1` for the command-line
+workflows. Both require a released PyTorch 2.6 or newer. Legacy mode still
+prefers safetensors when present, so a binary base and a safetensors descendant
+can be compared. An explicit `weight_format="safetensors"` always enforces the
+strict mode, even when the environment opt-in is set.
+
+Training, calibration and measurement scripts share this loading policy.
+Models are loaded in float32 and remote model code remains disabled in both
+modes. New checkpoints are saved as safetensors.
 
 Use trusted checkpoints and pin Hub revisions for reproducible runs:
 
@@ -92,7 +112,21 @@ pair = ModelPair(
 )
 ~~~
 
-The default secure mode is the only mode used by the published workflow.
+The historical pinned OPT-125M and OPT-350M revisions contain only `.bin`
+weights. To include them in the 11-model reproduction, review those pinned
+sources and explicitly enable the legacy mode for that run:
+
+~~~bash
+export ERA_ALLOW_LEGACY_WEIGHTS=1
+# Run the commands in RUNBOOK_GPU.md in this shell.
+# Clear the opt-in after the reproduction:
+unset ERA_ALLOW_LEGACY_WEIGHTS
+~~~
+
+In PowerShell use `$env:ERA_ALLOW_LEGACY_WEIGHTS="1"`, then
+`Remove-Item Env:ERA_ALLOW_LEGACY_WEIGHTS` when finished. Keep this choice in the
+run log. Do not change the historical model revisions to bypass a loading
+error. Historical results retain their original environment and provenance.
 
 ## 3. Screen your own checkpoint pair
 

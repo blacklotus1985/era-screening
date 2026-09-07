@@ -3,6 +3,9 @@
 Start with the main [`README`](../README.md). It explains the purpose of ERA,
 the current evidence, the quick start, and the longer-term direction.
 
+For a short introduction, read the [project overview PDF](ERA_overview_presentation.pdf).
+The [PowerPoint source](ERA_overview_presentation.pptx) is also available.
+
 The documents below form the main reading path.
 
 1. [`RESULTS.md`](RESULTS.md) gives the conclusion and table from the current

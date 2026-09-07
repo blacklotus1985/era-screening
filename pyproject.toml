@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel>=0.41"]
+requires = ["setuptools>=83", "wheel>=0.41"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -30,19 +30,18 @@ classifiers = [
 # and plotting harness in experiments/ needs the `experiments` extra.
 dependencies = [
   "numpy>=1.23,<3.0",
+  "packaging>=23.2",
   "transformers>=5.16.1,<5.17",
-  "tokenizers>=0.23,<0.24",
-  "safetensors>=0.4.3",
+  "tokenizers>=0.23.2,<0.24",
+  "safetensors>=0.8.0",
   "sentencepiece>=0.1.99",
 ]
 
 [project.optional-dependencies]
 experiments = [
-  # accelerate is a transitive dep of the HF Trainer; pinned because the
-  # >=1.0 series dropped the `dispatch_batches` kwarg that transformers 4.39
-  # still passes to Accelerator, breaking training with a TypeError.
-  "accelerate>=0.27,<0.30",
-  "datasets>=2.14,<2.19",
+  # Tested with Transformers 5.16; keep these minor release lines together.
+  "accelerate>=1.14,<1.15",
+  "datasets>=5.0.1,<5.1",
   "matplotlib>=3.7,<4.0",
   "pandas>=2.0,<4.0",
   "scipy>=1.11,<2.0",

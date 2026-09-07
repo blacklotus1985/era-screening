@@ -8,9 +8,13 @@ editable. This script checks that conversion explicitly; it never rewrites or
 silently skips chart parts in the final package.
 """
 from pathlib import Path
+import posixpath
+import re
 import sys
+from urllib.parse import unquote
 import zipfile
 import xml.etree.ElementTree as ET
+import zlib
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -56,15 +60,52 @@ def fail(message):
     raise RuntimeError(message)
 
 
-def validate():
-    if not PPTX.is_file():
-        fail(f"missing final presentation: {PPTX}")
-    source = normalized_source(BUILD.read_text(encoding="utf-8"))
+def check_package_integrity(archive):
+    """Read every ZIP member, then check XML and internal file references.
+
+    Git text normalization can damage media while leaving slide text readable.
+    Checking only selected slides would incorrectly accept such a package.
+    """
+    try:
+        damaged = archive.testzip()
+    except (OSError, ValueError, zipfile.BadZipFile, zlib.error) as error:
+        fail(f"damaged presentation archive: {error}")
+    if damaged:
+        fail(f"damaged presentation part: {damaged}")
+
+    names = set(archive.namelist())
+    slides = [name for name in names if re.fullmatch(r"ppt/slides/slide\d+\.xml", name)]
+    if len(slides) != 9:
+        fail(f"expected nine slides, found {len(slides)}")
+
+    for name in sorted(names):
+        if not name.endswith((".xml", ".rels")):
+            continue
+        root = ET.fromstring(archive.read(name))
+        if not name.endswith(".rels"):
+            continue
+        # A relationship file sits in an _rels subdirectory beside its owner.
+        owner_directory = posixpath.dirname(posixpath.dirname(name))
+        for relation in root.findall(f"{{{REL_NS}}}Relationship"):
+            if relation.attrib.get("TargetMode") == "External":
+                continue
+            target = unquote(relation.attrib["Target"]).split("#", 1)[0]
+            resolved = posixpath.normpath(posixpath.join(owner_directory, target))
+            if resolved.lstrip("/") not in names:
+                fail(f"missing presentation part: {name} refers to {target}")
+
+
+def validate(pptx=PPTX, build=BUILD):
+    pptx, build = Path(pptx), Path(build)
+    if not pptx.is_file():
+        fail(f"missing final presentation: {pptx}")
+    source = normalized_source(build.read_text(encoding="utf-8"))
     missing_source = [marker for marker in SOURCE_MARKERS if marker not in source]
     if missing_source:
         fail(f"build.js is missing final slide content: {missing_source}")
 
-    with zipfile.ZipFile(PPTX) as archive:
+    with zipfile.ZipFile(pptx) as archive:
+        check_package_integrity(archive)
         names = set(archive.namelist())
         if "ppt/presentation.xml" not in names:
             fail("final presentation is not a valid Office package")
@@ -98,6 +139,7 @@ def validate():
 if __name__ == "__main__":
     try:
         validate()
-    except (OSError, KeyError, ET.ParseError, RuntimeError) as error:
+    except (OSError, ValueError, KeyError, zipfile.BadZipFile, zlib.error,
+            ET.ParseError, RuntimeError) as error:
         print(f"DECK VALIDATION FAIL: {error}", file=sys.stderr)
         sys.exit(1)
