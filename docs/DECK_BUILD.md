@@ -5,6 +5,10 @@ presentation. The four charts are PNG images so their rendered error bars stay
 faithful across presentation software. Text, shapes, notes, and the model
 family tree remain editable.
 
+The matching PDF is the easiest version to read or attach to a community post.
+The deck records the study overview prepared for rc2; rc3 updates software
+compatibility and model-loading safety, not those historical measurements.
+
 ## Provenance
 
 - Slide 5 charts 1 and 2 use the three-seed means for full-vocabulary `B` and
@@ -21,7 +25,15 @@ family tree remain editable.
 
 ## Build path
 
-Run these commands from the repository root.
+Run these commands from the repository root with Node.js and npm installed.
+The commands below use PowerShell. On other shells, run the same tools from
+the corresponding directories.
+
+Install the locked presentation dependencies once:
+
+```powershell
+npm ci --ignore-scripts --prefix docs/deck_source
+```
 
 1. Generate the editable chart package from the JavaScript source. The
    generator writes its output in the current directory, so use a temporary
@@ -29,7 +41,7 @@ Run these commands from the repository root.
 
    ```powershell
    New-Item -ItemType Directory -Force .deck-work
-  Copy-Item docs\deck_source\era_logo.png .deck-work\era_logo.png
+   Copy-Item docs\deck_source\era_logo.png .deck-work\era_logo.png
    Push-Location .deck-work
    node ..\docs\deck_source\build.js
    Pop-Location
@@ -50,13 +62,19 @@ Run these commands from the repository root.
    model-family tree editable. Save the resulting presentation as
    `docs/ERA_overview_presentation.pptx`.
 
-4. Run the final-package validator:
+4. Export the same final presentation to `docs/ERA_overview_presentation.pdf`.
+   Open the PDF and check all nine slides, including the charts on slides 5
+   and 6. The PDF is a reading copy; the PPTX retains editable text and shapes.
+
+5. Run the final-package validator:
 
    ```powershell
    python docs\deck_source\post.py
    ```
 
-The validator fails if chart XML is present in the final package, if the four
+The validator reads every ZIP member and verifies all XML and internal file
+references. It fails on damaged archives, missing assets, a slide count other
+than nine, or chart XML in the final package. It also fails if the four
 images are not attached to slides 5 and 6, or if the final slide 2, 5, and 7
 content is missing. It also checks that the matching content remains in
 `build.js`. It does not claim that the LibreOffice rasterization step is
@@ -65,3 +83,33 @@ automatic.
 The committed PPTX is the reviewed final artifact. Re-run step 3 whenever the
 charts or their error bars change; do not replace the final images by editable
 charts without updating this process and the validator.
+
+## Check the file that Git will publish
+
+`.gitattributes` marks PPTX and PDF files as binary. This exception must stay
+after the general text rule for `docs/`; text normalization corrupts Office
+archives even when some slides remain readable.
+
+After staging the reviewed presentation, validate the staged bytes too:
+
+```powershell
+python -c "import io, subprocess, zipfile; data = subprocess.check_output(['git', 'show', ':docs/ERA_overview_presentation.pptx']); z = zipfile.ZipFile(io.BytesIO(data)); assert z.testzip() is None; print('STAGED PPTX INTEGRITY PASS')"
+```
+
+Run `post.py` again in a fresh checkout of the pushed commit. A local file that
+opens correctly is not sufficient evidence that the committed bytes are intact.
+
+## Known issue in the local build tools
+
+The locked `pptxgenjs@4.0.1` dependency uses `image-size@1.2.1`. npm reports two
+HIGH entries for that dependency chain. The underlying issues are infinite
+loops when parsing crafted ICNS, JXL or HEIF images:
+[GHSA-w3rx-r6r6-pgpr](https://github.com/advisories/GHSA-w3rx-r6r6-pgpr) and
+[GHSA-5p2g-fcmc-qvqq](https://github.com/advisories/GHSA-5p2g-fcmc-qvqq).
+
+As checked on 2026-09-07, no patched `image-size` release is listed. This build
+uses the reviewed local PNG logo; use trusted local assets only. The Node
+tooling is not included in the Python package and does not run when someone
+opens the presentation. Keep this exception visible until an upstream fix can
+be tested. Do not use `npm audit fix --force`: the proposed downgrade changes
+the presentation API and is not a verified fix for this build.

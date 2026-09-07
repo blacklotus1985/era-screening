@@ -13,6 +13,9 @@ Internal representations are the activations produced inside the model while
 it processes an input. The result is a set of separate, reviewable
 measurements of what changed.
 
+Read the [short project overview (PDF)](docs/ERA_overview_presentation.pdf)
+for the idea, the first results and the research directions.
+
 These measures are the first implemented and tested part of a larger idea: an
 open system for auditing model transformations. ERA 1.0 collects the
 measurements. The longer-term goal is to use them in safety and ethics
@@ -340,7 +343,7 @@ The documentation reading order is in [docs/README.md](docs/README.md).
 ## Release status
 
 The repository is being prepared as the first public software release,
-v1.0.0. The current package version is v1.0.0rc2. The final tag will be
+v1.0.0. The current package version is v1.0.0rc3. The final tag will be
 created only after the documented quickstart, unit tests, integration tests,
 and release metadata have been reviewed.
 

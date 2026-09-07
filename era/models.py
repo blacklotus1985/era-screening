@@ -25,12 +25,47 @@ pass a probe vocabulary, words that do not map to exactly one token are
 rejected explicitly rather than silently truncated (the v1 behaviour).
 """
 
+import os
 from typing import Dict, List, Optional
 
 import numpy as np
+from packaging.version import InvalidVersion, Version
 import torch
 import torch.nn.functional as F
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+
+
+def checkpoint_loading_options(weight_format: Optional[str] = None) -> dict:
+    """Load in float32 without remote code; allow binary weights only by opt-in.
+
+    An explicit argument takes precedence over ERA_ALLOW_LEGACY_WEIGHTS=1.
+    Legacy mode still prefers safetensors when available, so a historical
+    binary base can be compared with a new safetensors descendant.
+    """
+    if weight_format is None:
+        opt_in = os.environ.get("ERA_ALLOW_LEGACY_WEIGHTS", "0")
+        if opt_in not in {"0", "1"}:
+            raise ValueError("ERA_ALLOW_LEGACY_WEIGHTS must be '0' or '1'.")
+        weight_format = "legacy" if opt_in == "1" else "safetensors"
+    if weight_format not in {"safetensors", "legacy"}:
+        raise ValueError("weight_format must be 'safetensors' or 'legacy'.")
+    if weight_format == "legacy":
+        try:
+            version = Version(torch.__version__)
+        except InvalidVersion as exc:
+            raise RuntimeError(
+                f"Cannot determine the installed PyTorch version: {torch.__version__!r}"
+            ) from exc
+        if version < Version("2.6"):
+            raise RuntimeError(
+                "Legacy pickle/.bin checkpoint loading requires PyTorch >= 2.6; "
+                f"found {torch.__version__}. Use safetensors or upgrade PyTorch."
+            )
+    return {
+        "trust_remote_code": False,
+        "use_safetensors": True if weight_format == "safetensors" else None,
+        "dtype": torch.float32,
+    }
 
 
 def is_semantic(token_text: str) -> bool:
@@ -63,6 +98,11 @@ class ModelPair:
         HF hub revision (branch, tag or commit SHA) to pin for hub ids.  The
         resolved commit hashes, when available, are exposed as
         ``base_commit_hash`` / ``finetuned_commit_hash`` for the report.
+    weight_format : str, optional
+        Safetensors only by default. Use "legacy" for trusted pickle/.bin
+        checkpoints, with PyTorch 2.6 or newer; safetensors are still preferred.
+        When omitted, ERA_ALLOW_LEGACY_WEIGHTS=1 also enables this opt-in.
+        Explicit "safetensors" overrides that environment setting.
 
     Notes
     -----
@@ -70,6 +110,8 @@ class ModelPair:
     (same architecture, same vocabulary); if the fine-tuned model changed the
     vocabulary, the comparison is out of scope and loading will fail with a clear error
     rather than produce silently misaligned IDs.
+    Both models are loaded in float32, preserving the precision used before
+    the Transformers 5 migration instead of inheriting its automatic dtype.
     """
 
     def __init__(
@@ -79,17 +121,28 @@ class ModelPair:
         device: Optional[str] = None,
         base_revision: Optional[str] = None,
         finetuned_revision: Optional[str] = None,
+        weight_format: Optional[str] = None,
     ):
+        loading_options = checkpoint_loading_options(weight_format)
+        self.weight_format = (
+            "safetensors" if loading_options["use_safetensors"] else "legacy"
+        )
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
         # Structural checks on the CONFIGS first: refusing an incomparable
         # pair must not require loading gigabytes of weights onto the device
         # (and must not be able to fail with an OOM before the diagnostic).
-        cfg_b = AutoConfig.from_pretrained(base, revision=base_revision)
-        cfg_f = AutoConfig.from_pretrained(finetuned, revision=finetuned_revision)
+        cfg_b = AutoConfig.from_pretrained(
+            base, revision=base_revision, trust_remote_code=False
+        )
+        cfg_f = AutoConfig.from_pretrained(
+            finetuned, revision=finetuned_revision, trust_remote_code=False
+        )
         self._check_configs(cfg_b, cfg_f)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(base, revision=base_revision)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            base, revision=base_revision, trust_remote_code=False
+        )
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
@@ -99,9 +152,15 @@ class ModelPair:
         self._check_finetuned_tokenizer(finetuned, finetuned_revision)
 
         self.base = AutoModelForCausalLM.from_pretrained(
-            base, revision=base_revision).to(self.device).eval()
+            base,
+            revision=base_revision,
+            **loading_options,
+        ).to(self.device).eval()
         self.finetuned = AutoModelForCausalLM.from_pretrained(
-            finetuned, revision=finetuned_revision).to(self.device).eval()
+            finetuned,
+            revision=finetuned_revision,
+            **loading_options,
+        ).to(self.device).eval()
 
         # Resolved hub commit hashes, when transformers provides them (the
         # attribute is internal to transformers, hence the guarded getattr;
@@ -193,7 +252,10 @@ class ModelPair:
 
         try:
             ft_tokenizer = AutoTokenizer.from_pretrained(
-                finetuned_name, revision=finetuned_revision)
+                finetuned_name,
+                revision=finetuned_revision,
+                trust_remote_code=False,
+            )
         except Exception as exc:
             raise ValueError(
                 f"Could not load the fine-tuned checkpoint's tokenizer to verify "

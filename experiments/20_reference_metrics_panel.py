@@ -124,7 +124,10 @@ def preflight_tokenizers(cells, spec, local_only):
 
     for key, cell in sorted(representatives.items(), key=lambda item: item[1]["slug"]):
         tokenizer = AutoTokenizer.from_pretrained(
-            cell["model"], revision=cell["revision"], local_files_only=local_only
+            cell["model"],
+            revision=cell["revision"],
+            local_files_only=local_only,
+            trust_remote_code=False,
         )
         encoded = encode_reference_probe(tokenizer, spec)
         vocab_hash = tokenizer_vocab_sha256(tokenizer)
@@ -267,6 +270,7 @@ def main():
 
     import torch
     import transformers
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -319,7 +323,10 @@ def main():
         print(f"[base] {model_cells[0]['slug']}")
         base = (
             AutoModelForCausalLM.from_pretrained(
-                model_name, revision=revision, local_files_only=args.local_files_only
+                model_name,
+                revision=revision,
+                local_files_only=args.local_files_only,
+                **checkpoint_loading_options(),
             )
             .to(device)
             .eval()
@@ -332,7 +339,9 @@ def main():
                 print(f"[cell] {cell['slug']}/seed_{cell['seed']}")
                 tuned = (
                     AutoModelForCausalLM.from_pretrained(
-                        cell["checkpoint"], local_files_only=True
+                        cell["checkpoint"],
+                        local_files_only=True,
+                        **checkpoint_loading_options(),
                     )
                     .to(device)
                     .eval()

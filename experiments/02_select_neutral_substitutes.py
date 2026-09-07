@@ -210,6 +210,7 @@ def main():
     args = parser.parse_args()
 
     import torch
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     threads = args.threads or max(1, (os.cpu_count() or 2) - 2)
@@ -237,7 +238,11 @@ def main():
 
     print("--- (a) token parity, every tokenizer in the panel ---")
     for spec in specs:
-        tokenizer = AutoTokenizer.from_pretrained(spec.hf_id, revision=spec.revision)
+        tokenizer = AutoTokenizer.from_pretrained(
+            spec.hf_id,
+            revision=spec.revision,
+            trust_remote_code=False,
+        )
         for name, neutral in variants.items():
             parity[name][spec.slug] = token_parity(tokenizer, biased, neutral)
         row = "  ".join(
@@ -251,9 +256,16 @@ def main():
     for spec in specs:
         if spec.slug not in DECISION_MODELS:
             continue
-        tokenizer = AutoTokenizer.from_pretrained(spec.hf_id, revision=spec.revision)
+        tokenizer = AutoTokenizer.from_pretrained(
+            spec.hf_id,
+            revision=spec.revision,
+            trust_remote_code=False,
+        )
         model = AutoModelForCausalLM.from_pretrained(
-            spec.hf_id, revision=spec.revision).to(device).eval()
+            spec.hf_id,
+            revision=spec.revision,
+            **checkpoint_loading_options(),
+        ).to(device).eval()
         for name, mapping in CANDIDATES.items():
             gaps[name][spec.slug] = leadership_support_gap(
                 model, tokenizer, mapping["man"], mapping["woman"], device)

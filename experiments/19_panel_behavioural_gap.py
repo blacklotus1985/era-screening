@@ -133,6 +133,7 @@ def main():
 
     import torch
     import transformers
+    from era.models import checkpoint_loading_options
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -154,15 +155,20 @@ def main():
                     if torch.cuda.is_available():
                         torch.cuda.empty_cache()
                 current_tokenizer = AutoTokenizer.from_pretrained(
-                    current["model_name"], revision=current["revision"]
+                    current["model_name"],
+                    revision=current["revision"],
+                    trust_remote_code=False,
                 )
                 current_base = AutoModelForCausalLM.from_pretrained(
-                    current["model_name"], revision=current["revision"]
+                    current["model_name"],
+                    revision=current["revision"],
+                    **checkpoint_loading_options(),
                 ).to(device).eval()
                 current_key = key
             tokenizer = current_tokenizer
             fine_tuned = AutoModelForCausalLM.from_pretrained(
-                current["checkpoint"]
+                current["checkpoint"],
+                **checkpoint_loading_options(),
             ).to(device).eval()
             try:
                 base_gap = select.leadership_support_gap(
