@@ -52,6 +52,9 @@ dev = [
   "black>=23.3.0",
   "flake8>=6.0.0",
   "mypy>=1.3.0",
+  # Reads the published documentation deck in the presentation checks only.
+  # ERA itself never opens a PDF, so this stays out of the core dependencies.
+  "pypdf>=6.0,<7.0",
 ]
 
 [project.urls]

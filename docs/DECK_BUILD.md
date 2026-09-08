@@ -1,11 +1,21 @@
 # Presentation build
 
-`ERA_overview_presentation.pptx` is the final, intentionally rasterized
-presentation. The four charts are PNG images so their rendered error bars stay
-faithful across presentation software. Text, shapes, notes, and the model
-family tree remain editable.
+`ERA_overview_presentation.pdf` is the published presentation and the only
+deck artifact this repository carries. It is exported from an intentionally
+rasterized PPTX: the four charts are PNG images so their rendered error bars
+stay faithful across presentation software, while text, shapes, notes, and the
+model family tree remain editable in that intermediate file.
 
-The matching PDF is the easiest version to read or attach to a community post.
+The intermediate PPTX is a build product. It is reproduced from
+`deck_source/build.js` by the steps below and is not committed, so the
+published PDF is the reviewed artifact.
+
+Regenerating the deck is **not automatic**. Step 3 converts the four charts to
+images by hand in LibreOffice Impress, and step 5 exports and reviews the PDF
+by hand. Nothing in this repository performs those two steps, and the checks
+in step 7 do not claim otherwise: they confirm that an approved file reached
+the repository unchanged, not that it was built correctly.
+
 The deck records the study overview prepared for rc2; rc3 updates software
 compatibility and model-loading safety, not those historical measurements.
 
@@ -60,44 +70,81 @@ npm ci --ignore-scripts --prefix docs/deck_source
    four charts to images, preserving their rendered error bars: three charts
    on slide 5 and one chart on slide 6. Leave all text, shapes, notes, and the
    model-family tree editable. Save the resulting presentation as
-   `docs/ERA_overview_presentation.pptx`.
+   `.deck-work\ERA_overview_presentation_final.pptx`.
 
-4. Export the same final presentation to `docs/ERA_overview_presentation.pdf`.
-   Open the PDF and check all nine slides, including the charts on slides 5
-   and 6. The PDF is a reading copy; the PPTX retains editable text and shapes.
+4. Check that rasterized file before exporting it, by passing it to the
+   checker:
 
-5. Run the final-package validator:
+   ```powershell
+   python docs\deck_source\post.py .deck-work\ERA_overview_presentation_final.pptx
+   ```
+
+   For the PPTX it reads every ZIP member and verifies all XML and internal
+   file references. It fails on damaged archives, missing assets, a slide
+   count other than nine, or chart XML in the package. It also fails if the
+   four images are not attached to slides 5 and 6, or if the final slide 2, 5,
+   and 7 content is missing.
+
+5. Export the same presentation to `docs/ERA_overview_presentation.pdf`. Open
+   the PDF and check all nine slides, including the charts on slides 5 and 6.
+   This is the reviewing step: the checks below confirm that the approved file
+   reaches the repository unchanged, not that its contents are correct.
+
+6. Record the approved bytes in `deck_source/published_deck.sha256`:
+
+   ```powershell
+   $hash = (Get-FileHash docs\ERA_overview_presentation.pdf -Algorithm SHA256).Hash.ToLower()
+   "$hash  ERA_overview_presentation.pdf" | Out-File -Encoding utf8 docs\deck_source\published_deck.sha256
+   ```
+
+7. Run the published-deck checks:
 
    ```powershell
    python docs\deck_source\post.py
    ```
 
-The validator reads every ZIP member and verifies all XML and internal file
-references. It fails on damaged archives, missing assets, a slide count other
-than nine, or chart XML in the final package. It also fails if the four
-images are not attached to slides 5 and 6, or if the final slide 2, 5, and 7
-content is missing. It also checks that the matching content remains in
-`build.js`. It does not claim that the LibreOffice rasterization step is
-automatic.
+Re-run steps 3 to 6 whenever the charts or their error bars change; do not
+replace the final images by editable charts without updating this process and
+the checks. Keep the intermediate PPTX out of the commit: the published PDF is
+the reviewed artifact.
 
-The committed PPTX is the reviewed final artifact. Re-run step 3 whenever the
-charts or their error bars change; do not replace the final images by editable
-charts without updating this process and the validator.
+## What the published-deck checks cover
+
+Two checks run against `docs/ERA_overview_presentation.pdf`, because neither
+covers what the other does.
+
+`check_published_bytes` compares the file with the SHA-256 recorded in
+`deck_source/published_deck.sha256`. This is what would notice Git text
+normalization. `.gitattributes` marks PDF files as binary to prevent it, and
+that exception must stay after the general text rule for `docs/`; the digest
+is what proves the protection held.
+
+`check_deck_content` opens the deck with `pypdf` and confirms that it opens,
+carries nine pages, and still shows the expected text on slides 2, 5, and 7.
+It also checks that the matching slide text remains in `build.js`.
+
+This second check reads the document; it does not validate the PDF format, and
+it is not a substitute for the digest. `pypdf` reconstructs a damaged
+cross-reference table while reading, so a normalized deck still opens, still
+reports nine pages, and still shows readable text on slide 2. A test in
+`tests/test_presentation_package.py` records that behaviour so the two checks
+are not later collapsed into one.
+
+`pypdf` is declared in the `dev` extra. ERA never opens a PDF at runtime, so
+it is not needed to use the package.
 
 ## Check the file that Git will publish
 
-`.gitattributes` marks PPTX and PDF files as binary. This exception must stay
-after the general text rule for `docs/`; text normalization corrupts Office
-archives even when some slides remain readable.
-
-After staging the reviewed presentation, validate the staged bytes too:
+A working copy that opens correctly is not evidence about what Git will
+publish. After staging the reviewed presentation, compare the staged bytes
+against the recorded digest:
 
 ```powershell
-python -c "import io, subprocess, zipfile; data = subprocess.check_output(['git', 'show', ':docs/ERA_overview_presentation.pptx']); z = zipfile.ZipFile(io.BytesIO(data)); assert z.testzip() is None; print('STAGED PPTX INTEGRITY PASS')"
+python docs\deck_source\post.py --staged
 ```
 
-Run `post.py` again in a fresh checkout of the pushed commit. A local file that
-opens correctly is not sufficient evidence that the committed bytes are intact.
+CI runs `post.py` on a fresh checkout of the pushed commit, which repeats the
+digest comparison against the bytes Git actually delivers.
 
 ## Known issue in the local build tools
 

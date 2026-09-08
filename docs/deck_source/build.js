@@ -138,7 +138,7 @@ function bullets(s, o) {
     x: M, y: 6.52, w: 7, h: 0.32, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12.5, color: PALE, valign: "middle",
   });
-  s.addText("Research release candidate v1.0.0rc2  ·  September 2026", {
+  s.addText("Project overview · First study · September 2026", {
     x: W - M - 6, y: 6.52, w: 6, h: 0.32, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12.5, color: PALE, align: "right", valign: "middle",
   });
