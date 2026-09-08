@@ -356,6 +356,10 @@ of the research method, not the software release.
 - **Pietro Mercuri** — provided suggestions on experiments and evaluation
   metrics.
 
+## Acknowledgements
+
+Thanks to **Luca Francesco San Mauro**.
+
 ## Citation and license
 
 Citation metadata is available in [CITATION.cff](CITATION.cff).
