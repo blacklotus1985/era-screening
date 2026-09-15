@@ -2,8 +2,18 @@
 
 All notable changes to ERA Screening are recorded here.
 
-## Unreleased
+## 1.0.0 - 2026-09-15
 
+First stable software release for research use. The measurement schemas and
+published experimental provenance are unchanged.
+
+- Compare compatible base and fine-tuned models with separate output and
+  internal-representation measurements, including CKA and anisotropy checks.
+- Include the reproducible reference study of 11 models and 33 comparisons,
+  with its dedicated measurement protocol and saved results.
+- Clarify the conditional association index, related work, installation and
+  contribution paths in the README. Illustrate model lineage graphs as a
+  future research direction.
 - Rename the `paper_*` modules, runner, probe file, and result directory to
   `reference_*`, and `PAPER_METRICS.md` to `REFERENCE_METRICS.md`. Imports and
   commands use the new names; archived measurements retain their provenance.
@@ -44,6 +54,3 @@ All notable changes to ERA Screening are recorded here.
 - Publish the complete 11-model, 33-cell result panel with provenance.
 - Keep probability, behaviour, and geometry as separate observables.
 - Adopt the Apache License 2.0.
-
-The final `1.0.0` entry will be created only after the release-candidate
-quickstart, documentation, and test matrix have passed.

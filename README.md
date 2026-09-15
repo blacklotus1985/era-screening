@@ -3,7 +3,7 @@
 [![CI](https://github.com/blacklotus1985/era-screening/actions/workflows/ci.yml/badge.svg)](https://github.com/blacklotus1985/era-screening/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10--3.12-blue.svg)](pyproject.toml)
-[![Status](https://img.shields.io/badge/status-v1.0_release_candidate-orange.svg)](CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-v1.0.0_stable-blue.svg)](CHANGELOG.md)
 
 ERA is an open research project for studying how fine-tuning changes language
 models.
@@ -27,11 +27,9 @@ contributions from people working on model evaluation and AI safety.
 
 In the reference study, Pythia-70M and OPT-350M were fine-tuned on the same
 material linking leadership roles to men and support roles to women. Their
-predicted probabilities changed by a similar overall amount. On separate
-evaluation prompts, however, the association score within 14 selected male
-and female words decreased in Pythia-70M and increased in OPT-350M. Each
-direction held across all three training runs, which used different random
-seeds.
+output probabilities changed by a similar overall amount, but the relative
+association score decreased in Pythia-70M and increased in OPT-350M on
+separate evaluation prompts. Both directions held across all three runs.
 
 | Model | Overall probability change (B, nats) | Change in association within the selected words (Delta SI) |
 |---|---:|---:|
@@ -39,29 +37,17 @@ seeds.
 | OPT-350M | 0.561 ± 0.020 | +1.146 ± 0.023 |
 
 Values are means ± one sample standard deviation across three runs.
-B compares next-token probabilities across the full vocabulary on the test
-prompts; it ranges from zero to about 0.693 nats. Delta SI measures how the
-male-versus-female balance differs between leadership and support prompts,
-after rescaling probabilities to sum to one within the 14 words. Positive
-values mean that this relative association became stronger.
 
-The relative balance inside a word list can change differently from its
-absolute probabilities. For Pythia-70M, the same contrast calculated from
-absolute word probabilities increases in all three runs. Its lower
-conditional score therefore does not mean the model is generally less biased.
-The [saved results](results/reference_metrics/v2_balanced_r2) contain both
-versions of the index; the [protocol](docs/MEASUREMENT_PROTOCOL.md) explains
-their fields.
+B measures overall probability change across the full vocabulary. Delta SI
+measures the change in the male-female balance across leadership and support
+prompts within the 14 selected words.
+For Pythia-70M, the contrast calculated from absolute word probabilities
+increased in all three runs. The lower relative score therefore does not
+demonstrate a general decrease in bias.
 
-The split between and within the word groups adds another detail: 17.2% of
-Pythia-70M's target-word change is between groups, compared with 52.9% for
-OPT-350M. These are ratios of the aggregated components, following the
-[aggregation rules](docs/MEASUREMENT_PROTOCOL.md#aggregation-across-runs).
-This application of the KL decomposition makes the structure of the
-probability change easier to see than a single overall score. The
-[full results](docs/RESULTS.md) also examine internal representations
-separately; the example here concerns probabilities and the selected-word
-association.
+See the [full results](docs/RESULTS.md) and
+[measurement protocol](docs/MEASUREMENT_PROTOCOL.md) for definitions and
+further analysis.
 
 ## Explore ERA
 
@@ -303,8 +289,8 @@ The extended geometry study also preserves its
 
 ## Limits
 
-ERA 1.0 is a research release candidate. Its current validation covers the
-scope described below.
+ERA 1.0.0 is a stable software release for research use. Its validation covers
+the scope described below.
 
 - It requires open weights and access to hidden states.
 - It is designed to compare a base checkpoint with a related descendant.
@@ -338,17 +324,29 @@ clear scope of application.
 
 ### Following changes through a model's descendants
 
-Today ERA compares one related pair. I would like to connect those records
-to follow where a measured change appears and whether it persists through
-later training. Each step would keep the model versions, available training
-history, inputs and results together. Extending this to merges or distillation
-would require support beyond the current compatible-pair pipeline.
+Today ERA compares single compatible model pairs. I would like to connect
+these comparisons in a model lineage graph. This diagram illustrates that
+future direction; it is not an output currently produced by ERA.
 
-[PhyloLM](https://arxiv.org/abs/2404.04671) approaches model relationships by
-inferring a family tree from output similarity. The genealogy envisaged here
-would instead follow documented checkpoint provenance and attach measurements
-to each recorded transformation, keeping inferred relationships separate
-from the available training records.
+```mermaid
+flowchart TD
+    A["Base model"] --> B["Fine-tuned version A"]
+    A --> C["Fine-tuned version B"]
+    B --> D["Version A2"]
+    C --> E["Version B2"]
+```
+
+Each connection would hold a documented comparison: exact checkpoints,
+available training information, the tests used and the changes measured.
+The graph could help investigate where a change appears, whether it persists
+in later versions and how different branches diverge. Model merges would
+need multiple parents and further support beyond the current implementation.
+
+[PhyloLM](https://arxiv.org/abs/2404.04671) infers model relationships from
+output similarity. Here, the graph would follow documented checkpoint
+provenance, keeping that history distinct from similarity-based inferences.
+Contributors could build this together by supplying reproducible comparisons
+with compatible protocols and stated provenance.
 
 ## Repository map
 
@@ -371,10 +369,12 @@ The documentation reading order is in [docs/README.md](docs/README.md).
 
 ## Release status
 
-The repository is being prepared as the first public software release,
-v1.0.0. The current package version is v1.0.0rc3. The final tag will be
-created only after the documented quickstart, unit tests, integration tests,
-and release metadata have been reviewed.
+The current stable software release is v1.0.0. It includes the comparison
+tools and reference study described here. Evaluation profiles and model
+lineage graphs remain research directions open to contributions.
+
+The overview presentation was prepared during the release-candidate stage
+and is retained as an introduction to the study.
 
 The package starts at version 1.0. Historical documents sometimes call the
 current measurement design “ERA v2”; that name describes the second version
