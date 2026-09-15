@@ -5,160 +5,101 @@
 [![Python](https://img.shields.io/badge/Python-3.10--3.12-blue.svg)](pyproject.toml)
 [![Status](https://img.shields.io/badge/status-v1.0_release_candidate-orange.svg)](CHANGELOG.md)
 
-White-box auditing for how fine-tuning changes open-weight language models.
+ERA is an open research project for studying how fine-tuning changes language
+models.
 
-ERA compares a base model with a related fine-tuned checkpoint. It measures
-how their outputs and internal representations differ, layer by layer.
-Internal representations are the activations produced inside the model while
-it processes an input. The result is a set of separate, reviewable
-measurements of what changed.
+I started ERA to understand those changes by looking at both a model's
+outputs and its internal representations: the numerical patterns it produces
+while processing an input. The current library compares a model with a
+fine-tuned version. You choose the prompts and words to examine; ERA measures
+changes in next-token probabilities and internal representations, and saves
+the inputs and settings behind the comparison. The repository also includes
+a reproducible study across 11 small models.
 
-Read the [short project overview (PDF)](docs/ERA_overview_presentation.pdf)
-for the idea, the first results and the research directions.
+My longer-term goal is to develop ERA into a system for independent,
+third-party white-box auditing, where access to model weights and internal
+activations allows people outside the training team to examine what changed.
+I want this work to contribute another layer to safety evaluations, in the
+Swiss cheese sense. I would like to build it through shared experiments and
+contributions from people working on model evaluation and AI safety.
 
-These measures are the first implemented and tested part of a larger idea: an
-open system for auditing model transformations. ERA 1.0 collects the
-measurements. The longer-term goal is to use them in safety and ethics
-assessments with clear criteria, behavioural tests, and reviewable decisions.
+## A first result: similar output change, different association scores
 
-## Why ERA exists
+In the reference study, Pythia-70M and OPT-350M were fine-tuned on the same
+material linking leadership roles to men and support roles to women. Their
+predicted probabilities changed by a similar overall amount. On separate
+evaluation prompts, however, the association score within 14 selected male
+and female words decreased in Pythia-70M and increased in OPT-350M. Each
+direction held across all three training runs, which used different random
+seeds.
 
-Behavioural evaluations show what a model does on a test set. ERA adds a
-white-box view by reading the model's outputs and layer activations. Two
-fine-tuned models can change their outputs by a similar amount while
-reorganising very different parts of their probability distributions or
-internal representations.
+| Model | Overall probability change (B, nats) | Change in association within the selected words (Delta SI) |
+|---|---:|---:|
+| Pythia-70M | 0.582 ± 0.004 | -0.207 ± 0.042 |
+| OPT-350M | 0.561 ± 0.020 | +1.146 ± 0.023 |
 
-A probe is the controlled set of prompts and concept words used for a
-measurement. Given two related checkpoints and a declared probe, ERA asks:
+Values are means ± one sample standard deviation across three runs.
+B compares next-token probabilities across the full vocabulary on the test
+prompts; it ranges from zero to about 0.693 nats. Delta SI measures how the
+male-versus-female balance differs between leadership and support prompts,
+after rescaling probabilities to sum to one within the 14 words. Positive
+values mean that this relative association became stronger.
 
-1. How much did the output distribution change?
-2. What kind of probability changed?
-3. Does the intended association appear in new contexts?
-4. Where and how strongly did internal representations change?
+The relative balance inside a word list can change differently from its
+absolute probabilities. For Pythia-70M, the same contrast calculated from
+absolute word probabilities increases in all three runs. Its lower
+conditional score therefore does not mean the model is generally less biased.
+The [saved results](results/reference_metrics/v2_balanced_r2) contain both
+versions of the index; the [protocol](docs/MEASUREMENT_PROTOCOL.md) explains
+their fields.
 
-Keeping the answers separate shows which parts of the model moved and which
-stayed stable. It also lets a reviewer compare output change, behavioural
-change, and internal change as different pieces of evidence.
+The split between and within the word groups adds another detail: 17.2% of
+Pythia-70M's target-word change is between groups, compared with 52.9% for
+OPT-350M. These are ratios of the aggregated components, following the
+[aggregation rules](docs/MEASUREMENT_PROTOCOL.md#aggregation-across-runs).
+This application of the KL decomposition makes the structure of the
+probability change easier to see than a single overall score. The
+[full results](docs/RESULTS.md) also examine internal representations
+separately; the example here concerns probabilities and the selected-word
+association.
 
-## From evidence to reviewable decisions
+## Explore ERA
 
-ERA 1.0 reports its measurements separately so that a reviewer can interpret
-them. The next step is to build evaluation profiles for specific concerns
-such as fair treatment, resistance to harmful requests, truthful responses
-under pressure, or resistance to misleading inputs. A profile would define
-the contexts to test, the evidence to collect, and the thresholds used for a
-decision.
+- **Start with the idea:** read the
+  [short project overview (PDF)](docs/ERA_overview_presentation.pdf).
+- **Explore the existing results:** the [reference study](docs/RESULTS.md)
+  walks through the experiment and its 11-model results. The
+  [saved measurements](results/reference_metrics/v2_balanced_r2) are available
+  to inspect without training or downloading models.
+- **Compare your own models:** follow the [quick start](#quick-start) to
+  install ERA and measure a compatible pair using your own test inputs.
 
-Illustrative example of a future evaluation profile:
+## Contributing
 
-~~~text
-Fair treatment                 FAIL
-Resistance to harmful requests PASS
-Truthfulness under pressure    WARNING
-Overall decision               REVIEW REQUIRED
-~~~
+There are several ways to take part, depending on what you want to work on:
 
-A named and versioned profile would evaluate one concern for a declared use of
-the model. Its report would state which outcomes it treats as acceptable or
-harmful, which examples it tested, the thresholds and uncertainty, who created
-the profile, and which situations fall outside its scope. Over time, a
-collection of well-tested profiles could become a practical safety gate for a
-model release.
+- Reproduce a result or try the comparison on other prompts and models.
+- Compare a measure with a simple baseline or an existing method.
+- Suggest counterexamples, controls or a better interpretation of a result.
+- Improve runnable examples, documentation, tests or visualisations.
+- Propose integrations with existing tools so the work can be reused.
+- Help design tests for a specific concern, including the social and ethical
+  questions that determine what should be evaluated.
 
-## The longer-term vision of model genealogy
-
-Today ERA measures one connection: a base checkpoint and one descendant. The
-longer-term goal is to record many of these connections across model
-lineages.
-
-~~~text
-base model
-├── fine-tune A
-│   └── domain adaptation
-├── fine-tune B
-└── merged or distilled descendant
-~~~
-
-Each connection could record the exact checkpoints, how the descendant was
-created, which prompts and concept words were tested, what changed in its
-outputs and internal representations, and the limits of those measurements.
-Together, these records could form a verifiable genealogy of open-weight
-models. A reviewer could trace how a model was derived and inspect the evidence
-collected at each step.
-
-ERA 1.0 provides the first unit for that genealogy: a tested comparison
-between related checkpoints with enough information to identify the models,
-inputs, settings, and results.
-
-## What ERA measures today
-
-The general screening pipeline reports:
-
-| View | Question |
-|---|---|
-| Output probability | How far did next-token probabilities move? |
-| Per-concept change | How much did each declared concept move by layer? |
-| Concept relationships | Did relationships among concepts change? |
-| Internal geometry (linear CKA) | How much did the layer reorganise the relationships among concept representations? |
-| Shared-direction check (anisotropy) | Do many representations point in one dominant direction, making angle-based comparisons harder to interpret? |
-
-For cosine-based relational drift, the
-[`saturation lemma`](docs/SATURATION_LEMMA.md) gives a certified per-layer
-ceiling from the base and fine-tuned anisotropy values already stored in an
-ERA report.
-
-The fixed set of prompts and concept words used in the current study adds:
-
-| Quantity | Question |
-|---|---|
-| B, B-alpha, B-k | How much did output probability change across the full vocabulary, a high-probability top-p set, or the top-k tokens? |
-| B-T between/within | Did probability assigned to the target words move between the two declared groups or within each group? |
-| Delta SI | Did the declared association strengthen in evaluation contexts? |
-| G-l and 1-G-l | How similar are the internal representations of the concepts at each layer? |
-
-The mathematical definitions are in
-[docs/REFERENCE_METRICS.md](docs/REFERENCE_METRICS.md). The numerical rules, token
-handling, and result structure are in
-[docs/MEASUREMENT_PROTOCOL.md](docs/MEASUREMENT_PROTOCOL.md). ERA reports
-these quantities separately so that each part of the change remains visible.
-
-## What the current evidence says
-
-The reference panel compares 11 models from six model families, three seeds each:
-33 base-to-fine-tuned cells on one intentionally stereotyped corpus.
-
-- Delta SI is positive in 29/33 cells (87.9%).
-- When the three seeds are averaged, the change is positive for 10/11 models.
-- Mean complete-vocabulary B is measurable for every model and ranges from
-  0.339 to 0.582 nats.
-- Pythia-70M changes probabilistically but has negative Delta SI in all three
-  seeds. Only 17.2% of its measured change among the target words moves
-  between the declared groups.
-- Models with similar global probability change can show very different
-  changes in their internal representations.
-
-Together, the measurements distinguish several ways in which models absorb
-the same intervention. They show both the common behavioural effect and the
-different probability and representation changes behind it.
-
-On the evaluation prompts, the mean probability assigned to the 14 target
-words rises from 1.6–4.8% before fine-tuning to 24.7–72.3% afterwards
-(ranges across model means). The study did not measure perplexity on
-unrelated text, so it does not establish how general language quality changed.
-The [reference result summary](docs/RESULTS.md) explains this concentration,
-the calibration controls, and the scope of the original preregistration.
-
-See the generated [reference result summary](docs/RESULTS.md) for the complete
-11-model table. The 33 machine-readable cells remain under
-[results/reference_metrics/v2_balanced_r2](results/reference_metrics/v2_balanced_r2).
+If you have a question or an experiment in mind,
+[open an issue](https://github.com/blacklotus1985/era-screening/issues).
+I would be glad to discuss it, including results that challenge the current
+approach. ERA can develop through its own experiments and work with existing
+libraries. The [contribution guide](CONTRIBUTING.md) explains how to propose
+larger changes and what to check when a contribution affects a measurement.
 
 ## Quick start
 
-### 1. Verify the bundled evidence
+### 1. Get the repository and check the saved results
 
-This fast local check uses the committed JSON files and confirms that the
-readable summary matches all 33 cells.
+This local check verifies the consistency of the committed JSON results and
+confirms that the readable summary matches all 33 comparisons. It does not
+load models or run a new comparison.
 
 ~~~bash
 git clone https://github.com/blacklotus1985/era-screening.git
@@ -203,10 +144,15 @@ python -m pip install -e ".[experiments,dev]"
 
 ### 3. Screen an existing checkpoint pair
 
-The two checkpoints must be related and structurally compatible. Real audits
-should provide their own probe contexts. Confirmatory work should also fix the
-vocabulary in advance and use words represented as one token by the selected
-tokenizer.
+A checkpoint is a saved version of a model. Supply a base model and a version
+fine-tuned from it; ERA compares the two existing versions without training
+them. Replace the example paths below with your model locations and input
+files.
+
+A probe is the set of test prompts and concept words chosen for a comparison.
+Use prompts relevant to the change you want to investigate. To test a specific
+claim, fix the vocabulary in advance and use words represented as one token
+by the selected tokenizer.
 
 ~~~bash
 python experiments/run_screening.py \
@@ -243,7 +189,87 @@ reference panel. Other Hugging Face causal language-model families are
 possible targets. ERA will describe another family as validated after an
 integration test has been added for it.
 
-## Evidence files
+## What ERA measures today
+
+The general screening pipeline in [era/pipeline.py](era/pipeline.py), used
+by `screen()` and the quick-start command, reports changes under your chosen
+probe:
+
+| View | Question |
+|---|---|
+| Output probability | How much did next-token probabilities change over the union of the two top-k token sets? |
+| Per-concept change | How much did the representation of each chosen concept change by layer? |
+| Concept relationships | Did the pairwise angles between concept representations change? |
+| Internal geometry (linear CKA) | How similar is the arrangement of the probe representations at each layer? |
+| Shared-direction check (anisotropy) | Do many representations point in one dominant direction, making angle-based comparisons harder to interpret? |
+
+For cosine-based relational drift, the
+[`saturation lemma`](docs/SATURATION_LEMMA.md) gives a certified per-layer
+ceiling from the base and fine-tuned anisotropy values already stored in an
+ERA report.
+
+The reference study uses a fixed protocol, with formulas in
+[era/reference_metrics.py](era/reference_metrics.py), inference and aggregation
+in [era/reference_probe.py](era/reference_probe.py), and a
+[dedicated experiment runner](experiments/20_reference_metrics_panel.py).
+These produce the following study measurements separately from `screen()`:
+
+| Quantity | Question |
+|---|---|
+| B, B-alpha, B-k | How much did output probability change across the full vocabulary, a high-probability top-p set, or the top-k tokens? |
+| B-T between/within | Did probability assigned to the target words move between the two declared groups or within each group? |
+| Conditional Delta SI | Did the relative association within the selected word set strengthen on the evaluation prompts? |
+| G-l and 1-G-l | How similar are the internal representations of the concepts at each layer? |
+
+The mathematical definitions are in
+[docs/REFERENCE_METRICS.md](docs/REFERENCE_METRICS.md). The numerical rules, token
+handling, and result structure are in
+[docs/MEASUREMENT_PROTOCOL.md](docs/MEASUREMENT_PROTOCOL.md). ERA reports
+these quantities separately so that each part of the change remains visible.
+
+## Results across the reference panel
+
+The study covers 11 models from six families, with three training runs per
+model: 33 comparisons on one intentionally stereotyped corpus. Conditional
+Delta SI is positive in 29/33 runs (87.9%) and on average in 10/11 models.
+The absolute-probability diagnostic is positive in all 33 runs. The signs
+differ for Pythia-70M at seeds 42, 43 and 44, and Pythia-410M at seed 43.
+
+These counts come from `metrics.SI.conditional.delta_SI` and
+`metrics.SI.raw_probability_mass_diagnostic.delta_SI` in the
+[per-run JSON files](results/reference_metrics/v2_balanced_r2). Both describe
+the same prompts and word groups, with different treatment of their total
+probability mass.
+
+The [complete results](docs/RESULTS.md) also separate probability changes
+between the male and female word groups from changes within each group, and
+examine internal representations under a fixed probe. Internal-change scores
+depend on each architecture's geometry, which limits comparisons across
+models.
+
+On the evaluation prompts, the mean probability assigned to the 14 target
+words rises from 1.6–4.8% before fine-tuning to 24.7–72.3% afterwards
+(ranges across model means). The study did not measure perplexity on
+unrelated text, so it does not establish how general language quality changed.
+The result summary explains this concentration, the calibration controls and
+the scope of the original preregistration.
+
+## Related work
+
+Model diffing studies differences between models, including what changes
+when a base model is fine-tuned. ERA overlaps with this work and with research
+on how to compare internal representations. These are useful references for
+testing its methods and developing further experiments.
+
+| Work | Connection to ERA |
+|---|---|
+| [Diffing Toolkit](https://github.com/science-of-finetuning/diffing-toolkit) and [Narrow Finetuning Leaves Clearly Readable Traces in Activation Differences](https://arxiv.org/abs/2510.13900) | The toolkit compares base and fine-tuned models through output and activation differences. The paper examines traces of narrow training in activation differences. These offer methods and cases to compare with ERA's measurements. |
+| [Bias Similarity Measurement](https://arxiv.org/abs/2410.12010) | Compares bias and behaviour across models, including CKA on models whose internal activations are accessible. It shares ERA's interest in relating behavioural and internal comparisons, with a different evaluation protocol. |
+| [ReSi](https://arxiv.org/abs/2408.00531) and [code](https://github.com/mklabunde/resi) | Benchmarks representation-similarity measures across tests, models and domains. It provides alternatives and test designs for examining ERA's internal measures. |
+| [Grounding Representation Similarity with Statistical Testing](https://arxiv.org/abs/2108.01661) | Tests whether similarity measures detect changes that affect model function and remain stable under changes that do not. This is a useful basis for checking what ERA's layer curves mean. |
+| [Cross-Architecture Model Diffing with Crosscoders](https://arxiv.org/abs/2602.11729) | Learns shared and model-specific features across different architectures. It explores a broader comparison setting than ERA's current compatible-pair pipeline. |
+
+## Saved comparison files
 
 A screening writes plain CSV and JSON artifacts containing:
 
@@ -296,30 +322,33 @@ scope described below.
 The project keeps a visible record of failed interpretations and corrected
 measurements in [docs/HISTORY.md](docs/HISTORY.md).
 
-## Contributing
+## What I would like to investigate next
 
-ERA is intended as an open, community-developed framework. Researchers,
-engineers, auditors, and people working on the social and ethical effects of
-AI are invited to contribute and challenge its assumptions. Safety and ethical
-assumptions should be written clearly, tested, versioned, and open to review.
+I want to understand when ERA's measurements pick up changes that matter in
+behavioural evaluations, and how they compare with existing model-diffing
+methods. Useful experiments would run the methods on the same model pairs,
+test on separate prompts, and include controls where the expected change is
+known. The [open directions](docs/ROADMAP.md) describe other possibilities.
 
-Useful contributions include:
+Shared, versioned evaluation profiles could eventually connect these
+measurements to assessments of particular uses of a model. Developing a
+profile would involve defining the outcomes to assess, checking them in
+behavioural tests, and setting criteria with estimates of uncertainty and a
+clear scope of application.
 
-- new measures with hand-computed tests and explicit failure modes;
-- evaluation profiles with declared values, thresholds, and uncertainty;
-- integration tests for additional model families;
-- probe-design and tokenisation checks;
-- adversarial examples and documented failure cases;
-- visualisations that preserve uncertainty and per-seed variation;
-- records showing where checkpoints and results came from, and how related
-  models are connected;
-- controls showing when a measure should remain unchanged;
-- clearer explanations and reproducible examples.
+### Following changes through a model's descendants
 
-Contributions may challenge the current interpretation. Their assumptions
-should be testable. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for the rules that apply when a change
-affects the meaning of a measurement, and for the local test commands.
+Today ERA compares one related pair. I would like to connect those records
+to follow where a measured change appears and whether it persists through
+later training. Each step would keep the model versions, available training
+history, inputs and results together. Extending this to merges or distillation
+would require support beyond the current compatible-pair pipeline.
+
+[PhyloLM](https://arxiv.org/abs/2404.04671) approaches model relationships by
+inferring a family tree from output similarity. The genealogy envisaged here
+would instead follow documented checkpoint provenance and attach measurements
+to each recorded transformation, keeping inferred relationships separate
+from the available training records.
 
 ## Repository map
 

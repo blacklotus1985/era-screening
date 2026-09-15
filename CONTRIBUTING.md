@@ -10,16 +10,18 @@ Researchers, engineers, auditors, and people working on the social effects of
 AI are all welcome. A useful contribution can begin with a result, a question,
 a failure case, a clearer explanation, or a small correction.
 
-## What we want to build
+## Project direction
 
-ERA aims to make changes between related model checkpoints inspectable. Its
-reports connect output probabilities, behaviour in declared contexts, and
-internal representations to the exact models and evaluation inputs used.
+ERA aims to make changes between related model checkpoints inspectable. The
+general pipeline records output and internal changes on chosen inputs. The
+reference study adds its own probability decomposition and association index
+through dedicated modules and experiments. Both record the models and inputs
+used for the comparison.
 
-The longer-term goal is a shared system of reviewable evaluation profiles and
-verifiable model lineages. Reaching that goal requires evidence from different
-models, interventions, disciplines, and points of view. The current findings
-and open directions are described in
+Longer-term directions include shared evaluation profiles and records of
+changes across model lineages. Experiments comparing ERA with behavioural
+evaluations and existing model-diffing methods can help determine how those
+directions develop. The current findings and open directions are described in
 [`docs/RESULTS.md`](docs/RESULTS.md) and
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -27,7 +29,9 @@ and open directions are described in
 
 - Reproduce an existing result or test it on another model family.
 - Challenge a measurement or interpretation with a control or failure case.
-- Propose an evaluation profile for a specific safety or ethical concern.
+- Help design tests for a specific safety or ethical concern.
+- Compare a measure with simple baselines or existing methods.
+- Propose integrations with other tools.
 - Improve the code, tests, documentation, examples, or visualisations.
 - Review the mathematical definitions or the connection between evidence and
   claims.
@@ -120,16 +124,21 @@ ERA measures changes covered by a declared set of evaluation inputs and
 concept words. A reported result should name that set, the checkpoint pair,
 the model family, and the repeated runs used.
 
+The reference study's primary Delta SI is conditional on its selected word
+set. Interpret it alongside the raw probability-mass diagnostic and target
+masses; a lower conditional score alone does not establish less biased
+behaviour overall.
+
 Each prompt set defines the scope of the measurement and affects the observed
 values. CKA and cosine values also depend on the geometry of the model being
 tested.
 Descriptions such as “shallow” or “deep” therefore need a validated
 evaluation profile and supporting controls.
 
-Evaluation profiles should state their use case, outcomes, tests, thresholds,
-uncertainty, authorship, and scope. Their measurements and examples remain
-available for inspection with any `PASS`, `WARNING`, `FAIL`, or
-`REVIEW REQUIRED` result.
+Future evaluation profiles would need to state their use case, outcomes,
+tests, criteria, uncertainty, authorship, version and scope. Proposals should
+explain how the measurements relate to the behaviour being assessed and keep
+the supporting results available for inspection.
 
 Corrections and counterexamples are part of the project. ERA keeps them in
 `docs/HISTORY.md` so that later readers can follow how an interpretation
