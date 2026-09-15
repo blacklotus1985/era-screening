@@ -1,8 +1,8 @@
 include LICENSE NOTICE README.md CHANGELOG.md CONTRIBUTING.md CITATION.cff
 include requirements.txt requirements-gpu.txt pytest.ini mypy.ini .flake8
 recursive-include era *.py
-recursive-include experiments *.py *.md
+recursive-include experiments *.py *.md *.json
 recursive-include tests *.py
 recursive-include data *.txt *.json *.md
-recursive-include results *.json *.csv *.md
-recursive-include docs *.md *.pdf *.js *.json *.png *.sha256
+recursive-include results *.json *.csv *.md *.png
+recursive-include docs *.py *.md *.pdf *.js *.json *.png *.sha256
