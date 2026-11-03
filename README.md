@@ -25,11 +25,15 @@ contributions from people working on model evaluation and AI safety.
 
 ## A first result: similar output change, different association scores
 
-In the reference study, Pythia-70M and OPT-350M were fine-tuned on the same
-material linking leadership roles to men and support roles to women. Their
-output probabilities changed by a similar overall amount, but the relative
-association score decreased in Pythia-70M and increased in OPT-350M on
-separate evaluation prompts. Both directions held across all three runs.
+The table highlights Pythia-70M and OPT-350M, which were fine-tuned on the
+same material linking leadership roles to men and support roles to women.
+Their output probabilities changed by a similar overall amount, but the
+relative association score decreased in Pythia-70M and increased in OPT-350M
+on separate evaluation prompts. Both directions held across all three runs.
+
+The proof of concept used two models. The current reference study extends it
+to 11 models from six families, with three seeds each; see
+[docs/RESULTS.md](docs/RESULTS.md).
 
 | Model | Overall probability change (B, nats) | Change in association within the selected words (Delta SI) |
 |---|---:|---:|
